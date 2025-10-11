@@ -14,7 +14,10 @@
       "Bash(npm run build:*)",
       "Bash(npm uninstall:*)",
       "Bash(npm run dev:*)",
-      "Bash(ipconfig)"
+      "Bash(ipconfig)",
+      "Bash(gh issue list:*)",
+      "Bash(node scripts/fetch-issues.js)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []
