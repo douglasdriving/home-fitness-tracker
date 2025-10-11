@@ -5,6 +5,7 @@ import {
   saveUserProfile,
   updateStrengthLevels as updateStrengthLevelsUtil,
 } from '../utils/userProfile';
+import { calculateStrengthFromCalibration } from '../lib/progression-calculator';
 
 interface UserStore {
   profile: UserProfile | null;
@@ -29,10 +30,14 @@ export const useUserStore = create<UserStore>((set, get) => ({
     const profile = get().profile;
     if (!profile) return;
 
+    // Calculate strength levels from calibration data
+    const strengthLevels = calculateStrengthFromCalibration(data);
+
     const updatedProfile: UserProfile = {
       ...profile,
       calibrationCompleted: true,
       calibrationData: data,
+      strengthLevels,
     };
 
     saveUserProfile(updatedProfile);
