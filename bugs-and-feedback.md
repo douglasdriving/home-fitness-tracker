@@ -22,69 +22,87 @@
 
 ## 🟠 HIGH PRIORITY (Major UX Issues)
 
-- [ ] **#14: Add timer to calibration screen for timed exercises**
+- [x] **#14: Add timer to calibration screen for timed exercises**
   - Issue: Users must exit app to time their plank during calibration
-  - Fix: Add Timer component to calibration screen for timed exercises
+  - Fix: Added Timer component with 10-minute duration for timed exercises
   - Done when: Timer appears on calibration screen for plank/bird dog
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#3: Remove redundant buttons from rest timer**
+- [x] **#3: Remove redundant buttons from rest timer**
   - Issue: 2 skip buttons + pause button (pause is redundant)
-  - Fix: Remove pause button and one skip button from Timer component, keep single skip button below
+  - Fix: Added hideControls prop to Timer, applied to rest timer in WorkoutExecution
   - Done when: Rest timer only has one "Skip Rest" button
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#11: Make bottom nav active state more obvious**
+- [x] **#11: Make bottom nav active state more obvious**
   - Issue: Current tab is unclear (subtle color shift)
-  - Fix: Add stronger visual indicator (bold text, icon color, underline, or background)
+  - Fix: Added bold text, background tint, and colored indicator bar for active tab
   - Done when: Active tab is immediately obvious at a glance
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#12: Remove redundant title bars from all pages**
+- [x] **#12: Remove redundant title bars from all pages**
   - Issue: Title bar at top takes up space, bottom nav already shows location
-  - Fix: Remove header sections from Dashboard, History, ExerciseLibrary, Settings
+  - Fix: Removed header sections from Dashboard, History, ExerciseLibrary, Settings
   - Done when: Pages start with content, no title bar header
-  - Status: PENDING
+  - Status: FIXED ✓
+
+- [x] **#17: Calibration timer should count up, not down**
+  - Issue: Timer counts down from 10 minutes, confusing for calibration where you enter seconds achieved
+  - Fix: Added countUp and showSecondsOnly modes to Timer component
+  - Done when: Calibration timer counts up from 0s and user can easily read seconds
+  - Status: FIXED ✓
 
 ## 🟡 MEDIUM PRIORITY (Confusing UX)
 
-- [ ] **#5: Remove confusing strength level stats from dashboard**
+- [x] **#5: Remove confusing strength level stats from dashboard**
   - Issue: "Avg strength" and "Strength levels" section are unclear and redundant
-  - Fix: Remove both average strength stat and strength levels breakdown
+  - Fix: Removed average strength stat and strength levels breakdown section
   - Done when: Dashboard no longer shows any strength-related stats
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#6: Add workouts this week/month stats**
+- [x] **#6: Add workouts this week/month stats**
   - Issue: Need meaningful stats to replace removed strength stats
-  - Fix: Calculate and display "Workouts This Week" and "Workouts This Month"
+  - Fix: Added "Total", "This Week", and "This Month" workout counts to Quick Stats
   - Done when: Dashboard shows workout count for current week and month
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#4: Show calibration data somewhere**
+- [x] **#4: Show calibration data somewhere**
   - Issue: Can't view initial calibration results anywhere
-  - Fix: Add calibration data to Settings page with date and achieved values
+  - Fix: Added "Calibration Results" section to Settings with date and achieved values
   - Done when: User can see their calibration results in Settings
-  - Status: PENDING
+  - Status: FIXED ✓
+
+- [x] **#18: All sets have same reps/duration target**
+  - Issue: Workouts generated with same target across all sets (e.g., 3x12 reps), but naturally you'd do fewer reps in later sets
+  - Fix: Applied fatigue multipliers [1.0, 0.9, 0.8, 0.7] to sets 1-4
+  - Done when: Later sets in a workout have slightly lower targets to account for fatigue
+  - Status: FIXED ✓
 
 ## 🟢 LOW PRIORITY (Polish & Nice-to-Have)
 
-- [ ] **#8: Remove profile section from Settings**
+- [x] **#8: Remove profile section from Settings**
   - Issue: Profile section doesn't provide valuable info
-  - Fix: Remove "Profile" card from Settings page
+  - Fix: Removed "Profile" card from Settings page
   - Done when: Settings page no longer has Profile section
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#9: Remove about section from Settings**
+- [x] **#9: Remove about section from Settings**
   - Issue: About section is not needed
-  - Fix: Remove "About" card from Settings page
+  - Fix: Removed "About" card from Settings page
   - Done when: Settings page no longer has About section
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#7/#10: Add PWA install functionality**
+- [x] **#7/#10: Add PWA install functionality**
   - Issue: No install prompt, unclear how to install
-  - Fix: Add install button to Settings, implement beforeinstallprompt handler
+  - Fix: Implemented beforeinstallprompt handler and "Install App" button in Settings
   - Done when: Install button appears in Settings when PWA is installable
-  - Status: PENDING
+  - Status: FIXED ✓
+
+- [x] **#19: Set up deployment to free hosting**
+  - Issue: Need to deploy app to HTTPS hosting for PWA to work properly
+  - Fix: Added vercel.json config and comprehensive DEPLOYMENT.md guide
+  - Done when: App can be easily deployed to free HTTPS hosting service
+  - Status: FIXED ✓
 
 - [ ] **#15: Embed video player instead of external links**
   - Issue: Clicking video opens separate app/tab
@@ -100,7 +118,7 @@
 
 ---
 
-**Total Items:** 16
-**Completed:** 2
-**In Progress:** 1
-**Remaining:** 13
+**Total Items:** 19
+**Completed:** 16
+**In Progress:** 0
+**Remaining:** 3 (all deferred)
