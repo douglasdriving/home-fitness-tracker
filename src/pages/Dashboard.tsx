@@ -54,16 +54,40 @@ export default function Dashboard() {
     );
   }
 
+  // Calculate workouts this week and month
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const workoutsThisWeek = workoutHistory.filter(
+    (workout) => new Date(workout.completedDate) >= startOfWeek
+  ).length;
+
+  const workoutsThisMonth = workoutHistory.filter(
+    (workout) => new Date(workout.completedDate) >= startOfMonth
+  ).length;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-4 space-y-6">
         {/* Quick Stats */}
         <div className="bg-white rounded-lg shadow p-6">
           <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h2>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">{workoutHistory.length}</div>
-              <div className="text-sm text-gray-600">Workouts</div>
+              <div className="text-sm text-gray-600">Total</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">{workoutsThisWeek}</div>
+              <div className="text-sm text-gray-600">This Week</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-primary">{workoutsThisMonth}</div>
+              <div className="text-sm text-gray-600">This Month</div>
             </div>
           </div>
         </div>
