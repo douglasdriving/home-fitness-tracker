@@ -54,16 +54,6 @@ export default function Dashboard() {
     );
   }
 
-  // Calculate average strength level
-  const avgStrength = profile.strengthLevels
-    ? Math.round(
-        (profile.strengthLevels.abs +
-          profile.strengthLevels.glutes +
-          profile.strengthLevels.lowerBack) /
-          3
-      )
-    : 0;
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-4 space-y-6">
@@ -74,10 +64,6 @@ export default function Dashboard() {
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">{workoutHistory.length}</div>
               <div className="text-sm text-gray-600">Workouts</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">{avgStrength}</div>
-              <div className="text-sm text-gray-600">Avg Strength</div>
             </div>
           </div>
         </div>
@@ -142,53 +128,6 @@ export default function Dashboard() {
             <Button onClick={handleGenerateWorkout} fullWidth>
               Generate New Workout
             </Button>
-          </div>
-        )}
-
-        {/* Strength Breakdown */}
-        {profile.strengthLevels && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Strength Levels</h2>
-            <div className="space-y-3">
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Abs</span>
-                  <span className="font-medium text-gray-800">{profile.strengthLevels.abs}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full"
-                    style={{ width: `${profile.strengthLevels.abs}%` }}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Glutes</span>
-                  <span className="font-medium text-gray-800">{profile.strengthLevels.glutes}</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full"
-                    style={{ width: `${profile.strengthLevels.glutes}%` }}
-                  />
-                </div>
-              </div>
-              <div>
-                <div className="flex justify-between text-sm mb-1">
-                  <span className="text-gray-600">Lower Back</span>
-                  <span className="font-medium text-gray-800">
-                    {profile.strengthLevels.lowerBack}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2">
-                  <div
-                    className="bg-primary h-2 rounded-full"
-                    style={{ width: `${profile.strengthLevels.lowerBack}%` }}
-                  />
-                </div>
-              </div>
-            </div>
           </div>
         )}
       </div>
