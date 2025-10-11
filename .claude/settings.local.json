@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git add:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nAdd comprehensive design specification document\n\nCreated detailed design spec covering all features and user flows for the home fitness tracker app including:\n- Exercise database structure\n- Workout plan generation\n- Workout execution interface\n- First-time calibration flow\n- History tracking\n- Progressive overload system\n- Data backup and restore\n- Complete user flow diagrams\n- Screen layouts and wireframes\n- Data architecture schemas\n- System diagrams\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git push:*)",
+      "Bash(git commit -m \"$(cat <<''EOF''\nUpdate design spec with requested refinements\n\nChanges made:\n- Added rest timer between sets with automatic countdown and skip option\n- Removed streak tracking from quick stats\n- Changed edit buttons to editable input fields for reps/duration\n- Removed date filtering from history feature\n- Removed database architecture section (will be addressed in tech spec)\n- Removed system diagrams section (will be addressed in tech spec)\n- Updated responsive design to focus on mobile only (375px-430px)\n- Removed open questions and future enhancements sections\n- Renumbered all sections for clarity\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n\nCo-Authored-By: Claude <noreply@anthropic.com>\nEOF\n)\")",
+      "Bash(git commit:*)",
+      "Bash(npm create:*)",
+      "Bash(git reset:*)",
+      "Bash(npm install)",
+      "Bash(npm install:*)",
+      "Bash(npx tailwindcss init:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm uninstall:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
