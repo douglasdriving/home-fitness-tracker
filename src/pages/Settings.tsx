@@ -168,25 +168,6 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="p-4 space-y-4">
-        {/* User Info */}
-        {profile && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Profile</h2>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-600">User ID:</span>
-                <span className="font-mono text-gray-800">{profile.userId.slice(0, 8)}...</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-gray-600">Calibration:</span>
-                <span className="text-gray-800">
-                  {profile.calibrationCompleted ? 'Completed' : 'Not completed'}
-                </span>
-              </div>
-            </div>
-          </div>
-        )}
-
         {/* Calibration Data */}
         {profile?.calibrationData && profile.calibrationCompleted && (
           <div className="bg-white rounded-lg shadow p-6">
@@ -273,21 +254,6 @@ export default function Settings() {
             >
               Clear All Data
             </button>
-          </div>
-        </div>
-
-        {/* App Info */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">About</h2>
-          <div className="text-sm text-gray-600 space-y-2">
-            <div className="flex justify-between">
-              <span>Version:</span>
-              <span>1.0.0</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Built with:</span>
-              <span>React + TypeScript</span>
-            </div>
           </div>
         </div>
       </div>
