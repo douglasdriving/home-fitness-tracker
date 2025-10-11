@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/user-store';
 import { db } from '../db/db';
 import { loadUserProfile, saveUserProfile } from '../utils/userProfile';
+import { getExerciseById } from '../data/exerciseData';
+import { format } from 'date-fns';
 import Button from '../components/common/Button';
 
 export default function Settings() {
@@ -181,6 +183,38 @@ export default function Settings() {
                   {profile.calibrationCompleted ? 'Completed' : 'Not completed'}
                 </span>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Calibration Data */}
+        {profile?.calibrationData && profile.calibrationCompleted && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Calibration Results</h2>
+            <div className="mb-4 text-sm text-gray-600">
+              Completed on {format(new Date(profile.calibrationData.calibrationDate), 'MMM d, yyyy')}
+            </div>
+            <div className="space-y-3">
+              {profile.calibrationData.exercises.map((exercise, idx) => {
+                const exerciseData = getExerciseById(exercise.exerciseId);
+                return (
+                  <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                    <div className="flex justify-between items-center">
+                      <div>
+                        <div className="font-medium text-gray-800">{exerciseData?.name}</div>
+                        <div className="text-xs text-gray-500 capitalize">{exercise.muscleGroup}</div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-lg font-bold text-primary">
+                          {exercise.achievedReps
+                            ? `${exercise.achievedReps} reps`
+                            : `${exercise.achievedDuration}s`}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
