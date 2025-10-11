@@ -28,7 +28,9 @@ export default function WorkoutExecution() {
     const currentSet = currentExercise?.sets[currentSetIndex];
 
     if (currentSet) {
-      const value = currentSet.actualReps || currentSet.actualDuration || '';
+      // Pre-fill with actual value if exists, otherwise use target value
+      const value = currentSet.actualReps || currentSet.actualDuration ||
+                    currentSet.targetReps || currentSet.targetDuration || '';
       setInputValue(value.toString());
     }
   }, [currentWorkout, currentExerciseIndex, currentSetIndex, navigate]);
