@@ -1,47 +1,85 @@
 # Active Issues Backlog
 
-**Last Updated:** Not yet synced
-**Total Issues:** 0
+**Last Updated:** 2025-10-11 10:31:32
+**Total Issues:** 2
 
-> This file is automatically updated by Claude when running the issue sync workflow.
-> To refresh: Run `start-claude.bat` or ask Claude to "run the GitHub issues workflow"
+> This file is automatically updated by the issue management script.
+> To refresh: Run `node scripts/manage-issues.js`
+
+---
+
+## 🔵 UNPRIORITIZED
+
+No unprioritized issues.
 
 ---
 
 ## 🔴 CRITICAL PRIORITY
 
-No critical issues.
+No 🔴 critical priority issues.
 
 ---
 
 ## 🟠 HIGH PRIORITY
 
-No high priority issues.
+
+### Issue #2: Test bug
+- **Labels:** bug
+- **Reporter:** @douglasdriving
+- **Created:** 2025-10-11
+- **URL:** https://github.com/douglasdriving/home-fitness-tracker/issues/2
+- **Description:** This us a test issue. Just pretend to implement it and check off the issue.
+
+---
+
+**Device Info:**
+Device: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36
+Screen: 384x857
+
+_Submitted via in-app feedback_
+- **Status:** TODO
 
 ---
 
 ## 🟡 MEDIUM PRIORITY
 
-No medium priority issues.
+
+### Issue #4: Test 3
+- **Labels:** enhancement
+- **Reporter:** @douglasdriving
+- **Created:** 2025-10-11
+- **URL:** https://github.com/douglasdriving/home-fitness-tracker/issues/4
+- **Description:** This us a test issue. Just pretend to implement it and check off the issue.
+
+---
+
+**Device Info:**
+Device: Mozilla/5.0 (Linux; Android 10; K) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Mobile Safari/537.36
+Screen: 384x857
+
+_Submitted via in-app feedback_
+- **Status:** TODO
 
 ---
 
 ## 🟢 LOW PRIORITY
 
-No low priority issues.
+No 🟢 low priority issues.
 
 ---
 
 ## ⚪ BACKLOG
 
-No backlog items.
+No ⚪ backlog issues.
 
 ---
 
 ## Workflow Status
 
-- [ ] Fetch issues from GitHub
-- [ ] Prioritize and organize
-- [ ] Start working on issues
+- [x] Fetch issues from GitHub
+- [x] Compare with locally tracked issues
+- [x] Review and approve new issues
+- [ ] Prioritize unprioritized issues (Claude does this)
+- [ ] Fix prioritized issues (Claude does this)
 
-**Next Action:** Run `start-claude.bat` to sync issues from GitHub
+**Next Action:** Run `node scripts/manage-issues.js` to check for new issues.

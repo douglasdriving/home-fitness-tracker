@@ -103,20 +103,26 @@ npm run dev
 
 ### Automated Issue Workflow
 
-This project uses an automated workflow for managing GitHub issues and improvements:
+This project uses a terminal-based automation script for managing GitHub issues:
 
-**For Maintainers:**
-1. Run `start-claude.bat` to launch the automated workflow
-2. Claude will fetch all open GitHub issues from the repository
-3. Issues are prioritized automatically (Critical → High → Medium → Low)
-4. Claude works through them systematically
-5. Each fix is committed with issue reference (e.g., "Fixes #123")
-6. Progress tracked in `.claude/ACTIVE-ISSUES.md` and `.claude/COMPLETED.md`
+**How It Works:**
+1. Run `start-claude.bat` (or `node scripts/manage-issues.js`)
+2. Script fetches and prioritizes all open GitHub issues
+3. You review each issue interactively in the terminal (approve/reject/defer)
+4. Approved issues are organized in `.claude/ACTIVE-ISSUES.md`
+5. Script outputs a command to paste into Claude
+6. Claude implements the fixes and commits with issue references
+
+**Benefits:**
+- ✅ Administrative work (fetching, sorting) happens outside Claude
+- ✅ You maintain full control with manual approval gate
+- ✅ Claude focuses purely on implementation
+- ✅ Faster, more efficient workflow
 
 **For Contributors:**
 - Submit bugs/features via the in-app feedback form (Settings)
 - Or create issues directly on GitHub
-- Issues are automatically picked up by the workflow
+- Issues are automatically processed in next workflow run
 
 See `.claude/WORKFLOW.md` for detailed documentation.
 
@@ -126,6 +132,10 @@ See `.claude/WORKFLOW.md` for detailed documentation.
 - `.claude/WORKFLOW.md` - Automated issue management system
 - `DEPLOYMENT.md` - Deployment guide for Vercel
 - `bugs-and-feedback.md` - Historical issue tracking (legacy)
+
+### Testing Notes
+
+Test issues #2 and #4 have been processed through the automated workflow to validate the issue management system.
 
 ---
 
