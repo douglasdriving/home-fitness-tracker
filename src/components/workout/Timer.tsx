@@ -4,9 +4,10 @@ interface TimerProps {
   duration: number; // seconds
   onComplete?: () => void;
   autoStart?: boolean;
+  hideControls?: boolean; // Hide start/pause/skip buttons
 }
 
-export default function Timer({ duration, onComplete, autoStart = false }: TimerProps) {
+export default function Timer({ duration, onComplete, autoStart = false, hideControls = false }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(duration);
   const [isRunning, setIsRunning] = useState(autoStart);
 
@@ -69,22 +70,24 @@ export default function Timer({ duration, onComplete, autoStart = false }: Timer
         />
       </div>
 
-      <div className="flex gap-2">
-        <button
-          onClick={toggleTimer}
-          className="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors"
-        >
-          {isRunning ? 'Pause' : timeLeft === 0 ? 'Restart' : 'Start'}
-        </button>
-        {timeLeft > 0 && (
+      {!hideControls && (
+        <div className="flex gap-2">
           <button
-            onClick={skipTimer}
-            className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+            onClick={toggleTimer}
+            className="flex-1 bg-primary text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-dark transition-colors"
           >
-            Skip
+            {isRunning ? 'Pause' : timeLeft === 0 ? 'Restart' : 'Start'}
           </button>
-        )}
-      </div>
+          {timeLeft > 0 && (
+            <button
+              onClick={skipTimer}
+              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+            >
+              Skip
+            </button>
+          )}
+        </div>
+      )}
     </div>
   );
 }
