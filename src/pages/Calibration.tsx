@@ -186,7 +186,7 @@ export default function Calibration() {
           {/* Timer for timed exercises */}
           {currentExercise?.type === 'timed' && (
             <div className="mb-6">
-              <Timer duration={600} />
+              <Timer duration={600} countUp={true} showSecondsOnly={true} />
             </div>
           )}
 
