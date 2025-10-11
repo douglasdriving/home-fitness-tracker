@@ -98,6 +98,19 @@ export default function WorkoutExecution() {
 
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
 
+      // If user did less than target, adjust remaining sets to match user's capacity
+      const target = exercise?.type === 'reps' ? currentSet.targetReps : currentSet.targetDuration;
+      if (target && value < target) {
+        // Update all remaining sets in this exercise to the new lower target
+        for (let i = currentSetIndex + 1; i < currentExercise.sets.length; i++) {
+          if (exercise?.type === 'reps') {
+            await updateSet(currentExerciseIndex, i, { targetReps: value });
+          } else {
+            await updateSet(currentExerciseIndex, i, { targetDuration: value });
+          }
+        }
+      }
+
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
       const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;

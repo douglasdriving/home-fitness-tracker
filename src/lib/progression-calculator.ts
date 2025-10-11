@@ -36,8 +36,10 @@ export function calculateStrengthFromCalibration(
       // For reps: achieved reps divided by heaviness, multiplied by 10
       rawScore = (calibExercise.achievedReps / heavinessScore) * 10;
     } else if (exercise.type === 'timed' && calibExercise.achievedDuration) {
-      // For timed: achieved duration in seconds divided by heaviness, divided by 6 (normalize to ~10 scale)
-      rawScore = (calibExercise.achievedDuration / heavinessScore) / 6;
+      // For timed: inverse of estimation formula (strength / 10) * heaviness * 6
+      // Solving for strength: strength = duration / (heaviness * 0.6)
+      // Or equivalently: (duration / heaviness) * (10 / 6)
+      rawScore = (calibExercise.achievedDuration / heavinessScore) * (10 / 6);
     }
 
     // Cap strength level at 100
