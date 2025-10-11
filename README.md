@@ -86,13 +86,46 @@ Settings → Danger Zone → Reset calibration or clear all data
 
 ## Development
 
-Built with:
+### Quick Start
+
+```bash
+npm install
+npm run dev
+```
+
+### Tech Stack
 - React 18 + TypeScript
 - Vite 5
 - Tailwind CSS 3
 - Zustand state management
 - Dexie.js for IndexedDB
 - Vite PWA plugin
+
+### Automated Issue Workflow
+
+This project uses an automated workflow for managing GitHub issues and improvements:
+
+**For Maintainers:**
+1. Run `start-claude.bat` to launch the automated workflow
+2. Claude will fetch all open GitHub issues from the repository
+3. Issues are prioritized automatically (Critical → High → Medium → Low)
+4. Claude works through them systematically
+5. Each fix is committed with issue reference (e.g., "Fixes #123")
+6. Progress tracked in `.claude/ACTIVE-ISSUES.md` and `.claude/COMPLETED.md`
+
+**For Contributors:**
+- Submit bugs/features via the in-app feedback form (Settings)
+- Or create issues directly on GitHub
+- Issues are automatically picked up by the workflow
+
+See `.claude/WORKFLOW.md` for detailed documentation.
+
+### Project Documentation
+
+- `.claude/CLAUDE.md` - Comprehensive project reference
+- `.claude/WORKFLOW.md` - Automated issue management system
+- `DEPLOYMENT.md` - Deployment guide for Vercel
+- `bugs-and-feedback.md` - Historical issue tracking (legacy)
 
 ---
 

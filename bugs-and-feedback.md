@@ -1,5 +1,17 @@
 # Bugs & Feature Requests - Priority Ordered
 
+> **⚠️ LEGACY DOCUMENT**
+>
+> This document tracks the initial development phase issues (completed 2025-01-11).
+>
+> **For new issues:** This project now uses an automated workflow:
+> - Submit feedback via the in-app form (Settings → Submit Feedback)
+> - Or create issues directly on GitHub
+> - Active issues tracked in `.claude/ACTIVE-ISSUES.md`
+> - Completed issues archived in `.claude/COMPLETED.md`
+>
+> See `.claude/WORKFLOW.md` for details on the automated system.
+
 ## ✅ COMPLETED
 
 - [x] **#1: Pre-fill input fields with target values**
