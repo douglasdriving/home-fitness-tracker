@@ -14,11 +14,11 @@
 
 ## 🔴 CRITICAL PRIORITY (Breaks Core Functionality)
 
-- [ ] **#13: Calibration strength calculation is broken**
+- [x] **#13: Calibration strength calculation is broken**
   - Issue: 90s plank → strength level 3 → next workout generates 3x10s plank (way too easy)
-  - Fix: Review and fix calculateStrengthFromCalibration formula for timed exercises
+  - Fix: Changed formula from `/ 6` to `* (10/6)` to make it inverse of estimation formula
   - Done when: 90s plank calibration results in appropriate workout difficulty
-  - Status: IN PROGRESS
+  - Status: FIXED ✓ (90s now gives strength 30 → 90s workout)
 
 ## 🟠 HIGH PRIORITY (Major UX Issues)
 

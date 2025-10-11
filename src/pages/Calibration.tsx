@@ -5,6 +5,7 @@ import { CalibrationExercise } from '../types/user';
 import { getExerciseById } from '../data/exerciseData';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
+import Timer from '../components/workout/Timer';
 
 // Calibration exercises (one per muscle group)
 const CALIBRATION_EXERCISES = [
@@ -178,9 +179,16 @@ export default function Calibration() {
             <p className="text-sm text-yellow-800">
               {currentExercise?.type === 'reps'
                 ? 'Do as many reps as you can with good form. Stop when you can no longer maintain proper technique.'
-                : 'Hold the position for as long as you can with proper form. Stop when you start to struggle.'}
+                : 'Hold the position for as long as you can with proper form. Use the timer below to track your time.'}
             </p>
           </div>
+
+          {/* Timer for timed exercises */}
+          {currentExercise?.type === 'timed' && (
+            <div className="mb-6">
+              <Timer duration={600} />
+            </div>
+          )}
 
           <div className="mb-6">
             <Input
