@@ -1,15 +1,29 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import BottomNav from './components/common/BottomNav';
+import Dashboard from './pages/Dashboard';
+import WorkoutExecution from './pages/WorkoutExecution';
+import History from './pages/History';
+import ExerciseLibrary from './pages/ExerciseLibrary';
+import Calibration from './pages/Calibration';
+import Settings from './pages/Settings';
+
 function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="max-w-md mx-auto">
-        <h1 className="text-2xl font-bold text-center p-4">
-          Home Fitness Tracker
-        </h1>
-        <p className="text-center text-gray-600 p-4">
-          Setting up... Please wait while we install dependencies.
-        </p>
+    <BrowserRouter>
+      <div className="min-h-screen bg-gray-50 pb-16">
+        <div className="max-w-md mx-auto min-h-screen">
+          <Routes>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/workout" element={<WorkoutExecution />} />
+            <Route path="/history" element={<History />} />
+            <Route path="/exercises" element={<ExerciseLibrary />} />
+            <Route path="/calibration" element={<Calibration />} />
+            <Route path="/settings" element={<Settings />} />
+          </Routes>
+        </div>
+        <BottomNav />
       </div>
-    </div>
+    </BrowserRouter>
   )
 }
 
