@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/user-store';
 import { db } from '../db/db';
@@ -12,6 +12,49 @@ export default function Settings() {
   const { profile, initializeUser } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
+
+  useEffect(() => {
+    const handleBeforeInstallPrompt = (e: Event) => {
+      // Prevent the default browser install prompt
+      e.preventDefault();
+      // Store the event for later use
+      setDeferredPrompt(e);
+      setIsInstallable(true);
+    };
+
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    };
+  }, []);
+
+  const handleInstallApp = async () => {
+    if (!deferredPrompt) return;
+
+    try {
+      // Show the install prompt
+      deferredPrompt.prompt();
+
+      // Wait for the user's response
+      const { outcome } = await deferredPrompt.userChoice;
+
+      if (outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+
+      // Clear the deferred prompt
+      setDeferredPrompt(null);
+      setIsInstallable(false);
+    } catch (error) {
+      console.error('Install error:', error);
+      alert('Failed to install app. Please try again.');
+    }
+  };
 
   const handleExportData = async () => {
     try {
@@ -197,6 +240,19 @@ export default function Settings() {
                 );
               })}
             </div>
+          </div>
+        )}
+
+        {/* Install App */}
+        {isInstallable && (
+          <div className="bg-white rounded-lg shadow p-6">
+            <h2 className="text-lg font-semibold text-gray-800 mb-4">Install App</h2>
+            <p className="text-sm text-gray-600 mb-4">
+              Install this app on your device for a better experience. You can access it offline and from your home screen.
+            </p>
+            <Button onClick={handleInstallApp} fullWidth>
+              Install App
+            </Button>
           </div>
         )}
 
