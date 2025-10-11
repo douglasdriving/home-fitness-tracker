@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import BottomNav from './components/common/BottomNav';
+import ScrollToTop from './components/common/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import WorkoutExecution from './pages/WorkoutExecution';
 import History from './pages/History';
@@ -29,8 +30,9 @@ function App() {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-gray-50 pb-16">
-        <div className="max-w-md mx-auto min-h-screen">
+      <ScrollToTop />
+      <div className="min-h-screen bg-gray-50 pb-20">
+        <div className="max-w-md mx-auto">
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/workout" element={<WorkoutExecution />} />
