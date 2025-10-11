@@ -1,14 +1,15 @@
-import { Workout, WorkoutExercise } from '../types/workout';
+import { Workout, WorkoutExercise, WorkoutHistoryEntry } from '../types/workout';
 import type { Set } from '../types/workout';
 import { StrengthLevels } from '../types/user';
 import { MuscleGroup, Exercise } from '../types/exercise';
 import { getExercisesByMuscleGroup } from '../data/exerciseData';
-import { estimateExerciseCapacity } from './progression-calculator';
+import { estimateExerciseCapacity, calculateProgression } from './progression-calculator';
 
 interface GenerateWorkoutOptions {
   workoutNumber: number;
   strengthLevels: StrengthLevels;
   recentExerciseIds?: string[]; // IDs of exercises used in last 2-3 workouts
+  workoutHistory?: WorkoutHistoryEntry[]; // For progressive overload
 }
 
 /**
@@ -22,7 +23,7 @@ interface GenerateWorkoutOptions {
  * - Estimate total workout duration
  */
 export function generateWorkout(options: GenerateWorkoutOptions): Workout {
-  const { workoutNumber, strengthLevels, recentExerciseIds = [] } = options;
+  const { workoutNumber, strengthLevels, recentExerciseIds = [], workoutHistory = [] } = options;
 
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
@@ -72,12 +73,21 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     const strengthLevel = strengthLevels[primaryMuscleGroup];
     const heavinessScore = exercise.heavinessScore[primaryMuscleGroup];
 
-    // Estimate capacity for this exercise
-    const estimatedCapacity = estimateExerciseCapacity(
-      strengthLevel,
-      heavinessScore,
-      exercise.type
-    );
+    // Check if user has done this exercise before (progressive overload)
+    const lastPerformance = findLastPerformance(exercise.id, workoutHistory);
+
+    let targetValue: number;
+    if (lastPerformance) {
+      // Use progressive overload based on last performance
+      targetValue = calculateProgression(lastPerformance, exercise.type);
+    } else {
+      // First time doing this exercise, estimate based on strength level
+      targetValue = estimateExerciseCapacity(
+        strengthLevel,
+        heavinessScore,
+        exercise.type
+      );
+    }
 
     // Determine number of sets (3-4 sets based on strength level)
     const numSets = strengthLevel > 50 ? 4 : 3;
@@ -85,8 +95,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Create sets with target values
     const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({
       setNumber: index + 1,
-      targetReps: exercise.type === 'reps' ? estimatedCapacity : undefined,
-      targetDuration: exercise.type === 'timed' ? estimatedCapacity : undefined,
+      targetReps: exercise.type === 'reps' ? targetValue : undefined,
+      targetDuration: exercise.type === 'timed' ? targetValue : undefined,
       completed: false,
     }));
 
@@ -169,4 +179,30 @@ export function getRecentExerciseIds(recentWorkouts: Workout[]): string[] {
   });
 
   return Array.from(exerciseIds);
+}
+
+/**
+ * Find the last performance for a specific exercise
+ * Returns the average performance from the most recent workout containing this exercise
+ */
+function findLastPerformance(
+  exerciseId: string,
+  workoutHistory: WorkoutHistoryEntry[]
+): number | null {
+  // Look through history in reverse (most recent first)
+  for (let i = workoutHistory.length - 1; i >= 0; i--) {
+    const historyEntry = workoutHistory[i];
+    const exercise = historyEntry.exercises.find((ex) => ex.exerciseId === exerciseId);
+
+    if (exercise && exercise.completedSets.length > 0) {
+      // Calculate average performance across all sets
+      const totalPerformance = exercise.completedSets.reduce((sum, set) => {
+        return sum + (set.actualReps || set.actualDuration || 0);
+      }, 0);
+
+      return Math.round(totalPerformance / exercise.completedSets.length);
+    }
+  }
+
+  return null;
 }

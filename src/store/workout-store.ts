@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { Workout, WorkoutHistoryEntry, Set } from '../types/workout';
 import { db } from '../db/db';
 import { generateWorkout, getRecentExerciseIds } from '../lib/workout-generator';
+import { updateStrengthLevelsFromWorkout } from '../lib/progression-calculator';
 import { useUserStore } from './user-store';
 
 interface WorkoutStore {
@@ -66,15 +67,22 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
       const recentExerciseIds = getRecentExerciseIds(recentWorkouts);
 
+      // Get workout history for progressive overload
+      const workoutHistory = await db.history
+        .orderBy('completedDate')
+        .reverse()
+        .toArray();
+
       // Get next workout number
       const allWorkouts = await db.workouts.toArray();
       const workoutNumber = allWorkouts.length + 1;
 
-      // Generate new workout
+      // Generate new workout with progressive overload
       const newWorkout = generateWorkout({
         workoutNumber,
         strengthLevels: userProfile.strengthLevels,
         recentExerciseIds,
+        workoutHistory,
       });
 
       // Save to database
@@ -187,7 +195,25 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     await db.history.add(historyEntry);
 
     // Update user strength levels based on workout performance
-    // We'll implement this in Phase 6 with progressive overload
+    const userProfile = useUserStore.getState().profile;
+    if (userProfile && userProfile.strengthLevels) {
+      const updatedStrengthLevels = updateStrengthLevelsFromWorkout(
+        userProfile.strengthLevels,
+        currentWorkout.exercises.map((ex) => ({
+          exerciseId: ex.exerciseId,
+          muscleGroups: ex.muscleGroups,
+          completedSets: ex.sets
+            .filter((set) => set.completed)
+            .map((set) => ({
+              actualReps: set.actualReps,
+              actualDuration: set.actualDuration,
+            })),
+        }))
+      );
+
+      // Update user profile with new strength levels
+      useUserStore.getState().updateStrengthLevels(updatedStrengthLevels);
+    }
 
     set({ currentWorkout: null });
   },
