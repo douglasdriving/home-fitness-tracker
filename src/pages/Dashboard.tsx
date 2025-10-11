@@ -66,12 +66,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-primary text-white p-6">
-        <h1 className="text-2xl font-bold mb-1">Home Fitness Tracker</h1>
-        <p className="text-primary-light">Let's get stronger together!</p>
-      </div>
-
       <div className="p-4 space-y-6">
         {/* Quick Stats */}
         <div className="bg-white rounded-lg shadow p-6">

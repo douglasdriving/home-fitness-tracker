@@ -12,10 +12,6 @@ export default function History() {
   if (workoutHistory.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <div className="bg-primary text-white p-6">
-          <h1 className="text-2xl font-bold">Workout History</h1>
-        </div>
-
         <div className="p-4">
           <div className="bg-white rounded-lg shadow p-8 text-center">
             <div className="text-6xl mb-4">📊</div>
@@ -33,11 +29,6 @@ export default function History() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-primary text-white p-6">
-        <h1 className="text-2xl font-bold mb-1">Workout History</h1>
-        <p className="text-primary-light">{workoutHistory.length} workouts completed</p>
-      </div>
-
       <div className="p-4 space-y-4">
         {workoutHistory.map((entry) => {
           const totalSets = entry.exercises.reduce(

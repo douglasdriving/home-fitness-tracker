@@ -165,10 +165,6 @@ export default function Settings() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-primary text-white p-6">
-        <h1 className="text-2xl font-bold">Settings</h1>
-      </div>
-
       <div className="p-4 space-y-4">
         {/* User Info */}
         {profile && (

@@ -38,11 +38,6 @@ export default function ExerciseLibrary() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="bg-primary text-white p-6">
-        <h1 className="text-2xl font-bold mb-1">Exercise Library</h1>
-        <p className="text-primary-light">{allExercises.length} total exercises</p>
-      </div>
-
       <div className="p-4 space-y-4">
         {/* Search Bar */}
         <div>
