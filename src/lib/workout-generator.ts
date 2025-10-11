@@ -92,21 +92,19 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Determine number of sets (3-4 sets based on strength level)
     const numSets = strengthLevel > 50 ? 4 : 3;
 
-    // Create sets with target values that account for fatigue
-    // Apply fatigue multipliers: [1.0, 0.9, 0.8, 0.7] for sets 1-4
-    const fatigueMultipliers = [1.0, 0.9, 0.8, 0.7];
+    // Apply a sustainable multiplier for multiple sets
+    // Calibration tests single-set max capacity, but workouts need sustainable targets
+    // Use 75% of estimated capacity for all sets (allows completing all sets with good form)
+    const sustainableMultiplier = 0.75;
+    const sustainableTarget = Math.round(targetValue * sustainableMultiplier);
 
-    const sets: Set[] = Array.from({ length: numSets }, (_, index) => {
-      const fatigueMultiplier = fatigueMultipliers[index] || 0.7;
-      const adjustedTarget = Math.round(targetValue * fatigueMultiplier);
-
-      return {
-        setNumber: index + 1,
-        targetReps: exercise.type === 'reps' ? adjustedTarget : undefined,
-        targetDuration: exercise.type === 'timed' ? adjustedTarget : undefined,
-        completed: false,
-      };
-    });
+    // Create sets with the same target value for all sets
+    const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({
+      setNumber: index + 1,
+      targetReps: exercise.type === 'reps' ? sustainableTarget : undefined,
+      targetDuration: exercise.type === 'timed' ? sustainableTarget : undefined,
+      completed: false,
+    }));
 
     // Calculate rest time (30-60 seconds based on heaviness)
     // Heavier exercises need more rest
