@@ -72,10 +72,10 @@
   - Done when: User can see their calibration results in Settings
   - Status: FIXED ✓
 
-- [x] **#18: All sets have same reps/duration target**
-  - Issue: Workouts generated with same target across all sets (e.g., 3x12 reps), but naturally you'd do fewer reps in later sets
-  - Fix: Applied fatigue multipliers [1.0, 0.9, 0.8, 0.7] to sets 1-4
-  - Done when: Later sets in a workout have slightly lower targets to account for fatigue
+- [x] **#18: Calibration should inform sustainable workout targets**
+  - Issue: Workouts used calibration max as-is, but calibration tests single-set max (not sustainable for multiple sets)
+  - Fix: Apply 75% multiplier to estimated capacity - all sets use same sustainable target
+  - Done when: Workouts use realistic targets (e.g., 90s calibration → 3x68s workout, not 3x90s)
   - Status: FIXED ✓
 
 ## 🟢 LOW PRIORITY (Polish & Nice-to-Have)
