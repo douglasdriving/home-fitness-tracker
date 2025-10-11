@@ -117,11 +117,37 @@ Access at `http://localhost:4173` (note: PWA features require HTTPS in productio
 
 ## Environment Variables
 
-This app doesn't currently use environment variables, but if you add them:
+### Required: GitHub Token for Feedback Feature
 
-1. Go to Vercel Dashboard → Project → Settings → Environment Variables
-2. Add your variables
-3. Redeploy
+The in-app feedback feature requires a GitHub Personal Access Token to create issues.
+
+**Setup Steps:**
+
+1. **Create GitHub Personal Access Token:**
+   - Go to GitHub → Settings → Developer settings → Personal access tokens → Tokens (classic)
+   - Click "Generate new token (classic)"
+   - Name: `home-fitness-tracker-feedback`
+   - Expiration: Choose your preference (90 days or No expiration)
+   - Scopes: Check **only** `public_repo` (allows creating issues)
+   - Click "Generate token"
+   - **Copy the token immediately** (you won't see it again)
+
+2. **Add to Vercel:**
+   - Go to Vercel Dashboard → Your Project → Settings → Environment Variables
+   - Add new variable:
+     - Name: `GITHUB_TOKEN`
+     - Value: Paste your token
+     - Environments: Select all (Production, Preview, Development)
+   - Click "Save"
+
+3. **Redeploy:**
+   - Vercel will automatically redeploy
+   - Or manually redeploy from Deployments tab
+
+**Without this token:**
+- The feedback form will still appear
+- Users will see an error when trying to submit
+- Consider removing the feedback section from Settings if you don't want to set this up
 
 ## Support
 

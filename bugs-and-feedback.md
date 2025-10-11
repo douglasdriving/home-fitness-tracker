@@ -52,6 +52,18 @@
   - Done when: Calibration timer counts up from 0s and user can easily read seconds
   - Status: FIXED ✓
 
+- [ ] **#20: Scroll position persists when switching tabs**
+  - Issue: When switching tabs, page stays scrolled to previous position instead of starting at top
+  - Fix: Auto-scroll to top when navigating between tabs
+  - Done when: Every tab switch starts at the top of the new page
+  - Status: PENDING
+
+- [ ] **#21: Unnecessary scrollbars on pages with enough space**
+  - Issue: Pages are scrollable even when content fits, as if window is taller than screen
+  - Fix: Adjust layout to fit screen height, remove bottom padding causing extra scroll
+  - Done when: Scroll only appears when content actually exceeds screen height
+  - Status: PENDING
+
 ## 🟡 MEDIUM PRIORITY (Confusing UX)
 
 - [x] **#5: Remove confusing strength level stats from dashboard**
@@ -104,6 +116,12 @@
   - Done when: App can be easily deployed to free HTTPS hosting service
   - Status: FIXED ✓
 
+- [ ] **#22: Add in-app feedback/bug reporting**
+  - Issue: No way to submit feedback or report bugs from within the app
+  - Fix: Add simple feedback mechanism (GitHub Issues link or similar)
+  - Done when: Users can easily report bugs/feedback without leaving the app
+  - Status: PENDING
+
 - [ ] **#15: Embed video player instead of external links**
   - Issue: Clicking video opens separate app/tab
   - Fix: Embed YouTube videos using iframe
@@ -118,7 +136,7 @@
 
 ---
 
-**Total Items:** 19
+**Total Items:** 22
 **Completed:** 16
 **In Progress:** 0
-**Remaining:** 3 (all deferred)
+**Remaining:** 6 (2 deferred)

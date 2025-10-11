@@ -6,6 +6,7 @@ import { loadUserProfile, saveUserProfile } from '../utils/userProfile';
 import { getExerciseById } from '../data/exerciseData';
 import { format } from 'date-fns';
 import Button from '../components/common/Button';
+import FeedbackForm from '../components/feedback/FeedbackForm';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -14,6 +15,7 @@ export default function Settings() {
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -254,6 +256,21 @@ export default function Settings() {
               Install App
             </Button>
           </div>
+        )}
+
+        {/* Feedback & Bug Reports */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Feedback & Bug Reports</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Found a bug or have a suggestion? Let us know! Your feedback helps make this app better.
+          </p>
+          <Button onClick={() => setShowFeedbackForm(true)} fullWidth>
+            Submit Feedback
+          </Button>
+        </div>
+
+        {showFeedbackForm && (
+          <FeedbackForm onClose={() => setShowFeedbackForm(false)} />
         )}
 
         {/* Backup & Restore */}
