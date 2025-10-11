@@ -52,6 +52,7 @@ A progressive, open-source, local-first web application designed for fitness beg
 - **Exercise Selection**: Mix of exercises covering all 3 muscle groups
 - **Variety**: Different exercise combinations in each workout
 - **Sets & Reps**: Defined per exercise based on user capacity
+- **Rest Time**: Suggested rest period between sets (e.g., 60-90 seconds)
 
 **Display Format**:
 - List view showing upcoming workouts
@@ -86,15 +87,17 @@ A progressive, open-source, local-first web application designed for fitness beg
    - Check off completed sets
    - Progress indicator showing overall workout completion
 
-3. **Rep Adjustment**
-   - If user cannot complete planned reps, they can edit the number
+3. **Rep/Duration Input**
+   - Each set shows target reps/duration as editable input field
+   - User can click to adjust if they complete more/fewer reps
    - App auto-adjusts remaining sets to match user's actual capacity
    - Adjusted values are saved to history
 
-4. **Timer Integration** (for timed exercises)
-   - Built-in countdown timer
-   - Auto-starts when user initiates
-   - Auto-checks set when timer completes
+4. **Timer Integration**
+   - **Exercise Timer** (for timed exercises): Built-in countdown timer that auto-checks set when complete
+   - **Rest Timer**: Automatic countdown between sets (e.g., 60 seconds)
+   - Rest timer starts when user completes a set
+   - User can skip rest or let it complete naturally
 
 5. **Completion**
    - Set complete → check exercise
@@ -143,7 +146,6 @@ A progressive, open-source, local-first web application designed for fitness beg
 
 **History View**:
 - Chronological list of past workouts
-- Date-based filtering
 - Expandable workout details
 - Visual indicators for completed workouts
 
@@ -253,12 +255,16 @@ Begin First Exercise
     │
     ├─→ Perform Set 1
     │
+    ├─→ Log Reps/Duration (edit if needed)
+    │
     ├─→ Check Off Set 1
     │   │
     │   └─→ [If reps adjusted]
     │       └─→ Update remaining sets
     │
-    ├─→ Rest Period
+    ├─→ Rest Timer Starts (60 sec countdown)
+    │   │
+    │   └─→ [User can skip or wait]
     │
     ├─→ Repeat for all sets
     │
@@ -287,8 +293,6 @@ Main Dashboard
 Navigate to History Tab
     ↓
 View List of Past Workouts
-    ↓
-[Optional] Filter by Date Range
     ↓
 Select Specific Workout
     ↓
@@ -354,7 +358,6 @@ Confirmation Message
   - Estimated duration
 - **Quick Stats**:
   - Total workouts completed
-  - Current streak
   - Last workout date
 - **Bottom Navigation**:
   - Home (Dashboard)
@@ -384,7 +387,6 @@ Confirmation Message
 ├─────────────────────────┤
 │  Quick Stats            │
 │  ✅ 14 workouts done    │
-│  🔥 7 day streak        │
 │  📅 Last: Yesterday     │
 └─────────────────────────┘
 │ 🏠  📊  💪  ⚙️         │
@@ -402,10 +404,12 @@ Confirmation Message
 - **Media Display**: Video/image (optional)
 - **Set Tracker**:
   - Set number
-  - Target reps/duration
-  - Checkbox
-  - Edit button
-- **Timer** (for timed exercises): Start/pause/reset
+  - Editable input field for reps/duration
+  - Checkbox to mark complete
+- **Timer Display**:
+  - Exercise timer (for timed exercises)
+  - Rest timer (between sets)
+  - Skip rest button
 - **Navigation**: Previous/Next exercise, Quit workout
 
 **Visual Layout**:
@@ -425,11 +429,12 @@ Confirmation Message
 ├─────────────────────────┤
 │  SET TRACKING           │
 │                         │
-│  ☑ Set 1: 30 sec       │
-│  □ Set 2: 30 sec  ✏️    │
-│  □ Set 3: 30 sec        │
+│  ☑ Set 1: [30] sec     │
+│  □ Set 2: [30] sec     │
+│  □ Set 3: [30] sec     │
 │                         │
-│  [  Start Timer  ]      │
+│  ⏱ Rest: 0:45 remaining │
+│  [  Skip Rest  ]        │
 │                         │
 ├─────────────────────────┤
 │  [  Next Exercise  ]    │
@@ -443,7 +448,6 @@ Confirmation Message
 ### 4.3 History Screen
 
 **Components**:
-- **Date Filter**: Calendar/date picker
 - **Workout List**:
   - Date
   - Workout summary
@@ -457,7 +461,6 @@ Confirmation Message
 ```
 ┌─────────────────────────┐
 │  Workout History        │
-│  [📅 Filter]           │
 ├─────────────────────────┤
 │                         │
 │  Today - Oct 11         │
@@ -525,370 +528,52 @@ Confirmation Message
 
 ---
 
-## 5. Data Architecture
+## 5. User Interface States & Error Handling
 
-### 5.1 Exercise Database Schema
-
-```
-Exercise {
-  id: string (unique)
-  name: string
-  muscleGroups: array<string> ["abs" | "glutes" | "lowerBack"]
-  description: string (instructions)
-  videoUrl?: string (optional)
-  imageUrl?: string (optional)
-  source: string (attribution)
-  heavinessScore: number (1-10 per muscle group)
-  type: "reps" | "timed"
-  defaultReps?: number (if rep-based)
-  defaultDuration?: number (if timed, in seconds)
-}
-```
-
-**Example**:
-```json
-{
-  "id": "plank-001",
-  "name": "Plank",
-  "muscleGroups": ["abs", "lowerBack"],
-  "description": "Hold a push-up position with forearms on the ground...",
-  "videoUrl": "https://youtube.com/watch?v=...",
-  "source": "American Council on Exercise",
-  "heavinessScore": {
-    "abs": 5,
-    "lowerBack": 3
-  },
-  "type": "timed",
-  "defaultDuration": 30
-}
-```
-
----
-
-### 5.2 Workout Schema
-
-```
-Workout {
-  id: string (unique)
-  workoutNumber: number (sequential)
-  generatedDate: timestamp
-  completedDate?: timestamp
-  status: "pending" | "completed"
-  estimatedDuration: number (minutes)
-  exercises: array<WorkoutExercise>
-}
-
-WorkoutExercise {
-  exerciseId: string (reference to Exercise)
-  exerciseName: string (cached for display)
-  muscleGroups: array<string>
-  sets: array<Set>
-}
-
-Set {
-  setNumber: number
-  targetReps?: number (if rep-based)
-  targetDuration?: number (if timed, seconds)
-  completed: boolean
-  actualReps?: number (logged after completion)
-  actualDuration?: number (logged after completion)
-}
-```
-
----
-
-### 5.3 User Profile Schema
-
-```
-UserProfile {
-  userId: string (device-generated)
-  createdDate: timestamp
-  calibrationData: CalibrationData
-  currentStrengthLevels: StrengthLevels
-}
-
-CalibrationData {
-  calibrationDate: timestamp
-  exercises: array<{
-    exerciseId: string
-    muscleGroup: string
-    achievedReps?: number
-    achievedDuration?: number
-  }>
-}
-
-StrengthLevels {
-  abs: number (calculated score)
-  glutes: number (calculated score)
-  lowerBack: number (calculated score)
-  lastUpdated: timestamp
-}
-```
-
----
-
-### 5.4 History Schema
-
-```
-WorkoutHistory {
-  workoutId: string (reference to Workout)
-  completedDate: timestamp
-  totalDuration: number (actual minutes)
-  exercises: array<CompletedExercise>
-}
-
-CompletedExercise {
-  exerciseId: string
-  exerciseName: string
-  muscleGroups: array<string>
-  completedSets: array<{
-    setNumber: number
-    actualReps?: number
-    actualDuration?: number
-  }>
-}
-```
-
----
-
-## 6. System Diagrams
-
-### 6.1 Application Architecture Diagram
-
-```
-┌─────────────────────────────────────────┐
-│         User Interface (PWA)            │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌────────┐ │
-│  │Dash  │ │Work  │ │Hist  │ │Settings││
-│  │board │ │out   │ │ory   │ │        ││
-│  └──────┘ └──────┘ └──────┘ └────────┘ │
-└─────────────────────────────────────────┘
-                    ↕
-┌─────────────────────────────────────────┐
-│         Application Logic Layer         │
-│  ┌────────────┐  ┌──────────────────┐  │
-│  │ Workout    │  │ Progression      │  │
-│  │ Generator  │  │ Calculator       │  │
-│  └────────────┘  └──────────────────┘  │
-│  ┌────────────┐  ┌──────────────────┐  │
-│  │ Exercise   │  │ History          │  │
-│  │ Manager    │  │ Tracker          │  │
-│  └────────────┘  └──────────────────┘  │
-└─────────────────────────────────────────┘
-                    ↕
-┌─────────────────────────────────────────┐
-│         Data Storage Layer              │
-│  ┌────────────┐  ┌──────────────────┐  │
-│  │ IndexedDB  │  │ LocalStorage     │  │
-│  │ (History)  │  │ (User Profile)   │  │
-│  └────────────┘  └──────────────────┘  │
-│  ┌────────────┐                         │
-│  │ Exercise   │                         │
-│  │ Database   │                         │
-│  │ (Static)   │                         │
-│  └────────────┘                         │
-└─────────────────────────────────────────┘
-                    ↕
-┌─────────────────────────────────────────┐
-│         External Services               │
-│  ┌────────────┐  ┌──────────────────┐  │
-│  │ Google     │  │ YouTube          │  │
-│  │ Drive API  │  │ (video links)    │  │
-│  │ (backup)   │  │                  │  │
-│  └────────────┘  └──────────────────┘  │
-└─────────────────────────────────────────┘
-```
-
----
-
-### 6.2 Progression Algorithm Flow
-
-```
-                    START
-                      ↓
-        ┌─────────────────────────┐
-        │ Workout Just Completed  │
-        └─────────────────────────┘
-                      ↓
-        ┌─────────────────────────┐
-        │ Save to History with    │
-        │ Actual Reps/Duration    │
-        └─────────────────────────┘
-                      ↓
-        ┌─────────────────────────┐
-        │ Update Strength Levels  │
-        │ for Each Muscle Group   │
-        └─────────────────────────┘
-                      ↓
-        ┌─────────────────────────┐
-        │ Select Exercises for    │
-        │ Next Workout            │
-        │ (varied, all 3 groups)  │
-        └─────────────────────────┘
-                      ↓
-        ┌─────────────────────────┐
-        │ For Each Exercise:      │
-        └─────────────────────────┘
-                      ↓
-                ┌─────────┐
-            ┌───│ Done    │───┐
-            │   │ Before? │   │
-            ↓   └─────────┘   ↓
-          YES                 NO
-            ↓                  ↓
-    ┌──────────────┐    ┌──────────────┐
-    │ Get Last     │    │ Estimate     │
-    │ Performance  │    │ Using:       │
-    └──────────────┘    │ - Muscle     │
-            ↓            │   Group Data │
-    ┌──────────────┐    │ - Heaviness  │
-    │ Add 5-10%    │    │   Score      │
-    │ Progression  │    └──────────────┘
-    └──────────────┘           ↓
-            ↓            ┌──────────────┐
-            │            │ Set          │
-            │            │ Conservative │
-            │            │ Starting Val │
-            │            └──────────────┘
-            ↓                  ↓
-        ┌─────────────────────────┐
-        │ Set Target Reps/Duration│
-        │ for All Sets            │
-        └─────────────────────────┘
-                      ↓
-        ┌─────────────────────────┐
-        │ Save New Workout as     │
-        │ "Next Workout"          │
-        └─────────────────────────┘
-                      ↓
-                    END
-```
-
----
-
-### 6.3 Workout Execution State Machine
-
-```
-         ┌─────────────┐
-         │   READY     │ (Workout displayed on dashboard)
-         └─────────────┘
-                │
-                │ User taps "Start Workout"
-                ↓
-         ┌─────────────┐
-         │ IN_PROGRESS │
-         └─────────────┘
-                │
-                │ For each exercise
-                ↓
-         ┌─────────────┐
-         │  EXERCISE   │
-         │   ACTIVE    │
-         └─────────────┘
-                │
-                │ For each set
-                ↓
-         ┌─────────────┐
-         │SET_ACTIVE   │
-         └─────────────┘
-                │
-           ┌────┴────┐
-           │         │
-      Checkbox   Edit Reps
-           │         │
-           ↓         ↓
-    ┌──────────┐  ┌──────────────┐
-    │SET_DONE  │  │ ADJUST_SETS  │
-    └──────────┘  └──────────────┘
-           │         │
-           │         ↓
-           │    ┌──────────┐
-           │    │SET_DONE  │
-           │    └──────────┘
-           │         │
-           └────┬────┘
-                ↓
-        ┌──────────────┐
-        │ All Sets     │
-        │ Complete?    │
-        └──────────────┘
-           Yes │    No
-               ↓      ↓
-        ┌──────────┐ (return to SET_ACTIVE)
-        │EXERCISE  │
-        │COMPLETE  │
-        └──────────┘
-                │
-        ┌───────┴────────┐
-        │ More Exercises?│
-        └────────────────┘
-           Yes │     No
-               │      ↓
-        (return)  ┌──────────────┐
-                  │   WORKOUT    │
-                  │  COMPLETE    │
-                  └──────────────┘
-                         │
-                         ↓
-                  ┌──────────────┐
-                  │ Save History │
-                  │ Generate Next│
-                  └──────────────┘
-                         │
-                         ↓
-                  ┌──────────────┐
-                  │   FINISHED   │
-                  └──────────────┘
-```
-
----
-
-## 7. User Interface States & Error Handling
-
-### 7.1 Loading States
+### 5.1 Loading States
 - **Initial App Load**: Splash screen with app logo
 - **Workout Generation**: "Generating your next workout..." spinner
 - **History Loading**: Skeleton screens while fetching data
 - **Backup/Restore**: Progress indicator with percentage
 
-### 7.2 Empty States
+### 5.2 Empty States
 - **No History**: "You haven't completed any workouts yet. Start your first workout to track progress!"
 - **No Next Workout**: "Complete calibration to generate your first workout"
 - **Exercise Library Search**: "No exercises found. Try different search terms."
 
-### 7.3 Error States
+### 5.3 Error States
 - **Failed Workout Generation**: "Couldn't generate workout. Please try again." with retry button
 - **Backup Failed**: "Backup failed. Check your connection and try again."
 - **Restore Failed**: "Could not restore data. File may be corrupted."
 - **Storage Full**: "Device storage full. Free up space or backup data."
 
-### 7.4 Confirmation Dialogs
+### 5.4 Confirmation Dialogs
 - **Quit Workout Mid-Session**: "Are you sure you want to quit? Progress won't be saved."
 - **Delete History**: "Delete this workout from history? This cannot be undone."
 - **Restore Data**: "Restore backup? Choose to merge with or replace current data."
 
 ---
 
-## 8. Accessibility Considerations
+## 6. Accessibility Considerations
 
-### 8.1 Visual
+### 6.1 Visual
 - High contrast mode support
 - Adjustable font sizes
 - Clear visual hierarchy
 - Colorblind-friendly indicators (not relying on color alone)
 
-### 8.2 Motor
+### 6.2 Motor
 - Large touch targets (minimum 44x44px)
 - No time-critical interactions (except timer, which is optional)
 - Swipe gestures optional (always provide button alternative)
 
-### 8.3 Cognitive
+### 6.3 Cognitive
 - Simple, clear language
 - Consistent navigation patterns
 - Progress indicators for multi-step processes
 - Option to revisit tutorials/instructions
 
-### 8.4 Screen Readers
+### 6.4 Screen Readers
 - Proper ARIA labels
 - Semantic HTML structure
 - Descriptive button labels
@@ -896,67 +581,46 @@ CompletedExercise {
 
 ---
 
-## 9. Progressive Web App (PWA) Requirements
+## 7. Progressive Web App (PWA) Requirements
 
-### 9.1 Installation
+### 7.1 Installation
 - Installable on Android and iOS home screens
 - Custom app icon and splash screen
 - Standalone display mode (no browser UI)
 
-### 9.2 Offline Capability
+### 7.2 Offline Capability
 - Full functionality offline
 - Service worker for caching
 - Background sync for backups when connection available
 
-### 9.3 Performance
+### 7.3 Performance
 - Fast initial load (< 3 seconds)
 - Smooth animations (60fps)
 - Optimized images and media
 - Lazy loading for exercise videos
 
-### 9.4 Responsive Design
+### 7.4 Responsive Design
 - Mobile-first approach
-- Support for phone screens (375px - 430px width)
-- Tablet optimization (768px+ width)
-- Desktop view (1024px+ width)
+- Optimized for phone screens (375px - 430px width)
+- Touch-friendly interface
+- Portrait orientation primary focus
 
 ---
 
-## 10. Open Questions & Future Enhancements
+## 8. Success Metrics
 
-### 10.1 Open Questions for Review
-1. Should there be a rest day schedule, or user-driven workout frequency?
-2. What is the minimum number of exercises per workout?
-3. Should users be able to manually create custom workouts?
-4. Should there be achievement/badges system for motivation?
-5. How should the app handle missed workouts (not completing for several days)?
-
-### 10.2 Future Enhancements (Out of Scope for V1)
-- More muscle groups (upper body, legs)
-- Equipment-based exercises (dumbbells, resistance bands)
-- Social features (sharing progress)
-- Workout reminders/notifications
-- Detailed analytics and charts
-- Multiple user profiles
-- Audio coaching during workouts
-- Integration with fitness wearables
-
----
-
-## 11. Success Metrics
-
-### 11.1 User Engagement
+### 8.1 User Engagement
 - Daily/weekly active users
 - Workout completion rate
 - Average workouts per user per week
 - Calibration completion rate
 
-### 11.2 User Progression
+### 8.2 User Progression
 - Average strength level increase over time
 - Rep/duration improvements per exercise
 - User retention (30-day, 90-day)
 
-### 11.3 App Performance
+### 8.3 App Performance
 - App load time
 - Offline reliability
 - Backup success rate
@@ -964,7 +628,7 @@ CompletedExercise {
 
 ---
 
-## 12. Implementation Priorities
+## 9. Implementation Priorities
 
 ### Phase 1: Core Functionality (MVP)
 1. Exercise database with basic exercises
