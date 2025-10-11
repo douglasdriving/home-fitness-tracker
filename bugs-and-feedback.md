@@ -52,17 +52,17 @@
   - Done when: Calibration timer counts up from 0s and user can easily read seconds
   - Status: FIXED ✓
 
-- [ ] **#20: Scroll position persists when switching tabs**
+- [x] **#20: Scroll position persists when switching tabs**
   - Issue: When switching tabs, page stays scrolled to previous position instead of starting at top
-  - Fix: Auto-scroll to top when navigating between tabs
+  - Fix: Added ScrollToTop component that watches route changes and scrolls to top
   - Done when: Every tab switch starts at the top of the new page
-  - Status: PENDING
+  - Status: FIXED ✓
 
-- [ ] **#21: Unnecessary scrollbars on pages with enough space**
+- [x] **#21: Unnecessary scrollbars on pages with enough space**
   - Issue: Pages are scrollable even when content fits, as if window is taller than screen
-  - Fix: Adjust layout to fit screen height, remove bottom padding causing extra scroll
+  - Fix: Removed duplicate min-h-screen from inner container, adjusted padding
   - Done when: Scroll only appears when content actually exceeds screen height
-  - Status: PENDING
+  - Status: FIXED ✓
 
 ## 🟡 MEDIUM PRIORITY (Confusing UX)
 
@@ -116,11 +116,11 @@
   - Done when: App can be easily deployed to free HTTPS hosting service
   - Status: FIXED ✓
 
-- [ ] **#22: Add in-app feedback/bug reporting**
+- [x] **#22: Add in-app feedback/bug reporting**
   - Issue: No way to submit feedback or report bugs from within the app
-  - Fix: Add simple feedback mechanism (GitHub Issues link or similar)
+  - Fix: Created in-app feedback form with Vercel Serverless Function + GitHub API
   - Done when: Users can easily report bugs/feedback without leaving the app
-  - Status: PENDING
+  - Status: FIXED ✓
 
 - [ ] **#15: Embed video player instead of external links**
   - Issue: Clicking video opens separate app/tab
@@ -137,6 +137,6 @@
 ---
 
 **Total Items:** 22
-**Completed:** 16
+**Completed:** 19
 **In Progress:** 0
-**Remaining:** 6 (2 deferred)
+**Remaining:** 3 (all deferred)
