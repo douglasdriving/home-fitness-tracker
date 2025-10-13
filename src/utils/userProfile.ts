@@ -7,17 +7,21 @@ export function generateUserId(): string {
   return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
+// Default strength levels for new users (conservative starting point)
+// These levels will be adjusted after the first workout based on actual performance
+const DEFAULT_STRENGTH_LEVEL = 25;
+
 // Create a new user profile
 export function createUserProfile(): UserProfile {
   const now = Date.now();
   return {
     userId: generateUserId(),
     createdDate: now,
-    calibrationCompleted: false,
+    calibrationCompleted: true, // Skip calibration - use integrated approach
     strengthLevels: {
-      abs: 0,
-      glutes: 0,
-      lowerBack: 0,
+      abs: DEFAULT_STRENGTH_LEVEL,
+      glutes: DEFAULT_STRENGTH_LEVEL,
+      lowerBack: DEFAULT_STRENGTH_LEVEL,
       lastUpdated: now,
     },
   };

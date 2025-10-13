@@ -11,16 +11,10 @@ export default function Dashboard() {
     useWorkoutStore();
 
   useEffect(() => {
-    // Redirect to calibration if not completed
-    if (profile && !profile.calibrationCompleted) {
-      navigate('/calibration');
-      return;
-    }
-
     // Load current workout and history
     loadWorkouts();
     loadHistory();
-  }, [profile, navigate, loadWorkouts, loadHistory]);
+  }, [profile, loadWorkouts, loadHistory]);
 
   const handleGenerateWorkout = async () => {
     try {
@@ -144,13 +138,17 @@ export default function Dashboard() {
           </div>
         ) : (
           <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-6xl mb-4">🏋️</div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">Ready for your next workout?</h2>
+            <div className="text-6xl mb-4">{workoutHistory.length === 0 ? '👋' : '🏋️'}</div>
+            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+              {workoutHistory.length === 0 ? 'Welcome to your Fitness Journey!' : 'Ready for your next workout?'}
+            </h2>
             <p className="text-gray-600 mb-6">
-              Generate a personalized workout based on your current strength levels.
+              {workoutHistory.length === 0
+                ? "Let's get started! We'll generate your first personalized workout with exercises tailored to your fitness level. The app will learn and adapt as you progress."
+                : 'Generate a personalized workout based on your current strength levels.'}
             </p>
             <Button onClick={handleGenerateWorkout} fullWidth>
-              Generate New Workout
+              {workoutHistory.length === 0 ? 'Start Your First Workout' : 'Generate New Workout'}
             </Button>
           </div>
         )}

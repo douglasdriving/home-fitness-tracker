@@ -358,7 +358,7 @@ function generateClaudeCommand(hasUnprioritized) {
     return 'All issues are already prioritized. Please work through the issues in .claude/ACTIVE-ISSUES.md, starting with highest priority. For each issue: read the details, implement the fix, test it, commit with "Fixes #X", and move to .claude/COMPLETED.md. Provide a summary when done.';
   }
 
-  return 'I have unprioritized issues in .claude/ACTIVE-ISSUES.md under the "UNPRIORITIZED" section. Please:\n1. Read each unprioritized issue carefully\n2. Move them to the appropriate priority section (CRITICAL/HIGH/MEDIUM/LOW/BACKLOG) based on:\n   - Impact on core functionality\n   - User experience implications\n   - Complexity and effort required\n   - Project priorities\n3. Then work through all issues starting with highest priority\n4. For each: implement, test, commit with "Fixes #X", and move to COMPLETED.md\n5. Provide a summary when done';
+  return 'I have unprioritized issues in .claude/ACTIVE-ISSUES.md under the "UNPRIORITIZED" section. Please:\n1. Read each unprioritized issue carefully\n2. Intepret what exactly they mean, and rewrite them as a fix/feature to implement. Think of the design.\n3. Move them to the appropriate priority section (CRITICAL/HIGH/MEDIUM/LOW/BACKLOG) based on:\n   - Impact on core functionality\n   - User experience implications\n   - Complexity and effort required\n   - Project priorities\n4. Then work through all issues starting with highest priority\n5. For each: implement, test, commit with "Fixes #X", and move to COMPLETED.md\n6. Provide a summary when done';
 }
 
 function copyToClipboard(text) {

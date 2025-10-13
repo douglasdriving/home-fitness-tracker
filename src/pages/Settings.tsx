@@ -154,30 +154,32 @@ export default function Settings() {
     }
   };
 
-  const handleResetCalibration = () => {
+  const handleResetFitnessLevels = () => {
     if (
       !confirm(
-        'This will reset your calibration and strength levels. You will need to complete the calibration process again. Continue?'
+        'This will reset your strength levels to the default starting point. The app will re-adapt to your fitness level based on your next workouts. Continue?'
       )
     ) {
       return;
     }
 
     if (profile) {
+      const DEFAULT_STRENGTH_LEVEL = 25;
       const updatedProfile: typeof profile = {
         ...profile,
-        calibrationCompleted: false,
+        calibrationCompleted: true,
         calibrationData: undefined,
         strengthLevels: {
-          abs: 0,
-          glutes: 0,
-          lowerBack: 0,
+          abs: DEFAULT_STRENGTH_LEVEL,
+          glutes: DEFAULT_STRENGTH_LEVEL,
+          lowerBack: DEFAULT_STRENGTH_LEVEL,
           lastUpdated: Date.now(),
         },
       };
       saveUserProfile(updatedProfile);
       initializeUser();
-      navigate('/calibration');
+      alert('Your fitness levels have been reset. Start a new workout to re-establish your baseline.');
+      navigate('/');
     }
   };
 
@@ -317,8 +319,8 @@ export default function Settings() {
           </p>
 
           <div className="space-y-3">
-            <Button onClick={handleResetCalibration} variant="outline" fullWidth>
-              Reset Calibration
+            <Button onClick={handleResetFitnessLevels} variant="outline" fullWidth>
+              Reset Fitness Levels
             </Button>
 
             <button
