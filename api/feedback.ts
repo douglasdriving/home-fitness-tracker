@@ -19,11 +19,11 @@ export default async function handler(
   try {
     const { type, title, description, deviceInfo } = req.body;
 
-    if (!type || !title || !description) {
+    if (!title || !description) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Determine labels based on type
+    // Determine labels based on type (defaults to enhancement if not specified)
     const labels = type === 'bug' ? ['bug'] : ['enhancement'];
 
     // Format issue body

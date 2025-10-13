@@ -7,7 +7,6 @@ interface FeedbackFormProps {
 }
 
 export default function FeedbackForm({ onClose }: FeedbackFormProps) {
-  const [type, setType] = useState<'bug' | 'feature'>('bug');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -29,7 +28,6 @@ export default function FeedbackForm({ onClose }: FeedbackFormProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          type,
           title,
           description,
           deviceInfo,
@@ -77,47 +75,16 @@ export default function FeedbackForm({ onClose }: FeedbackFormProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Type Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Type
-            </label>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => setType('bug')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                  type === 'bug'
-                    ? 'bg-red-100 text-red-700 border-2 border-red-300'
-                    : 'bg-gray-100 text-gray-700 border-2 border-gray-200'
-                }`}
-              >
-                Bug Report
-              </button>
-              <button
-                type="button"
-                onClick={() => setType('feature')}
-                className={`flex-1 py-2 px-4 rounded-lg font-medium transition-colors ${
-                  type === 'feature'
-                    ? 'bg-blue-100 text-blue-700 border-2 border-blue-300'
-                    : 'bg-gray-100 text-gray-700 border-2 border-gray-200'
-                }`}
-              >
-                Feature Request
-              </button>
-            </div>
-          </div>
+          <p className="text-sm text-gray-600">
+            Share any feedback, bug reports, feature requests, or UX improvements you'd like to see.
+          </p>
 
           {/* Title */}
           <div>
             <Input
               type="text"
               label="Title"
-              placeholder={
-                type === 'bug'
-                  ? 'Brief description of the bug'
-                  : 'What feature would you like?'
-              }
+              placeholder="Brief summary of your feedback"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
@@ -132,11 +99,7 @@ export default function FeedbackForm({ onClose }: FeedbackFormProps) {
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder={
-                type === 'bug'
-                  ? 'What happened? What did you expect to happen? Steps to reproduce...'
-                  : 'Describe your feature idea in detail...'
-              }
+              placeholder="Describe your feedback in detail. If reporting a bug, please include what happened and what you expected to happen..."
               required
               rows={6}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none resize-none"
