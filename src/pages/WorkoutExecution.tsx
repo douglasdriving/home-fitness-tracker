@@ -98,15 +98,21 @@ export default function WorkoutExecution() {
 
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
 
-      // If user did less than target, adjust remaining sets to match user's capacity
+      // Adjust remaining sets based on user's actual performance
       const target = exercise?.type === 'reps' ? currentSet.targetReps : currentSet.targetDuration;
-      if (target && value < target) {
-        // Update all remaining sets in this exercise to the new lower target
-        for (let i = currentSetIndex + 1; i < currentExercise.sets.length; i++) {
-          if (exercise?.type === 'reps') {
-            await updateSet(currentExerciseIndex, i, { targetReps: value });
-          } else {
-            await updateSet(currentExerciseIndex, i, { targetDuration: value });
+      if (target) {
+        // If user significantly exceeded target (>20%), adjust remaining sets upward
+        // If user did less than target, adjust remaining sets downward
+        const shouldAdjust = value < target || value > target * 1.2;
+
+        if (shouldAdjust) {
+          // Update all remaining sets in this exercise to match actual performance
+          for (let i = currentSetIndex + 1; i < currentExercise.sets.length; i++) {
+            if (exercise?.type === 'reps') {
+              await updateSet(currentExerciseIndex, i, { targetReps: value });
+            } else {
+              await updateSet(currentExerciseIndex, i, { targetDuration: value });
+            }
           }
         }
       }
