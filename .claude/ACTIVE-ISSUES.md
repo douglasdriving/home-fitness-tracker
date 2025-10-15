@@ -1,9 +1,9 @@
 # Active Issues Backlog
 
-**Last Updated:** 2025-10-13
-**Active Issues:** 1 (Backlog)
-**Completed This Session:** 2
-**Obsolete:** 2
+**Last Updated:** 2025-10-15
+**Active Issues:** 2 (2 Low)
+**Completed This Session:** 8
+**Obsolete:** 3
 
 > This file is automatically updated by the issue management script.
 > To refresh: Run `node scripts/manage-issues.js`
@@ -12,7 +12,7 @@
 
 ## 🔵 UNPRIORITIZED
 
-No 🔵 unprioritized issues.
+No unprioritized issues.
 
 ---
 
@@ -36,7 +36,25 @@ No 🟡 medium priority issues.
 
 ## 🟢 LOW PRIORITY
 
-No 🟢 low priority issues.
+
+### Issue #9: Switch sides
+- **Labels:** enhancement
+- **Reporter:** @douglasdriving
+- **Created:** 2025-10-14
+- **URL:** https://github.com/douglasdriving/home-fitness-tracker/issues/9
+- **Description:** For the exercise that require that you do it on both sides e.g. side plank, it would be helpful to have a "switch sides" prompt appear midway through the set. And it would also be helpful to have a still image of the exercise in addition to the already existing "watch a tutorial" button. That way th...
+- **Status:** TODO
+- **Fix Plan:** Add mid-timer "Switch Sides" notification for bilateral exercises. Optionally add still image references. Requires Timer component modification.
+
+
+### Issue #17: Request: voice-to-text
+- **Labels:** enhancement
+- **Reporter:** @douglasdriving
+- **Created:** 2025-10-15
+- **URL:** https://github.com/douglasdriving/home-fitness-tracker/issues/17
+- **Description:** It would be awesome if i could input my feedback as voice to text. I think it is a lot easier to explain my thoughts when I talk than when I write. I would love it if I could just record a long message, and then the app turns that into text that it uploads. It would be best if i can submit all feedb...
+- **Status:** TODO
+- **Fix Plan:** Implement Web Speech API for voice recording and transcription in FeedbackForm. Requires browser API support and fallback handling.
 
 ---
 
@@ -56,6 +74,36 @@ No 🟢 low priority issues.
 
 ## ✅ COMPLETED THIS SESSION
 
+### Issue #13: Too easy at the beginning!
+- **Status:** COMPLETED
+- **Commit:** ee26275
+- **Solution:** Increased default strength level from 25 to 45 (80% increase) to provide more challenging starting workouts. Addresses user feedback that initial targets were way too easy.
+
+### Issue #14: Did not understand prone back extensions
+- **Status:** COMPLETED
+- **Commit:** 1a33443
+- **Solution:** Removed prone back extension exercise from database. Video link was broken and user reported exercise was ineffective.
+
+### Issue #16: No rep adjustment
+- **Status:** COMPLETED
+- **Commit:** 9c78686
+- **Solution:** Added dynamic target adjustment that adapts remaining sets when user exceeds target by >20%. Now adjusts both upward (when exceeding) and downward (when underperforming).
+
+### Issue #10: Uneven reps
+- **Status:** COMPLETED
+- **Commit:** cf2c694
+- **Solution:** Increased Superman exercise heaviness scores from 5 to 8 for both glutes and lower back, better reflecting its actual difficulty compared to other exercises.
+
+### Issue #12: No rest between exercises
+- **Status:** COMPLETED
+- **Commit:** f11d60c
+- **Solution:** Added 60-second rest timer between exercises (separate from 30-60s rest between sets). Shows preview of next exercise during rest with skip option.
+
+### Issue #15: 2 sides unclear
+- **Status:** COMPLETED
+- **Commit:** 76d8023
+- **Solution:** Added clarification notes to all bilateral exercises (Bird Dog, Single-Leg Glute Bridge, Donkey Kicks, Side Plank, Fire Hydrants) explaining how to count reps/duration for both sides.
+
 ### Issue #5: Integrated calibration
 - **Status:** COMPLETED
 - **Commit:** 2d57f62
@@ -65,6 +113,10 @@ No 🟢 low priority issues.
 - **Status:** COMPLETED
 - **Commit:** 42fd06d
 - **Solution:** Removed category selector (Bug Report / Feature Request). Users can now submit any feedback type without artificial categorization.
+
+### Issue #11: No calibration instructions
+- **Status:** OBSOLETE (resolved by #5)
+- **Reason:** Issue was about lack of instructions during calibration phase. Since mandatory calibration was removed in favor of integrated calibration, this is no longer applicable.
 
 ### Issue #6: Calibration muscle splitting
 - **Status:** OBSOLETE (resolved by #5)
