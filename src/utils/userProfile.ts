@@ -7,9 +7,10 @@ export function generateUserId(): string {
   return `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Default strength levels for new users (conservative starting point)
+// Default strength levels for new users
+// Increased from 25 to 45 to provide more challenging starting workouts
 // These levels will be adjusted after the first workout based on actual performance
-const DEFAULT_STRENGTH_LEVEL = 25;
+const DEFAULT_STRENGTH_LEVEL = 45;
 
 // Create a new user profile
 export function createUserProfile(): UserProfile {
