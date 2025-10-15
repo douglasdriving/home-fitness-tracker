@@ -208,20 +208,5 @@
     },
     "type": "reps",
     "defaultReps": 15
-  },
-  {
-    "id": "prone-back-extension-001",
-    "name": "Prone Back Extension",
-    "muscleGroups": ["lowerBack"],
-    "description": "Lie face down with hands behind your head. Engage your lower back muscles to lift your chest off the ground. Hold briefly at the top, then lower back down with control. Keep the movement controlled and avoid hyperextending.",
-    "videoUrl": "https://www.youtube.com/watch?v=qtdyyRzSwSY",
-    "source": "Mayo Clinic",
-    "heavinessScore": {
-      "abs": 0,
-      "glutes": 0,
-      "lowerBack": 5
-    },
-    "type": "reps",
-    "defaultReps": 12
   }
 ]
