@@ -33,7 +33,7 @@
     "id": "bird-dog-001",
     "name": "Bird Dog",
     "muscleGroups": ["lowerBack", "abs"],
-    "description": "Start on hands and knees in a tabletop position. Extend your right arm forward and left leg back simultaneously, forming a straight line. Hold briefly, then return to start. Repeat on the opposite side. Keep your core engaged and back flat throughout the movement.",
+    "description": "Start on hands and knees in a tabletop position. Extend your right arm forward and left leg back simultaneously, forming a straight line. Hold briefly, then return to start. Repeat on the opposite side. Keep your core engaged and back flat throughout the movement. Note: Count total reps for both sides combined (e.g., 10 reps = 5 per side).",
     "videoUrl": "https://www.youtube.com/watch?v=wiFNA3sqjCA",
     "source": "Mayo Clinic",
     "heavinessScore": {
@@ -108,7 +108,7 @@
     "id": "single-leg-glute-bridge-001",
     "name": "Single-Leg Glute Bridge",
     "muscleGroups": ["glutes", "lowerBack"],
-    "description": "Lie on your back with one knee bent and foot flat on the floor. Extend the other leg straight. Push through your grounded heel to lift your hips, forming a straight line from shoulders to the extended leg. Squeeze your glutes at the top, then lower with control. Complete all reps on one side before switching.",
+    "description": "Lie on your back with one knee bent and foot flat on the floor. Extend the other leg straight. Push through your grounded heel to lift your hips, forming a straight line from shoulders to the extended leg. Squeeze your glutes at the top, then lower with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 10 reps = 5 per leg).",
     "videoUrl": "https://www.youtube.com/watch?v=AVAXhy6pl7o",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -153,7 +153,7 @@
     "id": "donkey-kicks-001",
     "name": "Donkey Kicks",
     "muscleGroups": ["glutes"],
-    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg up behind you until your thigh is parallel to the ground. Squeeze your glutes at the top, then lower back down with control. Complete all reps on one side before switching.",
+    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg up behind you until your thigh is parallel to the ground. Squeeze your glutes at the top, then lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
     "videoUrl": "https://www.youtube.com/watch?v=SJ1Xuz9D-ZQ",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -168,7 +168,7 @@
     "id": "side-plank-001",
     "name": "Side Plank",
     "muscleGroups": ["abs", "lowerBack"],
-    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides.",
+    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides. Note: For timed exercises, hold the total duration per side (e.g., 20s = 20s per side).",
     "videoUrl": "https://www.youtube.com/watch?v=K2VljzCC16g",
     "source": "American Council on Exercise",
     "heavinessScore": {
@@ -183,7 +183,7 @@
     "id": "fire-hydrants-001",
     "name": "Fire Hydrants",
     "muscleGroups": ["glutes"],
-    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg out to the side until your thigh is parallel to the ground. Keep your hips level and avoid rotating your torso. Lower back down with control. Complete all reps on one side before switching.",
+    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg out to the side until your thigh is parallel to the ground. Keep your hips level and avoid rotating your torso. Lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
     "videoUrl": "https://www.youtube.com/watch?v=SjwPmhSWRuA",
     "source": "ACE Fitness",
     "heavinessScore": {
