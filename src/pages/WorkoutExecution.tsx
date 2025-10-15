@@ -6,7 +6,7 @@ import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Timer from '../components/workout/Timer';
 
-type WorkoutPhase = 'exercise' | 'rest';
+type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest';
 
 export default function WorkoutExecution() {
   const navigate = useNavigate();
@@ -127,14 +127,11 @@ export default function WorkoutExecution() {
           // Complete the workout
           await handleCompleteWorkout();
         } else {
-          // Move to next exercise
-          setCurrentExerciseIndex(currentExerciseIndex + 1);
-          setCurrentSetIndex(0);
-          setInputValue('');
-          setPhase('exercise');
+          // Rest between exercises before moving to next one
+          setPhase('exercise-rest');
         }
       } else {
-        // Move to rest phase
+        // Move to rest phase between sets
         setPhase('rest');
       }
     } catch (error) {
@@ -150,8 +147,20 @@ export default function WorkoutExecution() {
     setPhase('exercise');
   };
 
+  const handleExerciseRestComplete = () => {
+    // Move to next exercise
+    setCurrentExerciseIndex(currentExerciseIndex + 1);
+    setCurrentSetIndex(0);
+    setInputValue('');
+    setPhase('exercise');
+  };
+
   const handleSkipRest = () => {
-    handleRestComplete();
+    if (phase === 'exercise-rest') {
+      handleExerciseRestComplete();
+    } else {
+      handleRestComplete();
+    }
   };
 
   const handleCompleteWorkout = async () => {
@@ -170,7 +179,15 @@ export default function WorkoutExecution() {
     }
   };
 
-  if (phase === 'rest') {
+  if (phase === 'rest' || phase === 'exercise-rest') {
+    const isExerciseRest = phase === 'exercise-rest';
+    const nextExercise = isExerciseRest
+      ? currentWorkout.exercises[currentExerciseIndex + 1]
+      : null;
+    const nextExerciseInfo = nextExercise
+      ? getExerciseById(nextExercise.exerciseId)
+      : null;
+
     return (
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
@@ -195,13 +212,15 @@ export default function WorkoutExecution() {
             <div className="text-6xl mb-4">😌</div>
             <h2 className="text-2xl font-bold text-gray-800 mb-2">Rest Time</h2>
             <p className="text-gray-600 mb-6">
-              Take a break before your next set
+              {isExerciseRest
+                ? 'Great work! Take a break before the next exercise'
+                : 'Take a break before your next set'}
             </p>
           </div>
 
           <Timer
-            duration={currentExercise.restTime}
-            onComplete={handleRestComplete}
+            duration={isExerciseRest ? 60 : currentExercise.restTime}
+            onComplete={isExerciseRest ? handleExerciseRestComplete : handleRestComplete}
             autoStart={true}
             hideControls={true}
           />
@@ -212,20 +231,28 @@ export default function WorkoutExecution() {
             </Button>
           </div>
 
-          {/* Next Set Preview */}
+          {/* Next Set/Exercise Preview */}
           <div className="mt-6 bg-white rounded-lg shadow p-4">
             <h3 className="text-sm font-medium text-gray-600 mb-2">Up Next:</h3>
             <div className="flex justify-between items-center">
               <div>
-                <div className="font-medium text-gray-800">{currentExercise.exerciseName}</div>
+                <div className="font-medium text-gray-800">
+                  {isExerciseRest ? nextExercise?.exerciseName : currentExercise.exerciseName}
+                </div>
                 <div className="text-sm text-gray-600">
-                  Set {currentSetIndex + 2} of {currentExercise.sets.length}
+                  {isExerciseRest
+                    ? `Exercise ${currentExerciseIndex + 2} of ${currentWorkout.exercises.length}`
+                    : `Set ${currentSetIndex + 2} of ${currentExercise.sets.length}`}
                 </div>
               </div>
               <div className="text-lg font-bold text-primary">
-                {exercise?.type === 'reps'
-                  ? `${currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
-                  : `${currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`}
+                {isExerciseRest
+                  ? (nextExerciseInfo?.type === 'reps'
+                      ? `${nextExercise?.sets[0]?.targetReps} reps`
+                      : `${nextExercise?.sets[0]?.targetDuration}s`)
+                  : (exercise?.type === 'reps'
+                      ? `${currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
+                      : `${currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`)}
               </div>
             </div>
           </div>
