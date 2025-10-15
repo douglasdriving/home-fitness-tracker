@@ -68,8 +68,8 @@
     "source": "ACE Fitness",
     "heavinessScore": {
       "abs": 0,
-      "glutes": 5,
-      "lowerBack": 5
+      "glutes": 8,
+      "lowerBack": 8
     },
     "type": "reps",
     "defaultReps": 12
