@@ -12,7 +12,7 @@ type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest';
 
 export default function WorkoutExecution() {
   const navigate = useNavigate();
-  const { currentWorkout, updateSet, completeWorkout } = useWorkoutStore();
+  const { currentWorkout, updateSet, completeWorkout, updateWorkoutPosition } = useWorkoutStore();
 
   // Keep screen awake during workout
   useWakeLock();
@@ -23,10 +23,31 @@ export default function WorkoutExecution() {
   const [inputValue, setInputValue] = useState('');
   const [showInstructions, setShowInstructions] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Initialize position from saved state on mount
+  useEffect(() => {
+    if (!currentWorkout || isInitialized) {
+      if (!currentWorkout) navigate('/');
+      return;
+    }
+
+    // Restore saved position if it exists
+    if (currentWorkout.currentExerciseIndex !== undefined) {
+      setCurrentExerciseIndex(currentWorkout.currentExerciseIndex);
+    }
+    if (currentWorkout.currentSetIndex !== undefined) {
+      setCurrentSetIndex(currentWorkout.currentSetIndex);
+    }
+    if (currentWorkout.currentPhase) {
+      setPhase(currentWorkout.currentPhase);
+    }
+
+    setIsInitialized(true);
+  }, [currentWorkout, navigate, isInitialized]);
 
   useEffect(() => {
-    if (!currentWorkout) {
-      navigate('/');
+    if (!currentWorkout || !isInitialized) {
       return;
     }
 
@@ -40,7 +61,14 @@ export default function WorkoutExecution() {
                     currentSet.targetReps || currentSet.targetDuration || '';
       setInputValue(value.toString());
     }
-  }, [currentWorkout, currentExerciseIndex, currentSetIndex, navigate]);
+  }, [currentWorkout, currentExerciseIndex, currentSetIndex, isInitialized]);
+
+  // Save position whenever it changes
+  useEffect(() => {
+    if (!currentWorkout || !isInitialized) return;
+
+    updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phase);
+  }, [currentExerciseIndex, currentSetIndex, phase, currentWorkout, isInitialized, updateWorkoutPosition]);
 
   // Check if this is the first time doing this exercise
   useEffect(() => {

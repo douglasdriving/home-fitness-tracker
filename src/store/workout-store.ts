@@ -15,6 +15,7 @@ interface WorkoutStore {
   generateNewWorkout: () => Promise<void>;
   startWorkout: (workoutId: string) => Promise<void>;
   updateSet: (exerciseIndex: number, setIndex: number, updates: Partial<Set>) => Promise<void>;
+  updateWorkoutPosition: (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => Promise<void>;
   completeWorkout: () => Promise<WorkoutHistoryEntry>;
   loadHistory: () => Promise<void>;
 }
@@ -221,6 +222,27 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     set({ currentWorkout: null });
 
     return historyEntry;
+  },
+
+  /**
+   * Update workout position for persistence when navigating away
+   */
+  updateWorkoutPosition: async (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => {
+    const { currentWorkout } = get();
+
+    if (!currentWorkout) {
+      throw new Error('No current workout');
+    }
+
+    const updatedWorkout: Workout = {
+      ...currentWorkout,
+      currentExerciseIndex: exerciseIndex,
+      currentSetIndex: setIndex,
+      currentPhase: phase,
+    };
+
+    await db.workouts.put(updatedWorkout);
+    set({ currentWorkout: updatedWorkout });
   },
 
   /**

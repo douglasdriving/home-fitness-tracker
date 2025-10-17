@@ -9,6 +9,9 @@ export interface Workout {
   status: 'pending' | 'in-progress' | 'completed';
   estimatedDuration: number; // minutes
   exercises: WorkoutExercise[];
+  currentExerciseIndex?: number; // Track position for persistence
+  currentSetIndex?: number; // Track position for persistence
+  currentPhase?: 'exercise' | 'rest' | 'exercise-rest'; // Track phase for persistence
 }
 
 export interface WorkoutExercise {
