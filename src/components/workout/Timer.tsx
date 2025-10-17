@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { playCompletionSound } from '../../utils/sound';
 
 interface TimerProps {
   duration: number; // seconds
@@ -40,6 +41,7 @@ export default function Timer({
           // Count up mode
           if (prev >= duration - 1) {
             setIsRunning(false);
+            playCompletionSound(); // Play sound when timer completes
             if (onComplete) onComplete();
             return duration;
           }
@@ -48,6 +50,7 @@ export default function Timer({
           // Count down mode
           if (prev <= 1) {
             setIsRunning(false);
+            playCompletionSound(); // Play sound when timer completes
             if (onComplete) onComplete();
             return 0;
           }

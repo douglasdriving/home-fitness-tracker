@@ -4,6 +4,7 @@ export interface Workout {
   id: string;
   workoutNumber: number;
   generatedDate: number; // timestamp
+  startedDate?: number; // timestamp when workout was actually started
   completedDate?: number; // timestamp
   status: 'pending' | 'in-progress' | 'completed';
   estimatedDuration: number; // minutes

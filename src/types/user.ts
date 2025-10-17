@@ -6,6 +6,9 @@ export interface UserProfile {
   calibrationCompleted: boolean;
   calibrationData?: CalibrationData;
   strengthLevels: StrengthLevels;
+  equipment?: {
+    hasElasticBands?: boolean;
+  };
 }
 
 export interface CalibrationData {

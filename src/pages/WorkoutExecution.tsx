@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutStore } from '../store/workout-store';
 import { getExerciseById } from '../data/exerciseData';
+import { db } from '../db/db';
+import { useWakeLock } from '../hooks/useWakeLock';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Timer from '../components/workout/Timer';
@@ -12,10 +14,15 @@ export default function WorkoutExecution() {
   const navigate = useNavigate();
   const { currentWorkout, updateSet, completeWorkout } = useWorkoutStore();
 
+  // Keep screen awake during workout
+  useWakeLock();
+
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
   const [phase, setPhase] = useState<WorkoutPhase>('exercise');
   const [inputValue, setInputValue] = useState('');
+  const [showInstructions, setShowInstructions] = useState(false);
+  const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 
   useEffect(() => {
     if (!currentWorkout) {
@@ -34,6 +41,26 @@ export default function WorkoutExecution() {
       setInputValue(value.toString());
     }
   }, [currentWorkout, currentExerciseIndex, currentSetIndex, navigate]);
+
+  // Check if this is the first time doing this exercise
+  useEffect(() => {
+    const checkFirstTime = async () => {
+      if (!currentWorkout) return;
+
+      const currentExercise = currentWorkout.exercises[currentExerciseIndex];
+      const exerciseId = currentExercise.exerciseId;
+
+      // Check workout history for this exercise
+      const history = await db.history.toArray();
+      const hasBeenDone = history.some(workout =>
+        workout.exercises.some(ex => ex.exerciseId === exerciseId)
+      );
+
+      setIsFirstTime(!hasBeenDone);
+    };
+
+    checkFirstTime();
+  }, [currentWorkout, currentExerciseIndex]);
 
   if (!currentWorkout) {
     return null;
@@ -165,8 +192,8 @@ export default function WorkoutExecution() {
 
   const handleCompleteWorkout = async () => {
     try {
-      await completeWorkout();
-      navigate('/');
+      const historyEntry = await completeWorkout();
+      navigate('/workout-complete', { state: { workout: historyEntry } });
     } catch (error) {
       console.error('Error completing workout:', error);
       alert('Failed to complete workout. Please try again.');
@@ -283,6 +310,27 @@ export default function WorkoutExecution() {
       </div>
 
       <div className="p-4 space-y-6">
+        {/* First Time Exercise Banner */}
+        {isFirstTime && currentSetIndex === 0 && (
+          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">ℹ️</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-blue-800 mb-1">
+                  First Time Doing This Exercise!
+                </h3>
+                <p className="text-sm text-blue-700">
+                  {exercise?.type === 'reps'
+                    ? 'Do as many reps as you can with proper form, then enter that number. The app will adjust future targets based on your performance.'
+                    : 'Hold the position for as long as you can with proper form, then enter the duration in seconds. The app will adjust future targets based on your performance.'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Exercise Info */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between items-start mb-4">
@@ -307,23 +355,6 @@ export default function WorkoutExecution() {
             </div>
           </div>
 
-          {exercise?.description && (
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-              <p className="text-sm text-gray-700">{exercise.description}</p>
-            </div>
-          )}
-
-          {exercise?.videoUrl && (
-            <a
-              href={exercise.videoUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center text-primary hover:text-primary-dark mb-4"
-            >
-              <span className="mr-2">▶</span>
-              Watch video tutorial
-            </a>
-          )}
         </div>
 
         {/* Current Set */}
@@ -390,6 +421,41 @@ export default function WorkoutExecution() {
               />
             ))}
           </div>
+        </div>
+
+        {/* Exercise Instructions Toggle */}
+        <div className="bg-white rounded-lg shadow p-4">
+          <button
+            onClick={() => setShowInstructions(!showInstructions)}
+            className="w-full flex items-center justify-between text-left"
+          >
+            <span className="text-sm font-medium text-gray-700">
+              {showInstructions ? 'Hide' : 'Show'} Exercise Instructions
+            </span>
+            <span className="text-primary">{showInstructions ? '▼' : '▶'}</span>
+          </button>
+
+          {showInstructions && (
+            <div className="mt-4 space-y-3">
+              {exercise?.description && (
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                  <p className="text-sm text-gray-700">{exercise.description}</p>
+                </div>
+              )}
+
+              {exercise?.videoUrl && (
+                <a
+                  href={exercise.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center text-primary hover:text-primary-dark"
+                >
+                  <span className="mr-2">▶</span>
+                  Watch video tutorial
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>

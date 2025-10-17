@@ -15,6 +15,7 @@ interface UserStore {
   initializeUser: () => void;
   completeCalibration: (data: CalibrationData) => void;
   updateStrengthLevels: (levels: Partial<StrengthLevels>) => void;
+  updateEquipment: (equipment: { hasElasticBands?: boolean }) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -49,6 +50,22 @@ export const useUserStore = create<UserStore>((set, get) => ({
     if (!profile) return;
 
     const updatedProfile = updateStrengthLevelsUtil(profile, levels);
+    set({ profile: updatedProfile });
+  },
+
+  updateEquipment: (equipment: { hasElasticBands?: boolean }) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      equipment: {
+        ...profile.equipment,
+        ...equipment,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
     set({ profile: updatedProfile });
   },
 }));

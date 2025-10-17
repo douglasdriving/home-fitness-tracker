@@ -10,6 +10,7 @@ interface GenerateWorkoutOptions {
   strengthLevels: StrengthLevels;
   recentExerciseIds?: string[]; // IDs of exercises used in last 2-3 workouts
   workoutHistory?: WorkoutHistoryEntry[]; // For progressive overload
+  hasElasticBands?: boolean; // Whether user has elastic bands
 }
 
 /**
@@ -23,7 +24,7 @@ interface GenerateWorkoutOptions {
  * - Estimate total workout duration
  */
 export function generateWorkout(options: GenerateWorkoutOptions): Workout {
-  const { workoutNumber, strengthLevels, recentExerciseIds = [], workoutHistory = [] } = options;
+  const { workoutNumber, strengthLevels, recentExerciseIds = [], workoutHistory = [], hasElasticBands = false } = options;
 
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
@@ -32,7 +33,13 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   const selectedExercises: Exercise[] = [];
 
   for (const muscleGroup of targetMuscleGroups) {
-    const availableExercises = getExercisesByMuscleGroup(muscleGroup);
+    let availableExercises = getExercisesByMuscleGroup(muscleGroup);
+
+    // Filter by equipment - include exercises with no equipment requirement
+    // and band exercises only if user has bands
+    availableExercises = availableExercises.filter(
+      (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
+    );
 
     // Filter out recently used exercises
     const unusedExercises = availableExercises.filter(
@@ -55,9 +62,14 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   if (Math.random() > 0.5 && selectedExercises.length === 3) {
     // Pick a random muscle group
     const randomMuscleGroup = targetMuscleGroups[Math.floor(Math.random() * targetMuscleGroups.length)];
-    const availableExercises = getExercisesByMuscleGroup(randomMuscleGroup).filter(
+    let availableExercises = getExercisesByMuscleGroup(randomMuscleGroup).filter(
       (ex) => !selectedExercises.some((selected) => selected.id === ex.id) &&
               !recentExerciseIds.includes(ex.id)
+    );
+
+    // Apply equipment filter
+    availableExercises = availableExercises.filter(
+      (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
     );
 
     if (availableExercises.length > 0) {
@@ -136,12 +148,19 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
 /**
  * Calculate estimated workout duration in minutes
+ * Includes preparation time, setup time, and buffer for pauses
  */
 function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
   let totalSeconds = 0;
 
   exercises.forEach((exercise) => {
+    // Add setup/preparation time at the start of each exercise (10 seconds)
+    totalSeconds += 10;
+
     exercise.sets.forEach((set) => {
+      // Add 5 seconds setup time before each set (get into position)
+      totalSeconds += 5;
+
       // Add exercise time
       if (set.targetReps) {
         // Assume 3 seconds per rep
@@ -157,12 +176,16 @@ function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
     // Remove one rest time per exercise (no rest after last set)
     totalSeconds -= exercise.restTime;
 
-    // Add 30 seconds transition time between exercises
-    totalSeconds += 30;
+    // Add 45 seconds transition time between exercises (was 30)
+    // This accounts for checking instructions, catching breath, etc.
+    totalSeconds += 45;
   });
 
   // Remove last transition
-  totalSeconds -= 30;
+  totalSeconds -= 45;
+
+  // Add 15% buffer for pauses, water breaks, form resets, etc.
+  totalSeconds = Math.round(totalSeconds * 1.15);
 
   // Convert to minutes and round up
   return Math.ceil(totalSeconds / 60);

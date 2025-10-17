@@ -10,7 +10,7 @@ import FeedbackForm from '../components/feedback/FeedbackForm';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, initializeUser } = useUserStore();
+  const { profile, initializeUser, updateEquipment } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -246,6 +246,30 @@ export default function Settings() {
             </div>
           </div>
         )}
+
+        {/* Equipment */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Equipment</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Tell us what equipment you have so we can include appropriate exercises in your workouts.
+          </p>
+          <div className="space-y-3">
+            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+              <input
+                type="checkbox"
+                checked={profile?.equipment?.hasElasticBands || false}
+                onChange={(e) => updateEquipment({ hasElasticBands: e.target.checked })}
+                className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
+              />
+              <div>
+                <div className="font-medium text-gray-800">Elastic/Resistance Bands</div>
+                <div className="text-xs text-gray-500">
+                  Include band exercises like pallof press, clamshells, etc.
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
 
         {/* Install App */}
         {isInstallable && (

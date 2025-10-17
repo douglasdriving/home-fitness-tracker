@@ -4,6 +4,7 @@ import BottomNav from './components/common/BottomNav';
 import ScrollToTop from './components/common/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import WorkoutExecution from './pages/WorkoutExecution';
+import WorkoutComplete from './pages/WorkoutComplete';
 import History from './pages/History';
 import ExerciseLibrary from './pages/ExerciseLibrary';
 import Calibration from './pages/Calibration';
@@ -36,6 +37,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Dashboard />} />
             <Route path="/workout" element={<WorkoutExecution />} />
+            <Route path="/workout-complete" element={<WorkoutComplete />} />
             <Route path="/history" element={<History />} />
             <Route path="/exercises" element={<ExerciseLibrary />} />
             <Route path="/calibration" element={<Calibration />} />

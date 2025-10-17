@@ -15,7 +15,7 @@ interface WorkoutStore {
   generateNewWorkout: () => Promise<void>;
   startWorkout: (workoutId: string) => Promise<void>;
   updateSet: (exerciseIndex: number, setIndex: number, updates: Partial<Set>) => Promise<void>;
-  completeWorkout: () => Promise<void>;
+  completeWorkout: () => Promise<WorkoutHistoryEntry>;
   loadHistory: () => Promise<void>;
 }
 
@@ -83,6 +83,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         strengthLevels: userProfile.strengthLevels,
         recentExerciseIds,
         workoutHistory,
+        hasElasticBands: userProfile.equipment?.hasElasticBands || false,
       });
 
       // Save to database
@@ -108,6 +109,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     const updatedWorkout: Workout = {
       ...workout,
       status: 'in-progress',
+      startedDate: Date.now(), // Track when workout actually started
     };
 
     await db.workouts.put(updatedWorkout);
@@ -148,8 +150,9 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
   /**
    * Complete the current workout and save to history
+   * Returns the history entry for the completion screen
    */
-  completeWorkout: async () => {
+  completeWorkout: async (): Promise<WorkoutHistoryEntry> => {
     const { currentWorkout } = get();
 
     if (!currentWorkout) {
@@ -158,8 +161,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
     const completedDate = Date.now();
 
-    // Calculate actual duration
-    const startTime = currentWorkout.generatedDate;
+    // Calculate actual duration from when workout was started (not generated)
+    const startTime = currentWorkout.startedDate || currentWorkout.generatedDate;
     const totalDuration = Math.round((completedDate - startTime) / 60000); // minutes
 
     // Mark workout as completed
@@ -216,6 +219,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     }
 
     set({ currentWorkout: null });
+
+    return historyEntry;
   },
 
   /**
