@@ -79,7 +79,6 @@ export default function WorkoutExecution() {
       currentWorkout.currentPhase !== phase;
 
     if (positionChanged) {
-      console.log('Position changed, updating:', { currentExerciseIndex, currentSetIndex, phase });
       updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phase);
     }
   }, [currentExerciseIndex, currentSetIndex, phase, currentWorkout, isInitialized, updateWorkoutPosition]);
@@ -132,12 +131,6 @@ export default function WorkoutExecution() {
   const handleCompleteSet = async () => {
     const value = parseInt(inputValue);
 
-    console.log('=== COMPLETING SET ===');
-    console.log('Input value:', inputValue, 'Parsed:', value);
-    console.log('Current exercise index:', currentExerciseIndex);
-    console.log('Current set index:', currentSetIndex);
-    console.log('Exercise type:', exercise?.type);
-
     if (!value || value <= 0) {
       alert('Please enter a valid number');
       return;
@@ -152,20 +145,14 @@ export default function WorkoutExecution() {
           : { actualDuration: value }),
       };
 
-      console.log('Updates to apply:', updates);
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
-      console.log('Set updated successfully');
 
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
       const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
 
-      console.log('Is last set of exercise?', isLastSetOfExercise);
-      console.log('Is last exercise?', isLastExercise);
-
       // For new exercises on first set, store preview value and update remaining sets
       if (isFirstTime && currentSetIndex === 0 && !isLastSetOfExercise) {
-        console.log('First set of new exercise - storing preview and updating remaining sets to:', value);
         // Store the value for preview display (prevents flickering)
         if (exercise?.type === 'reps') {
           setNextSetPreview({ reps: value });
@@ -188,16 +175,13 @@ export default function WorkoutExecution() {
         // Move to next exercise or complete workout
         if (isLastExercise) {
           // Complete the workout
-          console.log('COMPLETING ENTIRE WORKOUT');
           await handleCompleteWorkout();
         } else {
           // Rest between exercises before moving to next one
-          console.log('Moving to exercise rest');
           setPhase('exercise-rest');
         }
       } else {
         // Move to rest phase between sets
-        console.log('Moving to rest between sets');
         setPhase('rest');
       }
     } catch (error) {
