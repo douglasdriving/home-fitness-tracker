@@ -68,11 +68,20 @@ export default function WorkoutExecution() {
     }
   }, [currentExerciseIndex, currentSetIndex, isInitialized, isFirstTime]);
 
-  // Save position whenever it changes
+  // Save position whenever it changes (but avoid infinite loop)
   useEffect(() => {
     if (!currentWorkout || !isInitialized) return;
 
-    updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phase);
+    // Only update if position actually changed
+    const positionChanged =
+      currentWorkout.currentExerciseIndex !== currentExerciseIndex ||
+      currentWorkout.currentSetIndex !== currentSetIndex ||
+      currentWorkout.currentPhase !== phase;
+
+    if (positionChanged) {
+      console.log('Position changed, updating:', { currentExerciseIndex, currentSetIndex, phase });
+      updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phase);
+    }
   }, [currentExerciseIndex, currentSetIndex, phase, currentWorkout, isInitialized, updateWorkoutPosition]);
 
   // Check if this is the first time doing this exercise

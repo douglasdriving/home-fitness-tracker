@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { playCompletionSound } from '../../utils/sound';
 
 interface TimerProps {
@@ -20,11 +20,19 @@ export default function Timer({
 }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(countUp ? 0 : duration);
   const [isRunning, setIsRunning] = useState(autoStart);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const onCompleteRef = useRef(onComplete);
+
+  // Keep onComplete ref updated
+  useEffect(() => {
+    onCompleteRef.current = onComplete;
+  }, [onComplete]);
 
   console.log('=== TIMER RENDER ===');
   console.log('Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
   console.log('TimeLeft:', timeLeft, 'IsRunning:', isRunning);
 
+  // Initialize timer when props change
   useEffect(() => {
     console.log('Timer init effect - setting timeLeft and isRunning');
     console.log('  Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
@@ -32,17 +40,25 @@ export default function Timer({
     setIsRunning(autoStart);
   }, [duration, autoStart, countUp]);
 
+  // Manage interval based on isRunning state
   useEffect(() => {
     console.log('Timer interval effect triggered');
     console.log('  isRunning:', isRunning, 'countUp:', countUp, 'duration:', duration);
+
+    // Clear any existing interval
+    if (intervalRef.current) {
+      console.log('  Clearing existing interval');
+      clearInterval(intervalRef.current);
+      intervalRef.current = null;
+    }
 
     if (!isRunning) {
       console.log('  Timer not running, skipping interval setup');
       return;
     }
 
-    console.log('  Setting up interval...');
-    const interval = setInterval(() => {
+    console.log('  Setting up NEW interval...');
+    intervalRef.current = setInterval(() => {
       console.log('  Interval tick!');
       setTimeLeft((prev) => {
         console.log('    Previous timeLeft:', prev);
@@ -51,8 +67,8 @@ export default function Timer({
           if (prev >= duration - 1) {
             console.log('    Count-up complete!');
             setIsRunning(false);
-            playCompletionSound(); // Play sound when timer completes
-            if (onComplete) onComplete();
+            playCompletionSound();
+            if (onCompleteRef.current) onCompleteRef.current();
             return duration;
           }
           const next = prev + 1;
@@ -63,8 +79,8 @@ export default function Timer({
           if (prev <= 1) {
             console.log('    Count-down complete!');
             setIsRunning(false);
-            playCompletionSound(); // Play sound when timer completes
-            if (onComplete) onComplete();
+            playCompletionSound();
+            if (onCompleteRef.current) onCompleteRef.current();
             return 0;
           }
           const next = prev - 1;
@@ -75,10 +91,13 @@ export default function Timer({
     }, 1000);
 
     return () => {
-      console.log('  Cleaning up interval');
-      clearInterval(interval);
+      console.log('  Cleanup: clearing interval');
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [isRunning, onComplete, countUp, duration]); // Removed timeLeft from dependencies!
+  }, [isRunning, countUp, duration]);
 
   const toggleTimer = () => {
     if (countUp) {
