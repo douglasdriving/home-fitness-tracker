@@ -53,7 +53,7 @@ export default function WorkoutComplete() {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary to-primary-dark text-white p-4 flex items-center justify-center">
+    <div className="bg-background min-h-screen p-4 pt-6 flex items-center justify-center">
       {showConfetti && (
         <div className="fixed inset-0 pointer-events-none z-50 overflow-hidden">
           {[...Array(50)].map((_, i) => (
@@ -73,43 +73,43 @@ export default function WorkoutComplete() {
         </div>
       )}
 
-      <div className="max-w-md w-full space-y-6">
+      <div className="max-w-md w-full bg-gradient-to-br from-primary to-primary-dark text-white p-8 rounded-lg shadow-2xl space-y-6">
         {/* Success Icon & Message */}
         <div className="text-center">
           <div className="text-8xl mb-4 animate-bounce">🏆</div>
+          <h2 className="text-4xl font-display font-bold mb-2 tracking-wide">WORKOUT COMPLETE!</h2>
+          <p className="text-white/80 font-medium">Great job crushing it!</p>
         </div>
 
         {/* Workout Stats */}
-          <h2 className="text-xl font-semibold mb-4">Workout Complete</h2>
-
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-4 mt-6">
             {/* Duration */}
-            <div className="bg-white/10 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold">{workout.totalDuration}</div>
-              <div className="text-sm text-white/80">minutes</div>
+            <div className="bg-white/10 rounded-lg p-4 text-center backdrop-blur">
+              <div className="text-4xl font-display font-bold">{workout.totalDuration}</div>
+              <div className="text-sm text-white/90 font-medium">minutes</div>
             </div>
 
             {/* Total Sets */}
-            <div className="bg-white/10 rounded-lg p-4 text-center">
-              <div className="text-3xl font-bold">{totalSets}</div>
-              <div className="text-sm text-white/80">sets</div>
+            <div className="bg-white/10 rounded-lg p-4 text-center backdrop-blur">
+              <div className="text-4xl font-display font-bold">{totalSets}</div>
+              <div className="text-sm text-white/90 font-medium">sets</div>
             </div>
 
             {/* Total Reps */}
             {totalReps > 0 && (
-              <div className="bg-white/10 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold">{totalReps}</div>
-                <div className="text-sm text-white/80">total reps</div>
+              <div className="bg-white/10 rounded-lg p-4 text-center backdrop-blur">
+                <div className="text-4xl font-display font-bold">{totalReps}</div>
+                <div className="text-sm text-white/90 font-medium">total reps</div>
               </div>
             )}
 
             {/* Timed Duration */}
             {totalTimedSeconds > 0 && (
-              <div className="bg-white/10 rounded-lg p-4 text-center">
-                <div className="text-3xl font-bold">
+              <div className="bg-white/10 rounded-lg p-4 text-center backdrop-blur">
+                <div className="text-4xl font-display font-bold">
                   {Math.round(totalTimedSeconds)}s
                 </div>
-                <div className="text-sm text-white/80">time under tension</div>
+                <div className="text-sm text-white/90 font-medium">time under tension</div>
               </div>
             )}
           </div>
@@ -131,16 +131,16 @@ export default function WorkoutComplete() {
           </div>
 
         {/* Actions */}
-          <button
-            onClick={async () => {
-              await loadWorkouts();
-              navigate('/');
-            }}
-            className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
-          >
-            🎉 Done
-          </button>
-        </div>
+        <button
+          onClick={async () => {
+            await loadWorkouts();
+            navigate('/');
+          }}
+          className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
+        >
+          🎉 Done
+        </button>
+      </div>
     </div>
   );
 }

@@ -213,24 +213,24 @@ export default function Settings() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-4 space-y-4">
+    <div className="bg-background min-h-screen">
+      <div className="p-4 space-y-6">
         {/* Calibration Data */}
         {profile?.calibrationData && profile.calibrationCompleted && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Calibration Results</h2>
-            <div className="mb-4 text-sm text-gray-600">
+          <div className="border-b border-background-lighter pb-6">
+            <h2 className="text-lg font-semibold text-text mb-4">Calibration Results</h2>
+            <div className="mb-4 text-sm text-text-muted">
               Completed on {format(new Date(profile.calibrationData.calibrationDate), 'MMM d, yyyy')}
             </div>
             <div className="space-y-3">
               {profile.calibrationData.exercises.map((exercise, idx) => {
                 const exerciseData = getExerciseById(exercise.exerciseId);
                 return (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                  <div key={idx} className="bg-background-light rounded-lg p-3">
                     <div className="flex justify-between items-center">
                       <div>
-                        <div className="font-medium text-gray-800">{exerciseData?.name}</div>
-                        <div className="text-xs text-gray-500 capitalize">{exercise.muscleGroup}</div>
+                        <div className="font-medium text-text">{exerciseData?.name}</div>
+                        <div className="text-xs text-text-muted capitalize">{exercise.muscleGroup}</div>
                       </div>
                       <div className="text-right">
                         <div className="text-lg font-bold text-primary">
@@ -248,13 +248,10 @@ export default function Settings() {
         )}
 
         {/* Equipment */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Equipment</h2>
-          <p className="text-sm text-gray-600 mb-4">
-            Tell us what equipment you have so we can include appropriate exercises in your workouts.
-          </p>
+        <div className="border-b border-background-lighter pb-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Equipment</h2>
           <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors">
+            <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
               <input
                 type="checkbox"
                 checked={profile?.equipment?.hasElasticBands || false}
@@ -262,9 +259,9 @@ export default function Settings() {
                 className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
               />
               <div>
-                <div className="font-medium text-gray-800">Elastic Loop Bands</div>
-                <div className="text-xs text-gray-500">
-                  Include elastic loop band exercises like pallof press, clamshells, etc.
+                <div className="font-medium text-text">Elastic Loop Bands</div>
+                <div className="text-xs text-text-muted">
+                  Includes elastic loop band exercises like clamshells and fire hydrants.
                 </div>
               </div>
             </label>
@@ -273,9 +270,9 @@ export default function Settings() {
 
         {/* Install App */}
         {isInstallable && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-lg font-semibold text-gray-800 mb-4">Install App</h2>
-            <p className="text-sm text-gray-600 mb-4">
+          <div className="border-b border-background-lighter pb-6">
+            <h2 className="text-lg font-semibold text-text mb-4">Install App</h2>
+            <p className="text-sm text-text-muted mb-4">
               Install this app on your device for a better experience. You can access it offline and from your home screen.
             </p>
             <Button onClick={handleInstallApp} fullWidth>
@@ -285,9 +282,9 @@ export default function Settings() {
         )}
 
         {/* Feedback & Bug Reports */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Feedback & Bug Reports</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="border-b border-background-lighter pb-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Feedback & Bug Reports</h2>
+          <p className="text-sm text-text-muted mb-4">
             Found a bug or have a suggestion? Let us know! Your feedback helps make this app better.
           </p>
           <Button onClick={() => setShowFeedbackForm(true)} fullWidth>
@@ -300,9 +297,9 @@ export default function Settings() {
         )}
 
         {/* Backup & Restore */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Backup & Restore</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="border-b border-background-lighter pb-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Backup & Restore</h2>
+          <p className="text-sm text-text-muted mb-4">
             Export your data to keep a backup, or restore from a previous backup.
           </p>
 
@@ -324,8 +321,8 @@ export default function Settings() {
                 <div
                   className={`w-full px-6 py-3 rounded-lg font-medium text-center transition-colors cursor-pointer ${
                     isImporting
-                      ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                      : 'bg-gray-200 text-gray-800 hover:bg-gray-300'
+                      ? 'bg-background-lighter text-text-muted cursor-not-allowed'
+                      : 'bg-background-lighter text-text hover:bg-background-lighter/80'
                   }`}
                 >
                   {isImporting ? 'Importing...' : 'Import Data'}
@@ -336,9 +333,9 @@ export default function Settings() {
         </div>
 
         {/* Danger Zone */}
-        <div className="bg-white rounded-lg shadow p-6 border-2 border-red-200">
-          <h2 className="text-lg font-semibold text-red-600 mb-4">Danger Zone</h2>
-          <p className="text-sm text-gray-600 mb-4">
+        <div className="border-2 border-red-400/30 rounded-lg p-6">
+          <h2 className="text-lg font-semibold text-red-400 mb-4">Danger Zone</h2>
+          <p className="text-sm text-text-muted mb-4">
             These actions cannot be undone. Use with caution.
           </p>
 

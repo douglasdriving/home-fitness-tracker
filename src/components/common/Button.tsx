@@ -14,9 +14,9 @@ export default function Button({
   const baseClasses = 'px-6 py-3 rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed';
 
   const variantClasses = {
-    primary: 'bg-primary text-white hover:bg-primary-dark',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300',
-    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-white',
+    primary: 'bg-primary text-background hover:bg-primary-dark font-semibold',
+    secondary: 'bg-background-lighter text-text hover:bg-background-lighter/80',
+    outline: 'border-2 border-primary text-primary hover:bg-primary hover:text-background',
   };
 
   const widthClass = fullWidth ? 'w-full' : '';

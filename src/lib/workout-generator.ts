@@ -2,7 +2,7 @@ import { Workout, WorkoutExercise, WorkoutHistoryEntry } from '../types/workout'
 import type { Set } from '../types/workout';
 import { StrengthLevels } from '../types/user';
 import { MuscleGroup, Exercise } from '../types/exercise';
-import { getExercisesByMuscleGroup } from '../data/exerciseData';
+import { getExercisesByMuscleGroup, getExerciseById } from '../data/exerciseData';
 import { estimateExerciseCapacity, calculateProgression } from './progression-calculator';
 
 interface GenerateWorkoutOptions {

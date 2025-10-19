@@ -57,9 +57,15 @@ export default function WorkoutExecution() {
     const currentSet = currentExercise?.sets[currentSetIndex];
 
     if (currentSet && !currentSet.completed) {
-      // For first-time exercises, leave input empty
+      // For first-time exercises, leave input empty (except for Side Plank sets 2+)
       if (isFirstTime) {
-        setInputValue('');
+        // For Side Plank sets 2+, pre-fill with target time per side
+        if (currentExercise.exerciseId === 'side-plank-001' && currentSetIndex > 0) {
+          const value = currentSet.targetDuration || '';
+          setInputValue(value.toString());
+        } else {
+          setInputValue('');
+        }
       } else {
         // For known exercises, use target value
         const value = currentSet.targetReps || currentSet.targetDuration || '';
@@ -232,18 +238,18 @@ export default function WorkoutExecution() {
       : null;
 
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-background min-h-screen">
         {/* Header */}
-        <div className="bg-primary text-white p-4">
+        <div className="bg-gradient-to-r from-primary to-primary-dark text-background p-4 shadow-lg">
           <div className="flex justify-between items-center mb-2">
-            <h1 className="text-xl font-bold">Workout #{currentWorkout.workoutNumber}</h1>
-            <button onClick={handleQuit} className="text-sm underline">
+            <h1 className="text-2xl font-display font-bold tracking-wide">WORKOUT #{currentWorkout.workoutNumber}</h1>
+            <button onClick={handleQuit} className="text-sm font-semibold underline hover:opacity-80 transition">
               Quit
             </button>
           </div>
-          <div className="w-full bg-white/30 rounded-full h-2">
+          <div className="w-full bg-background/30 rounded-full h-2">
             <div
-              className="bg-white h-2 rounded-full transition-all"
+              className="bg-background h-2 rounded-full transition-all"
               style={{ width: `${progress}%` }}
             />
           </div>
@@ -251,10 +257,10 @@ export default function WorkoutExecution() {
 
         {/* Rest Timer */}
         <div className="p-4">
-          <div className="bg-white rounded-lg shadow p-6 text-center mb-6">
+          <div className="bg-background-light rounded-lg shadow-lg p-6 text-center mb-6 border border-background-lighter">
             <div className="text-6xl mb-4">😌</div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">Rest Time</h2>
-            <p className="text-gray-600 mb-6">
+            <h2 className="text-2xl font-bold text-text mb-2">Rest Time</h2>
+            <p className="text-text-muted mb-6">
               {isExerciseRest
                 ? 'Great work! Take a break before the next exercise'
                 : 'Take a break before your next set'}
@@ -269,14 +275,14 @@ export default function WorkoutExecution() {
           />
 
           {/* Next Set/Exercise Preview */}
-          <div className="mt-6 bg-white rounded-lg shadow p-4">
-            <h3 className="text-sm font-medium text-gray-600 mb-2">Up Next:</h3>
+          <div className="mt-6 bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
+            <h3 className="text-sm font-medium text-text-muted mb-2">Up Next:</h3>
             <div className="flex justify-between items-center">
               <div>
-                <div className="font-medium text-gray-800">
+                <div className="font-medium text-text">
                   {isExerciseRest ? nextExercise?.exerciseName : currentExercise.exerciseName}
                 </div>
-                <div className="text-sm text-gray-600">
+                <div className="text-sm text-text-muted">
                   {isExerciseRest
                     ? `Exercise ${currentExerciseIndex + 2} of ${currentWorkout.exercises.length}`
                     : `Set ${currentSetIndex + 2} of ${currentExercise.sets.length}`}
@@ -299,22 +305,22 @@ export default function WorkoutExecution() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-background min-h-screen">
       {/* Header */}
-      <div className="bg-primary text-white p-4">
+      <div className="bg-gradient-to-r from-primary to-primary-dark text-background p-4 shadow-lg">
         <div className="flex justify-between items-center mb-2">
-          <h1 className="text-xl font-bold">Workout #{currentWorkout.workoutNumber}</h1>
-          <button onClick={handleQuit} className="text-sm underline">
+          <h1 className="text-2xl font-display font-bold tracking-wide">WORKOUT #{currentWorkout.workoutNumber}</h1>
+          <button onClick={handleQuit} className="text-sm font-semibold underline hover:opacity-80 transition">
             Quit
           </button>
         </div>
-        <div className="w-full bg-white/30 rounded-full h-2">
+        <div className="w-full bg-background/30 rounded-full h-2">
           <div
-            className="bg-white h-2 rounded-full transition-all"
+            className="bg-background h-2 rounded-full transition-all"
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-sm text-white/80 mt-2">
+        <p className="text-sm opacity-80 mt-2">
           {completedSets} of {totalSets} sets completed
         </p>
       </div>
@@ -322,35 +328,69 @@ export default function WorkoutExecution() {
       <div className="p-4 space-y-6">
         {/* First Time Exercise Banner */}
         {isFirstTime && currentSetIndex === 0 && (
-          <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+          <div className="bg-accent/10 border-l-4 border-accent p-4 rounded">
             <div className="flex items-start">
               <div className="flex-shrink-0">
                 <span className="text-2xl">ℹ️</span>
               </div>
               <div className="ml-3">
-                <h3 className="text-sm font-medium text-blue-800 mb-1">
+                <h3 className="text-sm font-medium text-accent mb-1">
                   First Time Doing This Exercise!
                 </h3>
-                <p className="text-sm text-blue-700">
-                  {exercise?.type === 'reps'
-                    ? 'Do as many reps as you can with proper form, then enter that number. The app will adjust future targets based on your performance.'
-                    : 'Hold the position for as long as you can with proper form, then enter the duration in seconds. The app will adjust future targets based on your performance.'}
-                </p>
+                <div className="text-sm text-text space-y-1">
+                  <p>
+                    {exercise?.type === 'reps'
+                      ? 'Do as many reps as you can with proper form, then enter that number.'
+                      : 'Hold the position for as long as you can with proper form, then enter the duration in seconds.'}
+                  </p>
+                  <p className="font-semibold">
+                    💡 Important: Don't push yourself too hard on the first set! Stop at a comfortable level that you can repeat for multiple sets. The app will adjust future targets based on your performance.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Bilateral Exercise Banner */}
+        {currentExercise.exerciseId === 'side-plank-001' && currentSetIndex === 0 && (
+          <div className="bg-secondary/10 border-l-4 border-secondary p-4 rounded">
+            <div className="flex items-start">
+              <div className="flex-shrink-0">
+                <span className="text-2xl">⏱️</span>
+              </div>
+              <div className="ml-3">
+                <h3 className="text-sm font-medium text-secondary mb-1">
+                  Both Sides Required
+                </h3>
+                {isFirstTime ? (
+                  <div className="text-sm text-text space-y-2">
+                    <p><strong>Important:</strong> Do this exercise on BOTH sides (left and right).</p>
+                    <p>• Don't push yourself too hard on the first set - stop at a comfortable level that you can repeat for multiple sets</p>
+                    <p>• Use the timer for ONE side, then manually reset and do the other side</p>
+                    <p>• Enter the <strong>time per side</strong> (not total time) when done</p>
+                    <p>• Future sets will automatically run the timer twice</p>
+                  </div>
+                ) : (
+                  <p className="text-sm text-text">
+                    The timer will run twice - once for your left side, then once for your right side. There will be a 10-second break to switch positions.
+                  </p>
+                )}
               </div>
             </div>
           </div>
         )}
 
         {/* Exercise Info */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
           <div className="flex justify-between items-start mb-4">
             <div>
-              <h2 className="text-2xl font-bold text-gray-800 mb-1">{currentExercise.exerciseName}</h2>
+              <h2 className="text-2xl font-bold text-text mb-1">{currentExercise.exerciseName}</h2>
               <div className="flex gap-2">
                 {currentExercise.muscleGroups.map((mg, idx) => (
                   <span
                     key={idx}
-                    className="text-xs bg-primary text-white px-2 py-1 rounded-full uppercase"
+                    className="text-xs bg-primary text-background px-2 py-1 rounded-full uppercase font-semibold"
                   >
                     {mg}
                   </span>
@@ -358,7 +398,7 @@ export default function WorkoutExecution() {
               </div>
             </div>
             <div className="text-right">
-              <div className="text-sm text-gray-600">Exercise</div>
+              <div className="text-sm text-text-muted">Exercise</div>
               <div className="text-lg font-bold text-primary">
                 {currentExerciseIndex + 1} / {currentWorkout.exercises.length}
               </div>
@@ -368,13 +408,13 @@ export default function WorkoutExecution() {
         </div>
 
         {/* Current Set */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">
+            <h3 className="text-lg font-semibold text-text">
               Set {currentSetIndex + 1} of {currentExercise.sets.length}
             </h3>
             {!isFirstTime && (
-              <div className="text-sm text-gray-600">
+              <div className="text-sm text-text-muted">
                 Target:{' '}
                 {exercise?.type === 'reps'
                   ? `${currentSet.targetReps} reps`
@@ -387,9 +427,11 @@ export default function WorkoutExecution() {
           {exercise?.type === 'timed' && (
             <div className="mb-4">
               <Timer
+                key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
                 duration={currentSet.targetDuration || 30}
-                countUp={isFirstTime}
-                showSecondsOnly={isFirstTime}
+                countUp={isFirstTime && currentSetIndex === 0}
+                showSecondsOnly={isFirstTime && currentSetIndex === 0}
+                bilateral={currentExercise.exerciseId === 'side-plank-001' && !(isFirstTime && currentSetIndex === 0)}
               />
             </div>
           )}
@@ -401,11 +443,13 @@ export default function WorkoutExecution() {
               label={
                 exercise?.type === 'reps'
                   ? 'How many reps did you complete?'
-                  : 'How many seconds did you hold?'
+                  : currentExercise.exerciseId === 'side-plank-001'
+                    ? 'How many seconds did you hold PER SIDE?'
+                    : 'How many seconds did you hold?'
               }
               placeholder={
                 isFirstTime
-                  ? (exercise?.type === 'reps' ? 'Enter reps' : 'Enter seconds')
+                  ? (exercise?.type === 'reps' ? 'Enter reps' : 'Enter seconds per side')
                   : (exercise?.type === 'reps'
                     ? `Target: ${currentSet.targetReps}`
                     : `Target: ${currentSet.targetDuration}s`)
@@ -422,8 +466,8 @@ export default function WorkoutExecution() {
         </div>
 
         {/* All Sets Progress */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-sm font-medium text-gray-600 mb-3">Set Progress</h3>
+        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
+          <h3 className="text-sm font-medium text-text-muted mb-3">Set Progress</h3>
           <div className="flex gap-2">
             {currentExercise.sets.map((set, index) => (
               <div
@@ -433,7 +477,7 @@ export default function WorkoutExecution() {
                     ? 'bg-primary'
                     : index === currentSetIndex
                     ? 'bg-primary/50'
-                    : 'bg-gray-200'
+                    : 'bg-background-lighter'
                 }`}
               />
             ))}
@@ -441,12 +485,12 @@ export default function WorkoutExecution() {
         </div>
 
         {/* Exercise Instructions Toggle */}
-        <div className="bg-white rounded-lg shadow p-4">
+        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
           <button
             onClick={() => setShowInstructions(!showInstructions)}
             className="w-full flex items-center justify-between text-left"
           >
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-text">
               {showInstructions ? 'Hide' : 'Show'} Exercise Instructions
             </span>
             <span className="text-primary">{showInstructions ? '▼' : '▶'}</span>
@@ -455,8 +499,8 @@ export default function WorkoutExecution() {
           {showInstructions && (
             <div className="mt-4 space-y-3">
               {exercise?.description && (
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                  <p className="text-sm text-gray-700">{exercise.description}</p>
+                <div className="bg-background-lighter border border-background-lighter rounded-lg p-3">
+                  <p className="text-sm text-text">{exercise.description}</p>
                 </div>
               )}
 
@@ -465,7 +509,7 @@ export default function WorkoutExecution() {
                   href={exercise.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center text-primary hover:text-primary-dark"
+                  className="inline-flex items-center text-primary hover:text-primary-light"
                 >
                   <span className="mr-2">▶</span>
                   Watch video tutorial

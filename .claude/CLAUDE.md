@@ -181,7 +181,6 @@ After completing a workout:
 ### Layout
 - Max width: 640px (max-w-md)
 - Bottom padding: 80px (pb-20) for fixed nav
-- No duplicate min-h-screen containers
 
 ## Development Commands
 

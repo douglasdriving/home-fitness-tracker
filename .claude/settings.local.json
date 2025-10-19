@@ -17,7 +17,11 @@
       "Bash(ipconfig)",
       "Bash(gh issue list:*)",
       "Bash(node scripts/fetch-issues.js)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "WebSearch",
+      "WebFetch(domain:www.youtube.com)",
+      "Bash(taskkill /F /IM node.exe /T)",
+      "Bash(taskkill //F //IM node.exe //T)"
     ],
     "deny": [],
     "ask": []

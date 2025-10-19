@@ -28,14 +28,14 @@ export default function History() {
 
   if (workoutHistory.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="bg-background min-h-screen">
         <div className="p-4">
-          <div className="bg-white rounded-lg shadow p-8 text-center">
+          <div className="p-8 text-center">
             <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
+            <h2 className="text-xl font-semibold text-text mb-2">
               No workouts yet
             </h2>
-            <p className="text-gray-600">
+            <p className="text-text-muted">
               Complete your first workout to see your history here.
             </p>
           </div>
@@ -45,8 +45,8 @@ export default function History() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="p-4 space-y-4">
+    <div className="bg-background min-h-screen">
+      <div className="p-4 space-y-6">
         {workoutHistory.map((entry) => {
           const totalSets = entry.exercises.reduce(
             (sum, ex) => sum + ex.completedSets.length,
@@ -54,15 +54,15 @@ export default function History() {
           );
 
           return (
-            <div key={entry.id} className="bg-white rounded-lg shadow">
+            <div key={entry.id} className="border-b border-background-lighter pb-6">
               {/* Header */}
-              <div className="p-4 border-b border-gray-200">
+              <div className="mb-4">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-800">
+                    <h3 className="text-lg font-bold text-text">
                       Workout #{entry.workoutNumber}
                     </h3>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-text-muted">
                       {format(new Date(entry.completedDate), 'MMM d, yyyy • h:mm a')}
                     </p>
                   </div>
@@ -71,12 +71,12 @@ export default function History() {
                       <div className="text-2xl font-bold text-primary">
                         {entry.totalDuration}
                       </div>
-                      <div className="text-xs text-gray-600">minutes</div>
+                      <div className="text-xs text-text-muted">minutes</div>
                     </div>
                     <button
                       onClick={() => handleDelete(entry.id, entry.workoutNumber)}
                       disabled={deletingId === entry.id}
-                      className="text-red-600 hover:text-red-800 p-1 disabled:opacity-50"
+                      className="text-red-400 hover:text-red-300 p-1 disabled:opacity-50"
                       title="Delete workout"
                     >
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,7 +85,7 @@ export default function History() {
                     </button>
                   </div>
                 </div>
-                <div className="flex gap-3 text-sm text-gray-600">
+                <div className="flex gap-3 text-sm text-text-muted">
                   <span>{entry.exercises.length} exercises</span>
                   <span>•</span>
                   <span>{totalSets} sets</span>
@@ -93,26 +93,26 @@ export default function History() {
               </div>
 
               {/* Exercises */}
-              <div className="p-4 space-y-3">
+              <div className="space-y-3">
                 {entry.exercises.map((exercise, idx) => (
-                  <div key={idx} className="bg-gray-50 rounded-lg p-3">
+                  <div key={idx} className="bg-background-light rounded-lg p-3">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex-1">
-                        <div className="font-medium text-gray-800">
+                        <div className="font-medium text-text">
                           {exercise.exerciseName}
                         </div>
                         <div className="flex gap-1 mt-1">
                           {exercise.muscleGroups.map((mg, mgIdx) => (
                             <span
                               key={mgIdx}
-                              className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full uppercase"
+                              className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase"
                             >
                               {mg}
                             </span>
                           ))}
                         </div>
                       </div>
-                      <div className="text-sm text-gray-600 ml-4">
+                      <div className="text-sm text-text-muted ml-4">
                         {exercise.completedSets.length} sets
                       </div>
                     </div>
@@ -122,7 +122,7 @@ export default function History() {
                       {exercise.completedSets.map((set, setIdx) => (
                         <div
                           key={setIdx}
-                          className="text-xs bg-white px-2 py-1 rounded border border-gray-200"
+                          className="text-xs bg-background-lighter text-text px-2 py-1 rounded"
                         >
                           Set {set.setNumber}:{' '}
                           {set.actualReps

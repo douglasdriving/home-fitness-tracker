@@ -67,7 +67,7 @@ export default function Dashboard() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <div className="text-4xl mb-4">💪</div>
           <div className="text-lg font-medium text-gray-700">Loading...</div>
@@ -93,35 +93,35 @@ export default function Dashboard() {
   ).length;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
         {/* Quick Stats */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Workouts</h2>
+        <div className="bg-background-light rounded-lg shadow-lg p-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Workouts</h2>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">{workoutHistory.length}</div>
-              <div className="text-sm text-gray-600">Total</div>
+              <div className="text-4xl font-display font-bold text-primary">{workoutHistory.length}</div>
+              <div className="text-sm text-text-muted font-medium">Total</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">{workoutsThisWeek}</div>
-              <div className="text-sm text-gray-600">This Week</div>
+              <div className="text-4xl font-display font-bold text-primary">{workoutsThisWeek}</div>
+              <div className="text-sm text-text-muted font-medium">This Week</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-bold text-primary">{workoutsThisMonth}</div>
-              <div className="text-sm text-gray-600">This Month</div>
+              <div className="text-4xl font-display font-bold text-primary">{workoutsThisMonth}</div>
+              <div className="text-sm text-text-muted font-medium">This Month</div>
             </div>
           </div>
         </div>
 
         {/* Next Workout */}
         {currentWorkout ? (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold text-gray-800">
-                Workout #{currentWorkout.workoutNumber}
+              <h2 className="text-2xl font-display font-bold text-text-bright">
+                WORKOUT #{currentWorkout.workoutNumber}
               </h2>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
                 {currentWorkout.estimatedDuration} min
               </span>
             </div>
@@ -138,18 +138,18 @@ export default function Dashboard() {
                 return (
                   <div
                     key={index}
-                    className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
+                    className="flex justify-between items-center p-3 bg-background-lighter rounded-lg"
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <div className="font-medium text-gray-800">{exercise.exerciseName}</div>
+                        <div className="font-medium text-text">{exercise.exerciseName}</div>
                         {isNew && (
-                          <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-semibold">
-                            New!
+                          <span className="text-xs bg-accent text-background px-2 py-0.5 rounded-full font-bold">
+                            NEW!
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-text-muted">
                         {isNew
                           ? `${exercise.sets.length} sets`
                           : `${exercise.sets.length} sets × ${targetValue}`
@@ -160,7 +160,7 @@ export default function Dashboard() {
                       {exercise.muscleGroups.map((mg, idx) => (
                         <span
                           key={idx}
-                          className="text-xs bg-primary text-white px-2 py-1 rounded-full uppercase"
+                          className="text-xs bg-primary text-background px-2 py-1 rounded-full uppercase"
                         >
                           {mg}
                         </span>
@@ -176,20 +176,9 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="bg-white rounded-lg shadow p-6 text-center">
-            <div className="text-6xl mb-4">{workoutHistory.length === 0 ? '👋' : '🏋️'}</div>
-            <h2 className="text-xl font-semibold text-gray-800 mb-2">
-              {workoutHistory.length === 0 ? 'Welcome to your Fitness Journey!' : 'Ready for your next workout?'}
-            </h2>
-            <p className="text-gray-600 mb-6">
-              {workoutHistory.length === 0
-                ? "Let's get started! We'll generate your first personalized workout with exercises tailored to your fitness level. The app will learn and adapt as you progress."
-                : 'Generate a personalized workout based on your current strength levels.'}
-            </p>
             <Button onClick={handleGenerateWorkout} fullWidth>
-              {workoutHistory.length === 0 ? 'Start Your First Workout' : 'Generate New Workout'}
+              New Workout
             </Button>
-          </div>
         )}
       </div>
     </div>

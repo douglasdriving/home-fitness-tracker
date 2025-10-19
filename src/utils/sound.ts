@@ -17,31 +17,36 @@ export function playCompletionSound(): void {
     oscillator.frequency.value = 659.25; // E5
     oscillator.type = 'sine';
 
-    // Set the envelope (quick attack, sustained, quick release)
+    // Set the envelope - LOUDER and more noticeable
     const now = audioContext.currentTime;
     gainNode.gain.setValueAtTime(0, now);
-    gainNode.gain.linearRampToValueAtTime(0.3, now + 0.01); // Attack
-    gainNode.gain.linearRampToValueAtTime(0.2, now + 0.1);  // Sustain
-    gainNode.gain.linearRampToValueAtTime(0, now + 0.4);    // Release
+    gainNode.gain.linearRampToValueAtTime(0.6, now + 0.01); // Attack - LOUDER (was 0.3)
+    gainNode.gain.linearRampToValueAtTime(0.5, now + 0.1);  // Sustain - LOUDER (was 0.2)
+    gainNode.gain.linearRampToValueAtTime(0, now + 0.5);    // Release - LONGER (was 0.4)
 
     // Start and stop the oscillator
     oscillator.start(now);
-    oscillator.stop(now + 0.4);
+    oscillator.stop(now + 0.5);
 
     // Clean up after sound finishes
     setTimeout(() => {
       audioContext.close();
-    }, 500);
+    }, 600);
+
+    console.log('✅ Timer completion sound played');
   } catch (error) {
-    console.warn('Could not play completion sound:', error);
+    console.error('❌ Could not play completion sound:', error);
+    console.log('💡 This might be a browser permissions issue. Try interacting with the page first.');
+
     // Fallback: try using a simple beep if available
     try {
       const audio = new Audio('data:audio/wav;base64,UklGRhQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=');
-      audio.play().catch(() => {
-        // Silent fail - audio not critical
+      audio.volume = 1.0; // Max volume
+      audio.play().catch((playError) => {
+        console.error('❌ Fallback audio also failed:', playError);
       });
-    } catch {
-      // Silent fail - audio not critical
+    } catch (fallbackError) {
+      console.error('❌ Fallback audio creation failed:', fallbackError);
     }
   }
 }

@@ -74,7 +74,7 @@ export default function Calibration() {
 
   if (step === 'welcome') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <div className="text-center mb-8">
             <div className="text-6xl mb-4">💪</div>
@@ -86,9 +86,9 @@ export default function Calibration() {
             </p>
           </div>
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h2 className="font-semibold text-blue-900 mb-2">What to expect:</h2>
-            <ul className="space-y-2 text-sm text-blue-800">
+          <div className="bg-primary/5 border border-primary/20 rounded-lg p-4 mb-6">
+            <h2 className="font-semibold text-primary-dark mb-2">What to expect:</h2>
+            <ul className="space-y-2 text-sm text-gray-700">
               <li>• 3 quick exercises to test</li>
               <li>• Takes about 10-15 minutes</li>
               <li>• Do your best, but don't overdo it</li>
@@ -106,7 +106,7 @@ export default function Calibration() {
 
   if (step === 'complete') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+      <div className="bg-gray-50 flex items-center justify-center p-4">
         <div className="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
           <div className="text-center">
             <div className="text-6xl mb-4">🎉</div>
@@ -128,7 +128,7 @@ export default function Calibration() {
 
   // Exercise step
   return (
-    <div className="min-h-screen bg-gray-50 p-4">
+    <div className="bg-gray-50 p-4">
       <div className="max-w-md mx-auto">
         {/* Progress indicator */}
         <div className="mb-6">

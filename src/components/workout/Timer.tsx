@@ -8,6 +8,8 @@ interface TimerProps {
   hideControls?: boolean; // Hide start/pause/skip buttons
   countUp?: boolean; // Count up from 0 instead of down from duration
   showSecondsOnly?: boolean; // Show only seconds, no minutes formatting
+  bilateral?: boolean; // Run timer twice (for exercises done on both sides)
+  transitionDuration?: number; // Seconds of rest between left and right sides (default 10)
 }
 
 export default function Timer({
@@ -16,10 +18,13 @@ export default function Timer({
   autoStart = false,
   hideControls = false,
   countUp = false,
-  showSecondsOnly = false
+  showSecondsOnly = false,
+  bilateral = false,
+  transitionDuration = 10
 }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(countUp ? 0 : duration);
   const [isRunning, setIsRunning] = useState(autoStart);
+  const [currentSide, setCurrentSide] = useState<'left' | 'transition' | 'right' | 'complete'>('left');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const onCompleteRef = useRef(onComplete);
 
@@ -32,7 +37,8 @@ export default function Timer({
   useEffect(() => {
     setTimeLeft(countUp ? 0 : duration);
     setIsRunning(autoStart);
-  }, [duration, autoStart, countUp]);
+    setCurrentSide(bilateral ? 'left' : 'complete');
+  }, [duration, autoStart, countUp, bilateral]);
 
   // Manage interval based on isRunning state
   useEffect(() => {
@@ -53,7 +59,38 @@ export default function Timer({
           if (prev >= duration - 1) {
             setIsRunning(false);
             playCompletionSound();
-            if (onCompleteRef.current) onCompleteRef.current();
+
+            // Handle bilateral transitions
+            if (bilateral) {
+              setCurrentSide((currentSideValue) => {
+                if (currentSideValue === 'left') {
+                  // Move to transition
+                  setTimeout(() => {
+                    setTimeLeft(0);
+                    setCurrentSide('transition');
+                    setIsRunning(true);
+                  }, 100);
+                  return 'left';
+                } else if (currentSideValue === 'transition') {
+                  // Move to right side
+                  setTimeout(() => {
+                    setTimeLeft(0);
+                    setCurrentSide('right');
+                    setIsRunning(true);
+                  }, 100);
+                  return 'transition';
+                } else if (currentSideValue === 'right') {
+                  // Complete - call onComplete
+                  setCurrentSide('complete');
+                  if (onCompleteRef.current) onCompleteRef.current();
+                  return 'complete';
+                }
+                return currentSideValue;
+              });
+            } else {
+              if (onCompleteRef.current) onCompleteRef.current();
+            }
+
             return duration;
           }
           return prev + 1;
@@ -62,7 +99,38 @@ export default function Timer({
           if (prev <= 1) {
             setIsRunning(false);
             playCompletionSound();
-            if (onCompleteRef.current) onCompleteRef.current();
+
+            // Handle bilateral transitions
+            if (bilateral) {
+              setCurrentSide((currentSideValue) => {
+                if (currentSideValue === 'left') {
+                  // Move to transition
+                  setTimeout(() => {
+                    setTimeLeft(transitionDuration);
+                    setCurrentSide('transition');
+                    setIsRunning(true);
+                  }, 100);
+                  return 'left';
+                } else if (currentSideValue === 'transition') {
+                  // Move to right side
+                  setTimeout(() => {
+                    setTimeLeft(duration);
+                    setCurrentSide('right');
+                    setIsRunning(true);
+                  }, 100);
+                  return 'transition';
+                } else if (currentSideValue === 'right') {
+                  // Complete - call onComplete
+                  setCurrentSide('complete');
+                  if (onCompleteRef.current) onCompleteRef.current();
+                  return 'complete';
+                }
+                return currentSideValue;
+              });
+            } else {
+              if (onCompleteRef.current) onCompleteRef.current();
+            }
+
             return 0;
           }
           return prev - 1;
@@ -76,7 +144,7 @@ export default function Timer({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, countUp, duration]);
+  }, [isRunning, countUp, duration, bilateral, transitionDuration]);
 
   const toggleTimer = () => {
     if (countUp) {
@@ -101,14 +169,51 @@ export default function Timer({
     if (onComplete) onComplete();
   };
 
+  const resetTimer = () => {
+    setTimeLeft(0);
+    setIsRunning(false);
+  };
+
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
 
-  const progress = countUp
-    ? (timeLeft / duration) * 100
-    : ((duration - timeLeft) / duration) * 100;
+  const progress = (() => {
+    if (bilateral) {
+      // For bilateral, show progress across both sides + transition
+      const totalDuration = (duration * 2) + transitionDuration;
+      let elapsed = 0;
+
+      if (currentSide === 'left') {
+        elapsed = countUp ? timeLeft : (duration - timeLeft);
+      } else if (currentSide === 'transition') {
+        elapsed = duration + (countUp ? timeLeft : (transitionDuration - timeLeft));
+      } else if (currentSide === 'right') {
+        elapsed = duration + transitionDuration + (countUp ? timeLeft : (duration - timeLeft));
+      } else {
+        elapsed = totalDuration;
+      }
+
+      return (elapsed / totalDuration) * 100;
+    }
+
+    return countUp
+      ? (timeLeft / duration) * 100
+      : ((duration - timeLeft) / duration) * 100;
+  })();
 
   const getStatusText = () => {
+    if (bilateral) {
+      if (currentSide === 'left') {
+        return 'Left Side';
+      } else if (currentSide === 'transition') {
+        return 'Switching Sides...';
+      } else if (currentSide === 'right') {
+        return 'Right Side';
+      } else {
+        return 'Complete';
+      }
+    }
+
     if (countUp) {
       return isRunning ? 'Timer Running' : timeLeft >= duration ? 'Time Complete' : 'Timer Paused';
     }
@@ -133,8 +238,8 @@ export default function Timer({
         </span>
       </div>
 
-      {/* Progress bar - hide for count-up timers */}
-      {!countUp && (
+      {/* Progress bar - hide for count-up timers (unless bilateral) */}
+      {(bilateral || !countUp) && (
         <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
           <div
             className="bg-primary h-2 rounded-full transition-all"
@@ -151,13 +256,24 @@ export default function Timer({
           >
             {getButtonText()}
           </button>
-          {((countUp && timeLeft < duration) || (!countUp && timeLeft > 0)) && (
-            <button
-              onClick={skipTimer}
-              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
-            >
-              Skip
-            </button>
+          {countUp ? (
+            timeLeft > 0 && (
+              <button
+                onClick={resetTimer}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              >
+                Reset
+              </button>
+            )
+          ) : (
+            timeLeft > 0 && (
+              <button
+                onClick={skipTimer}
+                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              >
+                Skip
+              </button>
+            )
           )}
         </div>
       )}

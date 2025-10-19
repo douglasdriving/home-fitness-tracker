@@ -2,7 +2,10 @@
   {
     "id": "plank-001",
     "name": "Plank",
-    "muscleGroups": ["abs", "lowerBack"],
+    "muscleGroups": [
+      "abs",
+      "lowerBack"
+    ],
     "description": "Start in a push-up position but rest on your forearms instead of your hands. Keep your body in a straight line from head to heels. Engage your core and hold this position. Don't let your hips sag or pike up.",
     "videoUrl": "https://www.youtube.com/watch?v=pSHjTRCQxIw",
     "source": "American Council on Exercise",
@@ -17,7 +20,10 @@
   {
     "id": "glute-bridge-001",
     "name": "Glute Bridge",
-    "muscleGroups": ["glutes", "lowerBack"],
+    "muscleGroups": [
+      "glutes",
+      "lowerBack"
+    ],
     "description": "Lie on your back with knees bent and feet flat on the floor, hip-width apart. Push through your heels to lift your hips off the ground until your body forms a straight line from shoulders to knees. Squeeze your glutes at the top, then lower back down with control.",
     "videoUrl": "https://www.youtube.com/watch?v=wPM8icPu6H8",
     "source": "ACE Fitness",
@@ -32,7 +38,10 @@
   {
     "id": "bird-dog-001",
     "name": "Bird Dog",
-    "muscleGroups": ["lowerBack", "abs"],
+    "muscleGroups": [
+      "lowerBack",
+      "abs"
+    ],
     "description": "Start on hands and knees in a tabletop position. Extend your right arm forward and left leg back simultaneously, forming a straight line. Hold briefly, then return to start. Repeat on the opposite side. Keep your core engaged and back flat throughout the movement. Note: Count total reps for both sides combined (e.g., 10 reps = 5 per side).",
     "videoUrl": "https://www.youtube.com/watch?v=wiFNA3sqjCA",
     "source": "Mayo Clinic",
@@ -47,7 +56,9 @@
   {
     "id": "crunches-001",
     "name": "Crunches",
-    "muscleGroups": ["abs"],
+    "muscleGroups": [
+      "abs"
+    ],
     "description": "Lie on your back with knees bent and feet flat on the floor. Place your hands behind your head, elbows out to the sides. Engage your abs to lift your shoulders off the ground, curling your upper body toward your knees. Lower back down with control. Don't pull on your neck.",
     "videoUrl": "https://www.youtube.com/watch?v=Xyd_fa5zoEU",
     "source": "American Council on Exercise",
@@ -62,7 +73,10 @@
   {
     "id": "superman-001",
     "name": "Superman",
-    "muscleGroups": ["lowerBack", "glutes"],
+    "muscleGroups": [
+      "lowerBack",
+      "glutes"
+    ],
     "description": "Lie face down on the floor with arms extended overhead. Simultaneously lift your arms, chest, and legs off the ground as high as comfortable. Hold briefly at the top, squeezing your lower back and glutes, then lower back down with control.",
     "videoUrl": "https://www.youtube.com/watch?v=z6PJMT2y8GQ",
     "source": "ACE Fitness",
@@ -77,7 +91,9 @@
   {
     "id": "bicycle-crunches-001",
     "name": "Bicycle Crunches",
-    "muscleGroups": ["abs"],
+    "muscleGroups": [
+      "abs"
+    ],
     "description": "Lie on your back with hands behind your head. Lift your shoulders off the ground and bring your knees to a 90-degree angle. Alternate bringing your right elbow to your left knee while extending your right leg, then switch sides in a pedaling motion. Keep your core engaged throughout.",
     "videoUrl": "https://www.youtube.com/watch?v=Iwyvozckjak",
     "source": "American Council on Exercise",
@@ -92,7 +108,10 @@
   {
     "id": "dead-bug-001",
     "name": "Dead Bug",
-    "muscleGroups": ["abs", "lowerBack"],
+    "muscleGroups": [
+      "abs",
+      "lowerBack"
+    ],
     "description": "Lie on your back with arms extended straight up toward the ceiling and knees bent at 90 degrees. Slowly lower your right arm overhead while straightening your left leg, keeping both hovering above the ground. Return to start and repeat on the opposite side. Keep your lower back pressed to the floor.",
     "videoUrl": "https://www.youtube.com/watch?v=g_BYB0R-4Ws",
     "source": "ACE Fitness",
@@ -107,7 +126,10 @@
   {
     "id": "single-leg-glute-bridge-001",
     "name": "Single-Leg Glute Bridge",
-    "muscleGroups": ["glutes", "lowerBack"],
+    "muscleGroups": [
+      "glutes",
+      "lowerBack"
+    ],
     "description": "Lie on your back with one knee bent and foot flat on the floor. Extend the other leg straight. Push through your grounded heel to lift your hips, forming a straight line from shoulders to the extended leg. Squeeze your glutes at the top, then lower with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 10 reps = 5 per leg).",
     "videoUrl": "https://www.youtube.com/watch?v=AVAXhy6pl7o",
     "source": "ACE Fitness",
@@ -122,7 +144,9 @@
   {
     "id": "mountain-climbers-001",
     "name": "Mountain Climbers",
-    "muscleGroups": ["abs"],
+    "muscleGroups": [
+      "abs"
+    ],
     "description": "Start in a plank position with hands directly under shoulders. Quickly alternate bringing your knees toward your chest in a running motion while keeping your core tight and hips level. Maintain a strong plank position throughout the movement.",
     "videoUrl": "https://www.youtube.com/watch?v=nmwgirgXLYM",
     "source": "American Council on Exercise",
@@ -137,7 +161,9 @@
   {
     "id": "leg-raises-001",
     "name": "Leg Raises",
-    "muscleGroups": ["abs"],
+    "muscleGroups": [
+      "abs"
+    ],
     "description": "Lie on your back with legs straight and hands under your lower back for support. Keeping your legs straight, lift them up to a 90-degree angle, then slowly lower them back down without touching the floor. Keep your lower back pressed to the ground throughout the movement.",
     "videoUrl": "https://www.youtube.com/watch?v=JB2oyawG9KI",
     "source": "ACE Fitness",
@@ -152,7 +178,9 @@
   {
     "id": "donkey-kicks-001",
     "name": "Donkey Kicks",
-    "muscleGroups": ["glutes"],
+    "muscleGroups": [
+      "glutes"
+    ],
     "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg up behind you until your thigh is parallel to the ground. Squeeze your glutes at the top, then lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
     "videoUrl": "https://www.youtube.com/watch?v=SJ1Xuz9D-ZQ",
     "source": "ACE Fitness",
@@ -167,7 +195,10 @@
   {
     "id": "side-plank-001",
     "name": "Side Plank",
-    "muscleGroups": ["abs", "lowerBack"],
+    "muscleGroups": [
+      "abs",
+      "lowerBack"
+    ],
     "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides. Note: For timed exercises, hold the total duration per side (e.g., 20s = 20s per side).",
     "videoUrl": "https://www.youtube.com/watch?v=K2VljzCC16g",
     "source": "American Council on Exercise",
@@ -182,9 +213,11 @@
   {
     "id": "fire-hydrants-001",
     "name": "Fire Hydrants",
-    "muscleGroups": ["glutes"],
+    "muscleGroups": [
+      "glutes"
+    ],
     "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg out to the side until your thigh is parallel to the ground. Keep your hips level and avoid rotating your torso. Lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
-    "videoUrl": "https://www.youtube.com/watch?v=SjwPmhSWRuA",
+    "videoUrl": "https://www.youtube.com/shorts/BLx5wSzafxg",
     "source": "ACE Fitness",
     "heavinessScore": {
       "abs": 0,
@@ -197,7 +230,9 @@
   {
     "id": "reverse-crunches-001",
     "name": "Reverse Crunches",
-    "muscleGroups": ["abs"],
+    "muscleGroups": [
+      "abs"
+    ],
     "description": "Lie on your back with hands by your sides and knees bent. Lift your feet off the ground so your thighs are perpendicular to the floor. Use your abs to curl your hips off the floor, bringing your knees toward your chest. Lower back down with control.",
     "videoUrl": "https://www.youtube.com/watch?v=ca7SsRHSo4Y",
     "source": "American Council on Exercise",
@@ -212,7 +247,10 @@
   {
     "id": "band-glute-bridge-001",
     "name": "Resistance Band Glute Bridge",
-    "muscleGroups": ["glutes", "lowerBack"],
+    "muscleGroups": [
+      "glutes",
+      "lowerBack"
+    ],
     "description": "Place a loop resistance band just above your knees. Lie on your back with knees bent and feet flat, hip-width apart. Push through your heels to lift your hips while pressing your knees outward against the band. Squeeze your glutes at the top, then lower with control. Note: This exercise uses a loop resistance band (broad rubber band) placed around your knees.",
     "videoUrl": "https://www.youtube.com/watch?v=E5GjlfwmLWY",
     "source": "ACE Fitness",
@@ -228,7 +266,9 @@
   {
     "id": "band-clamshells-001",
     "name": "Resistance Band Clamshells",
-    "muscleGroups": ["glutes"],
+    "muscleGroups": [
+      "glutes"
+    ],
     "description": "Lie on your side with a loop resistance band around your thighs, just above your knees. Keep your feet together and knees bent. Lift your top knee as high as possible while keeping your feet touching. Lower back down with control. Complete all reps on one side before switching. Note: This exercise uses a loop resistance band (broad rubber band). Count total reps for both sides combined.",
     "videoUrl": "https://www.youtube.com/watch?v=Ja69I53U5yM",
     "source": "Physical Therapy",
@@ -244,7 +284,9 @@
   {
     "id": "band-lateral-walk-001",
     "name": "Band Lateral Walk",
-    "muscleGroups": ["glutes"],
+    "muscleGroups": [
+      "glutes"
+    ],
     "description": "Place a loop resistance band around your ankles or just above your knees. Squat slightly and step sideways, maintaining tension in the band. Keep your knees pushed outward and core engaged. Take 10-15 steps in one direction, then return. Note: This exercise uses a loop resistance band (broad rubber band) placed around your ankles or knees.",
     "videoUrl": "https://www.youtube.com/watch?v=Mn-5OBdZLjA",
     "source": "Athletic Training",
