@@ -25,7 +25,7 @@ export default function WorkoutComplete() {
     return null;
   }
 
-  // Calculate total sets and reps
+  // Calculate total sets, reps, and time (only from completed sets with actual values)
   const totalSets = workout.exercises.reduce(
     (sum, ex) => sum + ex.completedSets.length,
     0
@@ -149,7 +149,7 @@ export default function WorkoutComplete() {
           <Button
             onClick={() => navigate('/')}
             fullWidth
-            className="bg-white text-primary hover:bg-white/90"
+            className="bg-white text-primary hover:bg-white/90 font-semibold"
           >
             Back to Dashboard
           </Button>
@@ -157,7 +157,7 @@ export default function WorkoutComplete() {
             onClick={() => navigate('/history')}
             variant="secondary"
             fullWidth
-            className="bg-white/20 hover:bg-white/30 text-white border-white/30"
+            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-medium"
           >
             View History
           </Button>
