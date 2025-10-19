@@ -146,21 +146,18 @@ export default function WorkoutComplete() {
 
         {/* Actions */}
         <div className="space-y-3">
-          <Button
+          <button
             onClick={() => navigate('/')}
-            fullWidth
-            className="bg-white text-primary hover:bg-white/90 font-semibold"
+            className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
           >
             Back to Dashboard
-          </Button>
-          <Button
+          </button>
+          <button
             onClick={() => navigate('/history')}
-            variant="secondary"
-            fullWidth
-            className="bg-white/20 hover:bg-white/30 text-white border border-white/30 font-medium"
+            className="w-full bg-white/20 hover:bg-white/30 text-white border border-white/30 font-medium px-6 py-3 rounded-lg transition-colors"
           >
             View History
-          </Button>
+          </button>
         </div>
       </div>
     </div>

@@ -69,7 +69,7 @@ export default function Dashboard() {
       <div className="p-4 space-y-6">
         {/* Quick Stats */}
         <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-lg font-semibold text-gray-800 mb-4">Quick Stats</h2>
+          <h2 className="text-lg font-semibold text-gray-800 mb-4">Workouts</h2>
           <div className="grid grid-cols-3 gap-4">
             <div className="text-center">
               <div className="text-3xl font-bold text-primary">{workoutHistory.length}</div>
@@ -133,7 +133,7 @@ export default function Dashboard() {
             </div>
 
             <Button onClick={handleStartWorkout} fullWidth>
-              {currentWorkout.status === 'in-progress' ? 'Continue Workout' : 'Start Workout'}
+              {currentWorkout.status === 'in-progress' ? 'Continue' : 'Start'}
             </Button>
           </div>
         ) : (

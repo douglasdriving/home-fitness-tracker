@@ -51,17 +51,16 @@ export default function WorkoutExecution() {
       return;
     }
 
-    // Initialize input value when changing sets
+    // Initialize input value ONLY when changing sets (not when workout updates)
     const currentExercise = currentWorkout.exercises[currentExerciseIndex];
     const currentSet = currentExercise?.sets[currentSetIndex];
 
-    if (currentSet) {
-      // Only pre-fill if there's an actual value, otherwise use target value
-      const value = currentSet.actualReps || currentSet.actualDuration ||
-                    currentSet.targetReps || currentSet.targetDuration || '';
+    if (currentSet && !currentSet.completed) {
+      // For incomplete sets, use target value
+      const value = currentSet.targetReps || currentSet.targetDuration || '';
       setInputValue(value.toString());
     }
-  }, [currentExerciseIndex, currentSetIndex, isInitialized]); // Remove currentWorkout from dependencies
+  }, [currentExerciseIndex, currentSetIndex, isInitialized]);
 
   // Save position whenever it changes
   useEffect(() => {
@@ -115,25 +114,6 @@ export default function WorkoutExecution() {
     setInputValue(e.target.value);
   };
 
-  const handleInputBlur = async () => {
-    const value = parseInt(inputValue);
-    if (!value || value <= 0) return;
-
-    try {
-      if (exercise?.type === 'reps') {
-        await updateSet(currentExerciseIndex, currentSetIndex, {
-          actualReps: value,
-        });
-      } else {
-        await updateSet(currentExerciseIndex, currentSetIndex, {
-          actualDuration: value,
-        });
-      }
-    } catch (error) {
-      console.error('Error updating set:', error);
-    }
-  };
-
   const handleCompleteSet = async () => {
     const value = parseInt(inputValue);
 
@@ -152,25 +132,6 @@ export default function WorkoutExecution() {
       };
 
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
-
-      // Adjust remaining sets based on user's actual performance
-      const target = exercise?.type === 'reps' ? currentSet.targetReps : currentSet.targetDuration;
-      if (target) {
-        // If user significantly exceeded target (>20%), adjust remaining sets upward
-        // If user did less than target, adjust remaining sets downward
-        const shouldAdjust = value < target || value > target * 1.2;
-
-        if (shouldAdjust) {
-          // Update all remaining sets in this exercise to match actual performance
-          for (let i = currentSetIndex + 1; i < currentExercise.sets.length; i++) {
-            if (exercise?.type === 'reps') {
-              await updateSet(currentExerciseIndex, i, { targetReps: value });
-            } else {
-              await updateSet(currentExerciseIndex, i, { targetDuration: value });
-            }
-          }
-        }
-      }
 
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
@@ -274,17 +235,11 @@ export default function WorkoutExecution() {
           </div>
 
           <Timer
+            key={`rest-${currentExerciseIndex}-${currentSetIndex}`}
             duration={isExerciseRest ? 60 : currentExercise.restTime}
             onComplete={isExerciseRest ? handleExerciseRestComplete : handleRestComplete}
             autoStart={true}
-            hideControls={false}
           />
-
-          <div className="mt-4">
-            <Button onClick={handleSkipRest} variant="secondary" fullWidth>
-              Skip Rest
-            </Button>
-          </div>
 
           {/* Next Set/Exercise Preview */}
           <div className="mt-6 bg-white rounded-lg shadow p-4">
@@ -391,12 +346,14 @@ export default function WorkoutExecution() {
             <h3 className="text-lg font-semibold text-gray-800">
               Set {currentSetIndex + 1} of {currentExercise.sets.length}
             </h3>
-            <div className="text-sm text-gray-600">
-              Target:{' '}
-              {exercise?.type === 'reps'
-                ? `${currentSet.targetReps} reps`
-                : `${currentSet.targetDuration}s`}
-            </div>
+            {!isFirstTime && (
+              <div className="text-sm text-gray-600">
+                Target:{' '}
+                {exercise?.type === 'reps'
+                  ? `${currentSet.targetReps} reps`
+                  : `${currentSet.targetDuration}s`}
+              </div>
+            )}
           </div>
 
           {/* Timer for timed exercises */}
@@ -420,13 +377,14 @@ export default function WorkoutExecution() {
                   : 'How many seconds did you hold?'
               }
               placeholder={
-                exercise?.type === 'reps'
-                  ? `Target: ${currentSet.targetReps}`
-                  : `Target: ${currentSet.targetDuration}s`
+                isFirstTime
+                  ? (exercise?.type === 'reps' ? 'Enter reps' : 'Enter seconds')
+                  : (exercise?.type === 'reps'
+                    ? `Target: ${currentSet.targetReps}`
+                    : `Target: ${currentSet.targetDuration}s`)
               }
               value={inputValue}
               onChange={handleInputChange}
-              onBlur={handleInputBlur}
               min="1"
             />
           </div>

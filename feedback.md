@@ -1,2 +1,0 @@
-1. When I was on the workout screen in the middle of a workout, then switched to the history screen, and then back to the workout screen, the checked sets was removed and I had to start entering everything from scratch. Please make it so that the current workout progress is stored in memory, so that when you return to the screen it is still there.
-2. My phone screen keeps shutting off during workouts. If possible, make the app prevent this from happening.
