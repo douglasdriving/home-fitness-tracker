@@ -21,21 +21,41 @@ export default function Timer({
   const [timeLeft, setTimeLeft] = useState(countUp ? 0 : duration);
   const [isRunning, setIsRunning] = useState(autoStart);
 
+  console.log('=== TIMER RENDER ===');
+  console.log('Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
+  console.log('TimeLeft:', timeLeft, 'IsRunning:', isRunning);
+
   useEffect(() => {
+    console.log('Timer init effect - setting timeLeft and isRunning');
+    console.log('  Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
     setTimeLeft(countUp ? 0 : duration);
     setIsRunning(autoStart);
   }, [duration, autoStart, countUp]);
 
   useEffect(() => {
-    if (!isRunning) return;
+    console.log('Timer interval effect triggered');
+    console.log('  isRunning:', isRunning, 'timeLeft:', timeLeft, 'countUp:', countUp, 'duration:', duration);
+
+    if (!isRunning) {
+      console.log('  Timer not running, skipping interval setup');
+      return;
+    }
 
     // For count-down, stop at 0
-    if (!countUp && timeLeft <= 0) return;
+    if (!countUp && timeLeft <= 0) {
+      console.log('  Count-down at 0, stopping');
+      return;
+    }
 
     // For count-up, stop at duration
-    if (countUp && timeLeft >= duration) return;
+    if (countUp && timeLeft >= duration) {
+      console.log('  Count-up reached duration, stopping');
+      return;
+    }
 
+    console.log('  Setting up interval...');
     const interval = setInterval(() => {
+      console.log('  Interval tick!');
       setTimeLeft((prev) => {
         if (countUp) {
           // Count up mode
@@ -59,7 +79,10 @@ export default function Timer({
       });
     }, 1000);
 
-    return () => clearInterval(interval);
+    return () => {
+      console.log('  Cleaning up interval');
+      clearInterval(interval);
+    };
   }, [isRunning, timeLeft, onComplete, countUp, duration]);
 
   const toggleTimer = () => {
