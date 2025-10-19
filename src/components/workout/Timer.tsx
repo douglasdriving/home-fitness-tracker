@@ -34,22 +34,10 @@ export default function Timer({
 
   useEffect(() => {
     console.log('Timer interval effect triggered');
-    console.log('  isRunning:', isRunning, 'timeLeft:', timeLeft, 'countUp:', countUp, 'duration:', duration);
+    console.log('  isRunning:', isRunning, 'countUp:', countUp, 'duration:', duration);
 
     if (!isRunning) {
       console.log('  Timer not running, skipping interval setup');
-      return;
-    }
-
-    // For count-down, stop at 0
-    if (!countUp && timeLeft <= 0) {
-      console.log('  Count-down at 0, stopping');
-      return;
-    }
-
-    // For count-up, stop at duration
-    if (countUp && timeLeft >= duration) {
-      console.log('  Count-up reached duration, stopping');
       return;
     }
 
@@ -57,24 +45,31 @@ export default function Timer({
     const interval = setInterval(() => {
       console.log('  Interval tick!');
       setTimeLeft((prev) => {
+        console.log('    Previous timeLeft:', prev);
         if (countUp) {
           // Count up mode
           if (prev >= duration - 1) {
+            console.log('    Count-up complete!');
             setIsRunning(false);
             playCompletionSound(); // Play sound when timer completes
             if (onComplete) onComplete();
             return duration;
           }
-          return prev + 1;
+          const next = prev + 1;
+          console.log('    Counting up to:', next);
+          return next;
         } else {
           // Count down mode
           if (prev <= 1) {
+            console.log('    Count-down complete!');
             setIsRunning(false);
             playCompletionSound(); // Play sound when timer completes
             if (onComplete) onComplete();
             return 0;
           }
-          return prev - 1;
+          const next = prev - 1;
+          console.log('    Counting down to:', next);
+          return next;
         }
       });
     }, 1000);
@@ -83,7 +78,7 @@ export default function Timer({
       console.log('  Cleaning up interval');
       clearInterval(interval);
     };
-  }, [isRunning, timeLeft, onComplete, countUp, duration]);
+  }, [isRunning, onComplete, countUp, duration]); // Removed timeLeft from dependencies!
 
   const toggleTimer = () => {
     if (countUp) {
