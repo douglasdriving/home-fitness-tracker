@@ -79,7 +79,10 @@ export default function Dashboard() {
   // Calculate workouts this week and month
   const now = new Date();
   const startOfWeek = new Date(now);
-  startOfWeek.setDate(now.getDate() - now.getDay()); // Start of week (Sunday)
+  // Start of week (Monday) - getDay() returns 0 for Sunday, 1 for Monday, etc.
+  const dayOfWeek = now.getDay();
+  const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // If Sunday, go back 6 days to Monday
+  startOfWeek.setDate(now.getDate() - daysToSubtract);
   startOfWeek.setHours(0, 0, 0, 0);
 
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
