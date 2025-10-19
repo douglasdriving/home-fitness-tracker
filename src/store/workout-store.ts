@@ -32,7 +32,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     set({ isLoading: true });
 
     try {
-      // Find the most recent pending or in-progress workout
+      // Find the most recent pending or in-progress workout (NOT completed)
       const workouts = await db.workouts
         .where('status')
         .anyOf(['pending', 'in-progress'])
@@ -166,16 +166,17 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     const startTime = currentWorkout.startedDate || currentWorkout.generatedDate;
     const totalDuration = Math.round((completedDate - startTime) / 60000); // minutes
 
-    // Mark workout as completed
+    // Mark workout as completed in database
     const updatedWorkout: Workout = {
       ...currentWorkout,
       status: 'completed',
       completedDate,
+      totalDuration,
     };
 
     await db.workouts.put(updatedWorkout);
 
-    // Create history entry
+    // Create history entry - only include completed sets
     const historyEntry: WorkoutHistoryEntry = {
       id: `history-${completedDate}-${Math.random().toString(36).substr(2, 9)}`,
       workoutId: currentWorkout.id,
@@ -187,7 +188,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         exerciseName: ex.exerciseName,
         muscleGroups: ex.muscleGroups,
         completedSets: ex.sets
-          .filter((set) => set.completed)
+          .filter((set) => set.completed && (set.actualReps || set.actualDuration))
           .map((set) => ({
             setNumber: set.setNumber,
             actualReps: set.actualReps,
@@ -207,7 +208,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
           exerciseId: ex.exerciseId,
           muscleGroups: ex.muscleGroups,
           completedSets: ex.sets
-            .filter((set) => set.completed)
+            .filter((set) => set.completed && (set.actualReps || set.actualDuration))
             .map((set) => ({
               actualReps: set.actualReps,
               actualDuration: set.actualDuration,
@@ -219,6 +220,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       useUserStore.getState().updateStrengthLevels(updatedStrengthLevels);
     }
 
+    // Clear current workout from state
     set({ currentWorkout: null });
 
     return historyEntry;
