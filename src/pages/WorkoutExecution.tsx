@@ -206,14 +206,6 @@ export default function WorkoutExecution() {
     setPhase('exercise');
   };
 
-  const handleSkipRest = () => {
-    if (phase === 'exercise-rest') {
-      handleExerciseRestComplete();
-    } else {
-      handleRestComplete();
-    }
-  };
-
   const handleCompleteWorkout = async () => {
     try {
       const historyEntry = await completeWorkout();

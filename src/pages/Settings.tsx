@@ -262,9 +262,9 @@ export default function Settings() {
                 className="w-5 h-5 text-primary rounded focus:ring-2 focus:ring-primary"
               />
               <div>
-                <div className="font-medium text-gray-800">Elastic/Resistance Bands</div>
+                <div className="font-medium text-gray-800">Elastic Loop Bands</div>
                 <div className="text-xs text-gray-500">
-                  Include band exercises like pallof press, clamshells, etc.
+                  Include elastic loop band exercises like pallof press, clamshells, etc.
                 </div>
               </div>
             </label>

@@ -145,18 +145,3 @@ export default function WorkoutComplete() {
   );
 }
 
-function getMotivationalMessage(workoutNumber: number): string {
-  const messages = [
-    "You're building stronger habits every day!",
-    "Consistency is key - keep it up!",
-    "Your body is getting stronger with each workout!",
-    "Progress over perfection - well done!",
-    "You showed up and did the work - that's what matters!",
-    "Every rep brings you closer to your goals!",
-    "You're investing in your health - amazing!",
-    "Keep pushing forward, you've got this!",
-  ];
-
-  // Rotate through messages based on workout number
-  return messages[workoutNumber % messages.length];
-}
