@@ -18,6 +18,7 @@ interface WorkoutStore {
   updateWorkoutPosition: (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => Promise<void>;
   completeWorkout: () => Promise<WorkoutHistoryEntry>;
   loadHistory: () => Promise<void>;
+  deleteHistoryEntry: (historyId: string) => Promise<void>;
 }
 
 export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
@@ -260,6 +261,26 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       set({ workoutHistory: history });
     } catch (error) {
       console.error('Failed to load history:', error);
+    }
+  },
+
+  /**
+   * Delete a workout history entry
+   */
+  deleteHistoryEntry: async (historyId: string) => {
+    try {
+      await db.history.delete(historyId);
+
+      // Reload history to update the UI
+      const history = await db.history
+        .orderBy('completedDate')
+        .reverse()
+        .toArray();
+
+      set({ workoutHistory: history });
+    } catch (error) {
+      console.error('Failed to delete history entry:', error);
+      throw error;
     }
   },
 }));

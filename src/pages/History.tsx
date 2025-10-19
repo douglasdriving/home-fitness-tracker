@@ -1,13 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useWorkoutStore } from '../store/workout-store';
 import { format } from 'date-fns';
 
 export default function History() {
-  const { workoutHistory, loadHistory } = useWorkoutStore();
+  const { workoutHistory, loadHistory, deleteHistoryEntry } = useWorkoutStore();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadHistory();
   }, [loadHistory]);
+
+  const handleDelete = async (historyId: string, workoutNumber: number) => {
+    if (!confirm(`Are you sure you want to delete Workout #${workoutNumber}? This cannot be undone.`)) {
+      return;
+    }
+
+    setDeletingId(historyId);
+    try {
+      await deleteHistoryEntry(historyId);
+    } catch (error) {
+      console.error('Failed to delete workout:', error);
+      alert('Failed to delete workout. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   if (workoutHistory.length === 0) {
     return (
@@ -41,7 +58,7 @@ export default function History() {
               {/* Header */}
               <div className="p-4 border-b border-gray-200">
                 <div className="flex justify-between items-start mb-2">
-                  <div>
+                  <div className="flex-1">
                     <h3 className="text-lg font-bold text-gray-800">
                       Workout #{entry.workoutNumber}
                     </h3>
@@ -49,11 +66,23 @@ export default function History() {
                       {format(new Date(entry.completedDate), 'MMM d, yyyy • h:mm a')}
                     </p>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
-                      {entry.totalDuration}
+                  <div className="flex items-start gap-3">
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">
+                        {entry.totalDuration}
+                      </div>
+                      <div className="text-xs text-gray-600">minutes</div>
                     </div>
-                    <div className="text-xs text-gray-600">minutes</div>
+                    <button
+                      onClick={() => handleDelete(entry.id, entry.workoutNumber)}
+                      disabled={deletingId === entry.id}
+                      className="text-red-600 hover:text-red-800 p-1 disabled:opacity-50"
+                      title="Delete workout"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </div>
                 </div>
                 <div className="flex gap-3 text-sm text-gray-600">
