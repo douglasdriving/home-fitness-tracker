@@ -9,6 +9,8 @@ export interface UserProfile {
   equipment?: {
     hasElasticBands?: boolean;
   };
+  weight?: number; // kg
+  height?: number; // cm
 }
 
 export interface CalibrationData {
