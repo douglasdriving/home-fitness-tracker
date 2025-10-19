@@ -146,18 +146,6 @@ export default function WorkoutExecution() {
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
       console.log('Set updated successfully');
 
-      // For new exercises, update remaining sets to match first set performance
-      if (isFirstTime && currentSetIndex === 0) {
-        console.log('First set of new exercise - updating remaining sets to:', value);
-        for (let i = 1; i < currentExercise.sets.length; i++) {
-          if (exercise?.type === 'reps') {
-            await updateSet(currentExerciseIndex, i, { targetReps: value });
-          } else {
-            await updateSet(currentExerciseIndex, i, { targetDuration: value });
-          }
-        }
-      }
-
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
       const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
@@ -165,6 +153,7 @@ export default function WorkoutExecution() {
       console.log('Is last set of exercise?', isLastSetOfExercise);
       console.log('Is last exercise?', isLastExercise);
 
+      // Move to next phase FIRST before updating remaining sets (prevents flickering)
       if (isLastSetOfExercise) {
         // Move to next exercise or complete workout
         if (isLastExercise) {
@@ -180,6 +169,22 @@ export default function WorkoutExecution() {
         // Move to rest phase between sets
         console.log('Moving to rest between sets');
         setPhase('rest');
+      }
+
+      // For new exercises, update remaining sets to match first set performance
+      // Do this AFTER changing phase to prevent flickering in "Up Next" preview
+      if (isFirstTime && currentSetIndex === 0 && !isLastSetOfExercise) {
+        console.log('First set of new exercise - updating remaining sets to:', value);
+        // Use setTimeout to ensure the phase change completes first
+        setTimeout(async () => {
+          for (let i = 1; i < currentExercise.sets.length; i++) {
+            if (exercise?.type === 'reps') {
+              await updateSet(currentExerciseIndex, i, { targetReps: value });
+            } else {
+              await updateSet(currentExerciseIndex, i, { targetDuration: value });
+            }
+          }
+        }, 0);
       }
     } catch (error) {
       console.error('Error completing set:', error);
