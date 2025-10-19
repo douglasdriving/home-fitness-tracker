@@ -56,12 +56,12 @@ export default function WorkoutExecution() {
     const currentSet = currentExercise?.sets[currentSetIndex];
 
     if (currentSet) {
-      // Pre-fill with actual value if exists, otherwise use target value
+      // Only pre-fill if there's an actual value, otherwise use target value
       const value = currentSet.actualReps || currentSet.actualDuration ||
                     currentSet.targetReps || currentSet.targetDuration || '';
       setInputValue(value.toString());
     }
-  }, [currentWorkout, currentExerciseIndex, currentSetIndex, isInitialized]);
+  }, [currentExerciseIndex, currentSetIndex, isInitialized]); // Remove currentWorkout from dependencies
 
   // Save position whenever it changes
   useEffect(() => {
