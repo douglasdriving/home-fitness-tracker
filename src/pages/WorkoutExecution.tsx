@@ -7,6 +7,7 @@ import { useWakeLock } from '../hooks/useWakeLock';
 import Button from '../components/common/Button';
 import Input from '../components/common/Input';
 import Timer from '../components/workout/Timer';
+import ExerciseModal from '../components/workout/ExerciseModal';
 
 type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest';
 
@@ -21,7 +22,7 @@ export default function WorkoutExecution() {
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
   const [phase, setPhase] = useState<WorkoutPhase>('exercise');
   const [inputValue, setInputValue] = useState('');
-  const [showInstructions, setShowInstructions] = useState(false);
+  const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [nextSetPreview, setNextSetPreview] = useState<{reps?: number, duration?: number} | null>(null);
@@ -484,41 +485,25 @@ export default function WorkoutExecution() {
           </div>
         </div>
 
-        {/* Exercise Instructions Toggle */}
+        {/* Exercise Help Button */}
         <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
           <button
-            onClick={() => setShowInstructions(!showInstructions)}
-            className="w-full flex items-center justify-between text-left"
+            onClick={() => setShowExerciseModal(true)}
+            className="w-full flex items-center justify-center gap-2 text-primary hover:text-primary-light transition-colors"
           >
-            <span className="text-sm font-medium text-text">
-              {showInstructions ? 'Hide' : 'Show'} Exercise Instructions
-            </span>
-            <span className="text-primary">{showInstructions ? '▼' : '▶'}</span>
+            <span className="text-xl">❓</span>
+            <span className="text-sm font-medium">How to do this exercise</span>
           </button>
-
-          {showInstructions && (
-            <div className="mt-4 space-y-3">
-              {exercise?.description && (
-                <div className="bg-background-lighter border border-background-lighter rounded-lg p-3">
-                  <p className="text-sm text-text">{exercise.description}</p>
-                </div>
-              )}
-
-              {exercise?.videoUrl && (
-                <a
-                  href={exercise.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-primary hover:text-primary-light"
-                >
-                  <span className="mr-2">▶</span>
-                  Watch video tutorial
-                </a>
-              )}
-            </div>
-          )}
         </div>
       </div>
+
+      {/* Exercise Modal */}
+      {showExerciseModal && exercise && (
+        <ExerciseModal
+          exercise={exercise}
+          onClose={() => setShowExerciseModal(false)}
+        />
+      )}
     </div>
   );
 }
