@@ -31,6 +31,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
   // Select exercises for each muscle group
   const selectedExercises: Exercise[] = [];
+  const selectedExerciseIds = new Set<string>();
 
   for (const muscleGroup of targetMuscleGroups) {
     let availableExercises = getExercisesByMuscleGroup(muscleGroup);
@@ -41,13 +42,20 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
     );
 
-    // Filter out recently used exercises
+    // Filter out recently used exercises AND already selected exercises
     const unusedExercises = availableExercises.filter(
-      (ex) => !recentExerciseIds.includes(ex.id)
+      (ex) => !recentExerciseIds.includes(ex.id) && !selectedExerciseIds.has(ex.id)
     );
 
-    // If all exercises were recently used, just use all available
-    const poolToChooseFrom = unusedExercises.length > 0 ? unusedExercises : availableExercises;
+    // If all exercises were recently used, filter only by selected exercises
+    let poolToChooseFrom = unusedExercises.length > 0 ? unusedExercises : availableExercises.filter(
+      (ex) => !selectedExerciseIds.has(ex.id)
+    );
+
+    // If still no exercises (shouldn't happen), use all available
+    if (poolToChooseFrom.length === 0) {
+      poolToChooseFrom = availableExercises;
+    }
 
     // Pick a random exercise from the pool
     const randomIndex = Math.floor(Math.random() * poolToChooseFrom.length);
@@ -55,6 +63,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
     if (selectedExercise) {
       selectedExercises.push(selectedExercise);
+      selectedExerciseIds.add(selectedExercise.id);
     }
   }
 
@@ -63,8 +72,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Pick a random muscle group
     const randomMuscleGroup = targetMuscleGroups[Math.floor(Math.random() * targetMuscleGroups.length)];
     let availableExercises = getExercisesByMuscleGroup(randomMuscleGroup).filter(
-      (ex) => !selectedExercises.some((selected) => selected.id === ex.id) &&
-              !recentExerciseIds.includes(ex.id)
+      (ex) => !selectedExerciseIds.has(ex.id) && !recentExerciseIds.includes(ex.id)
     );
 
     // Apply equipment filter
@@ -74,7 +82,9 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
     if (availableExercises.length > 0) {
       const randomIndex = Math.floor(Math.random() * availableExercises.length);
-      selectedExercises.push(availableExercises[randomIndex]);
+      const fourthExercise = availableExercises[randomIndex];
+      selectedExercises.push(fourthExercise);
+      selectedExerciseIds.add(fourthExercise.id);
     }
   }
 
