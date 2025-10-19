@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import Button from '../components/common/Button';
 import { WorkoutHistoryEntry } from '../types/workout';
+import { useWorkoutStore } from '../store/workout-store';
 
 export default function WorkoutComplete() {
   const navigate = useNavigate();
   const location = useLocation();
   const workout = location.state?.workout as WorkoutHistoryEntry | undefined;
+  const { loadWorkouts } = useWorkoutStore();
 
   const [showConfetti, setShowConfetti] = useState(true);
 
@@ -147,7 +148,10 @@ export default function WorkoutComplete() {
         {/* Actions */}
         <div className="space-y-3">
           <button
-            onClick={() => navigate('/')}
+            onClick={async () => {
+              await loadWorkouts();
+              navigate('/');
+            }}
             className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
           >
             Back to Dashboard
