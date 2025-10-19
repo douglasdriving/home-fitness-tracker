@@ -28,70 +28,49 @@ export default function Timer({
     onCompleteRef.current = onComplete;
   }, [onComplete]);
 
-  console.log('=== TIMER RENDER ===');
-  console.log('Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
-  console.log('TimeLeft:', timeLeft, 'IsRunning:', isRunning);
-
   // Initialize timer when props change
   useEffect(() => {
-    console.log('Timer init effect - setting timeLeft and isRunning');
-    console.log('  Duration:', duration, 'AutoStart:', autoStart, 'CountUp:', countUp);
     setTimeLeft(countUp ? 0 : duration);
     setIsRunning(autoStart);
   }, [duration, autoStart, countUp]);
 
   // Manage interval based on isRunning state
   useEffect(() => {
-    console.log('Timer interval effect triggered');
-    console.log('  isRunning:', isRunning, 'countUp:', countUp, 'duration:', duration);
-
     // Clear any existing interval
     if (intervalRef.current) {
-      console.log('  Clearing existing interval');
       clearInterval(intervalRef.current);
       intervalRef.current = null;
     }
 
     if (!isRunning) {
-      console.log('  Timer not running, skipping interval setup');
       return;
     }
 
-    console.log('  Setting up NEW interval...');
     intervalRef.current = setInterval(() => {
-      console.log('  Interval tick!');
       setTimeLeft((prev) => {
-        console.log('    Previous timeLeft:', prev);
         if (countUp) {
           // Count up mode
           if (prev >= duration - 1) {
-            console.log('    Count-up complete!');
             setIsRunning(false);
             playCompletionSound();
             if (onCompleteRef.current) onCompleteRef.current();
             return duration;
           }
-          const next = prev + 1;
-          console.log('    Counting up to:', next);
-          return next;
+          return prev + 1;
         } else {
           // Count down mode
           if (prev <= 1) {
-            console.log('    Count-down complete!');
             setIsRunning(false);
             playCompletionSound();
             if (onCompleteRef.current) onCompleteRef.current();
             return 0;
           }
-          const next = prev - 1;
-          console.log('    Counting down to:', next);
-          return next;
+          return prev - 1;
         }
       });
     }, 1000);
 
     return () => {
-      console.log('  Cleanup: clearing interval');
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
