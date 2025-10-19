@@ -24,6 +24,7 @@ export default function WorkoutExecution() {
   const [showInstructions, setShowInstructions] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState(false);
+  const [nextSetPreview, setNextSetPreview] = useState<{reps?: number, duration?: number} | null>(null);
 
   // Initialize position from saved state on mount
   useEffect(() => {
@@ -153,7 +154,27 @@ export default function WorkoutExecution() {
       console.log('Is last set of exercise?', isLastSetOfExercise);
       console.log('Is last exercise?', isLastExercise);
 
-      // Move to next phase FIRST before updating remaining sets (prevents flickering)
+      // For new exercises on first set, store preview value and update remaining sets
+      if (isFirstTime && currentSetIndex === 0 && !isLastSetOfExercise) {
+        console.log('First set of new exercise - storing preview and updating remaining sets to:', value);
+        // Store the value for preview display (prevents flickering)
+        if (exercise?.type === 'reps') {
+          setNextSetPreview({ reps: value });
+        } else {
+          setNextSetPreview({ duration: value });
+        }
+
+        // Update all remaining sets
+        for (let i = 1; i < currentExercise.sets.length; i++) {
+          if (exercise?.type === 'reps') {
+            await updateSet(currentExerciseIndex, i, { targetReps: value });
+          } else {
+            await updateSet(currentExerciseIndex, i, { targetDuration: value });
+          }
+        }
+      }
+
+      // Move to next phase
       if (isLastSetOfExercise) {
         // Move to next exercise or complete workout
         if (isLastExercise) {
@@ -170,22 +191,6 @@ export default function WorkoutExecution() {
         console.log('Moving to rest between sets');
         setPhase('rest');
       }
-
-      // For new exercises, update remaining sets to match first set performance
-      // Do this AFTER changing phase to prevent flickering in "Up Next" preview
-      if (isFirstTime && currentSetIndex === 0 && !isLastSetOfExercise) {
-        console.log('First set of new exercise - updating remaining sets to:', value);
-        // Use setTimeout to ensure the phase change completes first
-        setTimeout(async () => {
-          for (let i = 1; i < currentExercise.sets.length; i++) {
-            if (exercise?.type === 'reps') {
-              await updateSet(currentExerciseIndex, i, { targetReps: value });
-            } else {
-              await updateSet(currentExerciseIndex, i, { targetDuration: value });
-            }
-          }
-        }, 0);
-      }
     } catch (error) {
       console.error('Error completing set:', error);
       alert('Failed to complete set. Please try again.');
@@ -196,6 +201,7 @@ export default function WorkoutExecution() {
     // Move to next set
     setCurrentSetIndex(currentSetIndex + 1);
     setInputValue('');
+    setNextSetPreview(null); // Clear preview when moving to next set
     setPhase('exercise');
   };
 
@@ -297,8 +303,8 @@ export default function WorkoutExecution() {
                       ? `${nextExercise?.sets[0]?.targetReps} reps`
                       : `${nextExercise?.sets[0]?.targetDuration}s`)
                   : (exercise?.type === 'reps'
-                      ? `${currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
-                      : `${currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`)}
+                      ? `${nextSetPreview?.reps || currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
+                      : `${nextSetPreview?.duration || currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`)}
               </div>
             </div>
           </div>
