@@ -213,7 +213,7 @@
     "id": "band-glute-bridge-001",
     "name": "Resistance Band Glute Bridge",
     "muscleGroups": ["glutes", "lowerBack"],
-    "description": "Place a resistance band just above your knees. Lie on your back with knees bent and feet flat, hip-width apart. Push through your heels to lift your hips while pressing your knees outward against the band. Squeeze your glutes at the top, then lower with control.",
+    "description": "Place a loop resistance band just above your knees. Lie on your back with knees bent and feet flat, hip-width apart. Push through your heels to lift your hips while pressing your knees outward against the band. Squeeze your glutes at the top, then lower with control. Note: This exercise uses a loop resistance band (broad rubber band) placed around your knees.",
     "videoUrl": "https://www.youtube.com/watch?v=E5GjlfwmLWY",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -229,7 +229,7 @@
     "id": "band-clamshells-001",
     "name": "Resistance Band Clamshells",
     "muscleGroups": ["glutes"],
-    "description": "Lie on your side with a resistance band around your thighs, just above your knees. Keep your feet together and knees bent. Lift your top knee as high as possible while keeping your feet touching. Lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both sides combined.",
+    "description": "Lie on your side with a loop resistance band around your thighs, just above your knees. Keep your feet together and knees bent. Lift your top knee as high as possible while keeping your feet touching. Lower back down with control. Complete all reps on one side before switching. Note: This exercise uses a loop resistance band (broad rubber band). Count total reps for both sides combined.",
     "videoUrl": "https://www.youtube.com/watch?v=Ja69I53U5yM",
     "source": "Physical Therapy",
     "heavinessScore": {
@@ -242,74 +242,10 @@
     "equipment": "elastic-band"
   },
   {
-    "id": "band-standing-glute-kickback-001",
-    "name": "Standing Band Glute Kickback",
-    "muscleGroups": ["glutes", "lowerBack"],
-    "description": "Anchor a resistance band at ankle height. Stand facing the anchor and loop the band around one ankle. Keeping your leg straight, kick it back behind you, squeezing your glutes. Return to start with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined.",
-    "videoUrl": "https://www.youtube.com/watch?v=Kz6E2OFmGGM",
-    "source": "ACE Fitness",
-    "heavinessScore": {
-      "abs": 0,
-      "glutes": 6,
-      "lowerBack": 3
-    },
-    "type": "reps",
-    "defaultReps": 12,
-    "equipment": "elastic-band"
-  },
-  {
-    "id": "band-pallof-press-001",
-    "name": "Band Pallof Press",
-    "muscleGroups": ["abs", "lowerBack"],
-    "description": "Anchor a resistance band at chest height to your side. Stand perpendicular to the anchor and hold the band with both hands at your chest. Press the band straight out in front of you, resisting rotation. Hold briefly, then return to chest. Complete all reps facing one direction, then switch sides.",
-    "videoUrl": "https://www.youtube.com/watch?v=EejbDFJWKYU",
-    "source": "Functional Training",
-    "heavinessScore": {
-      "abs": 7,
-      "glutes": 0,
-      "lowerBack": 5
-    },
-    "type": "reps",
-    "defaultReps": 10,
-    "equipment": "elastic-band"
-  },
-  {
-    "id": "band-russian-twist-001",
-    "name": "Band Russian Twist",
-    "muscleGroups": ["abs"],
-    "description": "Sit on the floor with knees bent and feet elevated. Hold a resistance band anchored in front of you at chest height with both hands. Lean back slightly and rotate your torso from side to side, pulling the band across your body. Keep your core engaged throughout.",
-    "videoUrl": "https://www.youtube.com/watch?v=wkD8rjkodUI",
-    "source": "Core Training",
-    "heavinessScore": {
-      "abs": 6,
-      "glutes": 0,
-      "lowerBack": 0
-    },
-    "type": "reps",
-    "defaultReps": 20,
-    "equipment": "elastic-band"
-  },
-  {
-    "id": "band-woodchop-001",
-    "name": "Band Woodchop",
-    "muscleGroups": ["abs", "lowerBack"],
-    "description": "Anchor a resistance band at shoulder height. Stand with feet shoulder-width apart, holding the band with both hands. Pull the band diagonally down and across your body, rotating your torso. Return to start with control. Complete all reps on one side before switching.",
-    "videoUrl": "https://www.youtube.com/watch?v=pAplQXk3dkU",
-    "source": "Functional Core Training",
-    "heavinessScore": {
-      "abs": 6,
-      "glutes": 0,
-      "lowerBack": 4
-    },
-    "type": "reps",
-    "defaultReps": 12,
-    "equipment": "elastic-band"
-  },
-  {
     "id": "band-lateral-walk-001",
     "name": "Band Lateral Walk",
     "muscleGroups": ["glutes"],
-    "description": "Place a resistance band around your ankles or just above your knees. Squat slightly and step sideways, maintaining tension in the band. Keep your knees pushed outward and core engaged. Take 10-15 steps in one direction, then return.",
+    "description": "Place a loop resistance band around your ankles or just above your knees. Squat slightly and step sideways, maintaining tension in the band. Keep your knees pushed outward and core engaged. Take 10-15 steps in one direction, then return. Note: This exercise uses a loop resistance band (broad rubber band) placed around your ankles or knees.",
     "videoUrl": "https://www.youtube.com/watch?v=Mn-5OBdZLjA",
     "source": "Athletic Training",
     "heavinessScore": {
@@ -319,22 +255,6 @@
     },
     "type": "reps",
     "defaultReps": 20,
-    "equipment": "elastic-band"
-  },
-  {
-    "id": "band-anti-rotation-hold-001",
-    "name": "Band Anti-Rotation Hold",
-    "muscleGroups": ["abs", "lowerBack"],
-    "description": "Anchor a resistance band at chest height to your side. Stand perpendicular to the anchor and hold the band with both hands extended in front of you. Hold this position, resisting the band's pull to rotate you. Keep your core tight and body still. Perform on both sides.",
-    "videoUrl": "https://www.youtube.com/watch?v=J9lD2BKJY3Q",
-    "source": "Core Stability Training",
-    "heavinessScore": {
-      "abs": 6,
-      "glutes": 0,
-      "lowerBack": 5
-    },
-    "type": "timed",
-    "defaultDuration": 20,
     "equipment": "elastic-band"
   }
 ]
