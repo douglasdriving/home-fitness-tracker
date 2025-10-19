@@ -402,7 +402,11 @@ export default function WorkoutExecution() {
           {/* Timer for timed exercises */}
           {exercise?.type === 'timed' && (
             <div className="mb-4">
-              <Timer duration={currentSet.targetDuration || 30} />
+              <Timer
+                duration={currentSet.targetDuration || 30}
+                countUp={isFirstTime}
+                showSecondsOnly={isFirstTime}
+              />
             </div>
           )}
 
