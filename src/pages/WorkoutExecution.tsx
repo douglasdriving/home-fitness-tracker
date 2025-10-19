@@ -277,7 +277,7 @@ export default function WorkoutExecution() {
             duration={isExerciseRest ? 60 : currentExercise.restTime}
             onComplete={isExerciseRest ? handleExerciseRestComplete : handleRestComplete}
             autoStart={true}
-            hideControls={true}
+            hideControls={false}
           />
 
           <div className="mt-4">
