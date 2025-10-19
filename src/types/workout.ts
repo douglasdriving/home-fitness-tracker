@@ -8,6 +8,7 @@ export interface Workout {
   completedDate?: number; // timestamp
   status: 'pending' | 'in-progress' | 'completed';
   estimatedDuration: number; // minutes
+  totalDuration?: number; // actual minutes (set when completed)
   exercises: WorkoutExercise[];
   currentExerciseIndex?: number; // Track position for persistence
   currentSetIndex?: number; // Track position for persistence
