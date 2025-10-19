@@ -117,13 +117,15 @@ export default function Timer({
         </span>
       </div>
 
-      {/* Progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-        <div
-          className="bg-primary h-2 rounded-full transition-all"
-          style={{ width: `${progress}%` }}
-        />
-      </div>
+      {/* Progress bar - hide for count-up timers */}
+      {!countUp && (
+        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+          <div
+            className="bg-primary h-2 rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      )}
 
       {!hideControls && (
         <div className="flex gap-2">

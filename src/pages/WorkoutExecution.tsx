@@ -56,11 +56,16 @@ export default function WorkoutExecution() {
     const currentSet = currentExercise?.sets[currentSetIndex];
 
     if (currentSet && !currentSet.completed) {
-      // For incomplete sets, use target value
-      const value = currentSet.targetReps || currentSet.targetDuration || '';
-      setInputValue(value.toString());
+      // For first-time exercises, leave input empty
+      if (isFirstTime) {
+        setInputValue('');
+      } else {
+        // For known exercises, use target value
+        const value = currentSet.targetReps || currentSet.targetDuration || '';
+        setInputValue(value.toString());
+      }
     }
-  }, [currentExerciseIndex, currentSetIndex, isInitialized]);
+  }, [currentExerciseIndex, currentSetIndex, isInitialized, isFirstTime]);
 
   // Save position whenever it changes
   useEffect(() => {
@@ -117,6 +122,12 @@ export default function WorkoutExecution() {
   const handleCompleteSet = async () => {
     const value = parseInt(inputValue);
 
+    console.log('=== COMPLETING SET ===');
+    console.log('Input value:', inputValue, 'Parsed:', value);
+    console.log('Current exercise index:', currentExerciseIndex);
+    console.log('Current set index:', currentSetIndex);
+    console.log('Exercise type:', exercise?.type);
+
     if (!value || value <= 0) {
       alert('Please enter a valid number');
       return;
@@ -131,23 +142,43 @@ export default function WorkoutExecution() {
           : { actualDuration: value }),
       };
 
+      console.log('Updates to apply:', updates);
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
+      console.log('Set updated successfully');
+
+      // For new exercises, update remaining sets to match first set performance
+      if (isFirstTime && currentSetIndex === 0) {
+        console.log('First set of new exercise - updating remaining sets to:', value);
+        for (let i = 1; i < currentExercise.sets.length; i++) {
+          if (exercise?.type === 'reps') {
+            await updateSet(currentExerciseIndex, i, { targetReps: value });
+          } else {
+            await updateSet(currentExerciseIndex, i, { targetDuration: value });
+          }
+        }
+      }
 
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
       const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
 
+      console.log('Is last set of exercise?', isLastSetOfExercise);
+      console.log('Is last exercise?', isLastExercise);
+
       if (isLastSetOfExercise) {
         // Move to next exercise or complete workout
         if (isLastExercise) {
           // Complete the workout
+          console.log('COMPLETING ENTIRE WORKOUT');
           await handleCompleteWorkout();
         } else {
           // Rest between exercises before moving to next one
+          console.log('Moving to exercise rest');
           setPhase('exercise-rest');
         }
       } else {
         // Move to rest phase between sets
+        console.log('Moving to rest between sets');
         setPhase('rest');
       }
     } catch (error) {

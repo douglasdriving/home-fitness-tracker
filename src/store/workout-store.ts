@@ -161,6 +161,10 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       throw new Error('No current workout to complete');
     }
 
+    console.log('=== COMPLETING WORKOUT ===');
+    console.log('Current workout:', currentWorkout);
+    console.log('Exercises:', currentWorkout.exercises);
+
     const completedDate = Date.now();
 
     // Calculate actual duration from when workout was started (not generated)
@@ -176,6 +180,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     };
 
     await db.workouts.put(updatedWorkout);
+    console.log('Workout marked as completed in DB');
 
     // Create history entry - only include completed sets
     const historyEntry: WorkoutHistoryEntry = {
@@ -184,21 +189,32 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       workoutNumber: currentWorkout.workoutNumber,
       completedDate,
       totalDuration,
-      exercises: currentWorkout.exercises.map((ex) => ({
-        exerciseId: ex.exerciseId,
-        exerciseName: ex.exerciseName,
-        muscleGroups: ex.muscleGroups,
-        completedSets: ex.sets
-          .filter((set) => set.completed && (set.actualReps || set.actualDuration))
+      exercises: currentWorkout.exercises.map((ex) => {
+        console.log(`Exercise ${ex.exerciseName}:`, ex.sets);
+        const completedSets = ex.sets
+          .filter((set) => {
+            const isCompleted = set.completed && (set.actualReps || set.actualDuration);
+            console.log(`  Set ${set.setNumber}: completed=${set.completed}, actualReps=${set.actualReps}, actualDuration=${set.actualDuration}, included=${isCompleted}`);
+            return isCompleted;
+          })
           .map((set) => ({
             setNumber: set.setNumber,
             actualReps: set.actualReps,
             actualDuration: set.actualDuration,
-          })),
-      })),
+          }));
+        console.log(`  Total completed sets for ${ex.exerciseName}:`, completedSets.length);
+        return {
+          exerciseId: ex.exerciseId,
+          exerciseName: ex.exerciseName,
+          muscleGroups: ex.muscleGroups,
+          completedSets,
+        };
+      }),
     };
 
+    console.log('History entry to save:', historyEntry);
     await db.history.add(historyEntry);
+    console.log('History entry saved');
 
     // Update user strength levels based on workout performance
     const userProfile = useUserStore.getState().profile;

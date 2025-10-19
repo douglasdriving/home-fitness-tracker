@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/user-store';
 import { useWorkoutStore } from '../store/workout-store';
+import { db } from '../db/db';
 import Button from '../components/common/Button';
 
 export default function Dashboard() {
@@ -9,12 +10,39 @@ export default function Dashboard() {
   const { profile } = useUserStore();
   const { currentWorkout, loadWorkouts, generateNewWorkout, startWorkout, loadHistory, workoutHistory } =
     useWorkoutStore();
+  const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Load current workout and history
     loadWorkouts();
     loadHistory();
   }, [profile, loadWorkouts, loadHistory]);
+
+  // Check which exercises in current workout are new
+  useEffect(() => {
+    const checkNewExercises = async () => {
+      if (!currentWorkout) {
+        setNewExerciseIds(new Set());
+        return;
+      }
+
+      const history = await db.history.toArray();
+      const newIds = new Set<string>();
+
+      for (const exercise of currentWorkout.exercises) {
+        const hasBeenDone = history.some(workout =>
+          workout.exercises.some(ex => ex.exerciseId === exercise.exerciseId)
+        );
+        if (!hasBeenDone) {
+          newIds.add(exercise.exerciseId);
+        }
+      }
+
+      setNewExerciseIds(newIds);
+    };
+
+    checkNewExercises();
+  }, [currentWorkout]);
 
   const handleGenerateWorkout = async () => {
     try {
@@ -102,6 +130,7 @@ export default function Dashboard() {
             <div className="space-y-3 mb-6">
               {currentWorkout.exercises.map((exercise, index) => {
                 const firstSet = exercise.sets[0];
+                const isNew = newExerciseIds.has(exercise.exerciseId);
                 const targetValue = firstSet.targetReps
                   ? `${firstSet.targetReps} reps`
                   : `${firstSet.targetDuration}s`;
@@ -111,10 +140,20 @@ export default function Dashboard() {
                     key={index}
                     className="flex justify-between items-center p-3 bg-gray-50 rounded-lg"
                   >
-                    <div>
-                      <div className="font-medium text-gray-800">{exercise.exerciseName}</div>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium text-gray-800">{exercise.exerciseName}</div>
+                        {isNew && (
+                          <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full font-semibold">
+                            New!
+                          </span>
+                        )}
+                      </div>
                       <div className="text-sm text-gray-600">
-                        {exercise.sets.length} sets × {targetValue}
+                        {isNew
+                          ? `${exercise.sets.length} sets`
+                          : `${exercise.sets.length} sets × ${targetValue}`
+                        }
                       </div>
                     </div>
                     <div className="flex gap-1">

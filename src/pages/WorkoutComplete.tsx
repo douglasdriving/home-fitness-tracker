@@ -77,10 +77,6 @@ export default function WorkoutComplete() {
         {/* Success Icon & Message */}
         <div className="text-center">
           <div className="text-8xl mb-4 animate-bounce">🏆</div>
-          <h1 className="text-3xl font-bold mb-2">Workout Complete!</h1>
-          <p className="text-white/80">
-            Amazing work! You crushed workout #{workout.workoutNumber}
-          </p>
         </div>
 
         {/* Workout Stats */}
