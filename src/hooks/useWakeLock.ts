@@ -12,14 +12,12 @@ export function useWakeLock() {
       try {
         if ('wakeLock' in navigator) {
           wakeLockRef.current = await navigator.wakeLock.request('screen');
-          console.log('Screen Wake Lock acquired');
 
           // Re-acquire wake lock when page becomes visible again
           const handleVisibilityChange = async () => {
             if (document.visibilityState === 'visible' && wakeLockRef.current !== null) {
               try {
                 wakeLockRef.current = await navigator.wakeLock.request('screen');
-                console.log('Screen Wake Lock re-acquired');
               } catch (err) {
                 console.warn('Could not re-acquire wake lock:', err);
               }
@@ -43,7 +41,6 @@ export function useWakeLock() {
     return () => {
       if (wakeLockRef.current) {
         wakeLockRef.current.release().then(() => {
-          console.log('Screen Wake Lock released');
           wakeLockRef.current = null;
         });
       }
