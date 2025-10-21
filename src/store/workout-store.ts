@@ -291,7 +291,28 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
    */
   updateHistoryEntry: async (_historyId: string, updatedEntry: WorkoutHistoryEntry) => {
     try {
-      await db.history.put(updatedEntry);
+      // Get all history entries
+      const allHistory = await db.history.toArray();
+
+      // Replace the updated entry in the list
+      const historyWithUpdate = allHistory.map((entry) =>
+        entry.id === updatedEntry.id ? updatedEntry : entry
+      );
+
+      // Sort by date to determine chronological order
+      const sortedHistory = historyWithUpdate.sort(
+        (a, b) => a.completedDate - b.completedDate
+      );
+
+      // Reassign workout numbers based on chronological order
+      sortedHistory.forEach((entry, index) => {
+        entry.workoutNumber = index + 1;
+      });
+
+      // Update all entries in the database
+      for (const entry of sortedHistory) {
+        await db.history.put(entry);
+      }
 
       // Update strength levels based on the updated workout performance
       const userProfile = useUserStore.getState().profile;
