@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { WorkoutHistoryEntry } from '../../types/workout';
 import { format } from 'date-fns';
 import Button from '../common/Button';
+import { getExerciseById } from '../../data/exerciseData';
 
 interface EditWorkoutModalProps {
   workout: WorkoutHistoryEntry;
@@ -184,45 +185,50 @@ export default function EditWorkoutModal({ workout, onSave, onClose }: EditWorko
 
                 {/* Sets */}
                 <div className="space-y-2">
-                  {exercise.completedSets.map((set, setIndex) => (
-                    <div key={setIndex} className="flex items-center gap-2">
-                      <span className="text-sm text-text-muted w-16">Set {set.setNumber}:</span>
+                  {exercise.completedSets.map((set, setIndex) => {
+                    const exerciseData = getExerciseById(exercise.exerciseId);
+                    const isRepBased = exerciseData?.type === 'reps';
 
-                      {set.actualReps !== undefined ? (
-                        <input
-                          type="number"
-                          min="0"
-                          value={set.actualReps || ''}
-                          onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'actualReps', e.target.value)}
-                          className="flex-1 bg-background-lighter border border-background-lighter rounded px-2 py-1 text-text text-sm"
-                          placeholder="Reps"
-                        />
-                      ) : (
-                        <input
-                          type="number"
-                          min="0"
-                          value={set.actualDuration || ''}
-                          onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'actualDuration', e.target.value)}
-                          className="flex-1 bg-background-lighter border border-background-lighter rounded px-2 py-1 text-text text-sm"
-                          placeholder="Seconds"
-                        />
-                      )}
+                    return (
+                      <div key={setIndex} className="flex items-center gap-2">
+                        <span className="text-sm text-text-muted w-16">Set {set.setNumber}:</span>
 
-                      <span className="text-xs text-text-muted w-12">
-                        {set.actualReps !== undefined ? 'reps' : 'sec'}
-                      </span>
+                        {isRepBased ? (
+                          <input
+                            type="number"
+                            min="0"
+                            value={set.actualReps ?? ''}
+                            onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'actualReps', e.target.value)}
+                            className="flex-1 bg-background-lighter border border-background-lighter rounded px-2 py-1 text-text text-sm"
+                            placeholder="Reps"
+                          />
+                        ) : (
+                          <input
+                            type="number"
+                            min="0"
+                            value={set.actualDuration ?? ''}
+                            onChange={(e) => handleSetChange(exerciseIndex, setIndex, 'actualDuration', e.target.value)}
+                            className="flex-1 bg-background-lighter border border-background-lighter rounded px-2 py-1 text-text text-sm"
+                            placeholder="Seconds"
+                          />
+                        )}
 
-                      <button
-                        onClick={() => handleDeleteSet(exerciseIndex, setIndex)}
-                        className="text-red-400 hover:text-red-300 p-1"
-                        title="Delete set"
-                      >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                      </button>
-                    </div>
-                  ))}
+                        <span className="text-xs text-text-muted w-12">
+                          {isRepBased ? 'reps' : 'sec'}
+                        </span>
+
+                        <button
+                          onClick={() => handleDeleteSet(exerciseIndex, setIndex)}
+                          className="text-red-400 hover:text-red-300 p-1"
+                          title="Delete set"
+                        >
+                          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                          </svg>
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ))}

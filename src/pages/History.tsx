@@ -67,24 +67,6 @@ export default function History() {
     setShowAddManual(false);
   };
 
-  if (workoutHistory.length === 0) {
-    return (
-      <div className="bg-background min-h-screen">
-        <div className="p-4">
-          <div className="p-8 text-center">
-            <div className="text-6xl mb-4">📊</div>
-            <h2 className="text-xl font-semibold text-text mb-2">
-              No workouts yet
-            </h2>
-            <p className="text-text-muted">
-              Complete your first workout to see your history here.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
@@ -101,7 +83,18 @@ export default function History() {
           </button>
         </div>
 
-        {workoutHistory.map((entry) => {
+        {workoutHistory.length === 0 ? (
+          <div className="p-8 text-center">
+            <div className="text-6xl mb-4">📊</div>
+            <h2 className="text-xl font-semibold text-text mb-2">
+              No workouts yet
+            </h2>
+            <p className="text-text-muted">
+              Complete your first workout to see your history here.
+            </p>
+          </div>
+        ) : (
+          workoutHistory.map((entry) => {
           const totalSets = entry.exercises.reduce(
             (sum, ex) => sum + ex.completedSets.length,
             0
@@ -199,7 +192,8 @@ export default function History() {
               </div>
             </div>
           );
-        })}
+        })
+        )}
       </div>
 
       {/* Edit Modal */}
