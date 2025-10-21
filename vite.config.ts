@@ -8,13 +8,13 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico'],
+      includeAssets: ['favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png'],
       manifest: {
         name: 'Home Fitness Tracker',
         short_name: 'Fitness',
         description: 'Track your core strength workouts with personalized progression',
-        theme_color: '#4F46E5',
-        background_color: '#ffffff',
+        theme_color: '#1a0b2e',
+        background_color: '#1a0b2e',
         display: 'standalone',
         orientation: 'portrait',
         scope: '/',

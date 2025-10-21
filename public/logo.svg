@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Background circle -->
+  <circle cx="100" cy="100" r="95" fill="#1a0b2e"/>
+
+  <!-- Outer ring -->
+  <circle cx="100" cy="100" r="85" fill="none" stroke="#a78bfa" stroke-width="4"/>
+
+  <!-- Abstract person doing plank/core exercise -->
+  <!-- Head -->
+  <circle cx="70" cy="70" r="12" fill="#a78bfa"/>
+
+  <!-- Body and arms forming strong core shape -->
+  <path d="M 70 82 L 70 95 L 140 95 L 140 105 L 70 105 L 70 118"
+        stroke="#34d399" stroke-width="8" stroke-linecap="round" fill="none"/>
+
+  <!-- Supporting arm -->
+  <path d="M 70 105 L 45 120"
+        stroke="#34d399" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Back leg extended -->
+  <path d="M 140 100 L 165 90"
+        stroke="#34d399" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Front leg -->
+  <path d="M 140 100 L 150 130"
+        stroke="#34d399" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Core strength indicator - geometric shapes -->
+  <circle cx="105" cy="100" r="6" fill="#fbbf24"/>
+  <circle cx="95" cy="100" r="6" fill="#fbbf24"/>
+
+  <!-- Dynamic movement lines -->
+  <path d="M 160 75 L 175 70" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 165 85 L 180 80" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+  <path d="M 170 95 L 185 90" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+</svg>

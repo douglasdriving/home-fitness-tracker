@@ -23,7 +23,8 @@
       "Bash(taskkill /F /IM node.exe /T)",
       "Bash(taskkill //F //IM node.exe //T)",
       "Bash(rmdir src/components/calibration src/components/exercises src/components/history)",
-      "Bash(rm initial-idea.md feedback.md)"
+      "Bash(rm initial-idea.md feedback.md)",
+      "Bash(where:*)"
     ],
     "deny": [],
     "ask": []

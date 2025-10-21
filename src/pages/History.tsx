@@ -1,10 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useWorkoutStore } from '../store/workout-store';
 import { format } from 'date-fns';
+import { WorkoutHistoryEntry } from '../types/workout';
+import EditWorkoutModal from '../components/history/EditWorkoutModal';
+import AddManualWorkoutModal from '../components/history/AddManualWorkoutModal';
 
 export default function History() {
-  const { workoutHistory, loadHistory, deleteHistoryEntry } = useWorkoutStore();
+  const { workoutHistory, loadHistory, deleteHistoryEntry, updateHistoryEntry, addManualWorkout } = useWorkoutStore();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [editingWorkout, setEditingWorkout] = useState<WorkoutHistoryEntry | null>(null);
+  const [showAddManual, setShowAddManual] = useState(false);
 
   useEffect(() => {
     loadHistory();
@@ -24,6 +29,42 @@ export default function History() {
     } finally {
       setDeletingId(null);
     }
+  };
+
+  const handleEdit = (entry: WorkoutHistoryEntry) => {
+    setEditingWorkout(entry);
+  };
+
+  const handleSaveEdit = async (updatedWorkout: WorkoutHistoryEntry) => {
+    try {
+      await updateHistoryEntry(updatedWorkout.id, updatedWorkout);
+      setEditingWorkout(null);
+    } catch (error) {
+      console.error('Failed to update workout:', error);
+      alert('Failed to update workout. Please try again.');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingWorkout(null);
+  };
+
+  const handleAddManual = () => {
+    setShowAddManual(true);
+  };
+
+  const handleSaveManual = async (workout: WorkoutHistoryEntry) => {
+    try {
+      await addManualWorkout(workout);
+      setShowAddManual(false);
+    } catch (error) {
+      console.error('Failed to add manual workout:', error);
+      alert('Failed to add manual workout. Please try again.');
+    }
+  };
+
+  const handleCancelManual = () => {
+    setShowAddManual(false);
   };
 
   if (workoutHistory.length === 0) {
@@ -47,6 +88,19 @@ export default function History() {
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
+        {/* Add Manual Workout Button */}
+        <div className="flex justify-end">
+          <button
+            onClick={handleAddManual}
+            className="bg-accent hover:bg-accent-dark text-background font-semibold px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+            </svg>
+            Add Manual Workout
+          </button>
+        </div>
+
         {workoutHistory.map((entry) => {
           const totalSets = entry.exercises.reduce(
             (sum, ex) => sum + ex.completedSets.length,
@@ -73,6 +127,15 @@ export default function History() {
                       </div>
                       <div className="text-xs text-text-muted">minutes</div>
                     </div>
+                    <button
+                      onClick={() => handleEdit(entry)}
+                      className="text-accent hover:text-accent-light p-1"
+                      title="Edit workout"
+                    >
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                    </button>
                     <button
                       onClick={() => handleDelete(entry.id, entry.workoutNumber)}
                       disabled={deletingId === entry.id}
@@ -138,6 +201,23 @@ export default function History() {
           );
         })}
       </div>
+
+      {/* Edit Modal */}
+      {editingWorkout && (
+        <EditWorkoutModal
+          workout={editingWorkout}
+          onSave={handleSaveEdit}
+          onClose={handleCancelEdit}
+        />
+      )}
+
+      {/* Add Manual Workout Modal */}
+      {showAddManual && (
+        <AddManualWorkoutModal
+          onSave={handleSaveManual}
+          onClose={handleCancelManual}
+        />
+      )}
     </div>
   );
 }
