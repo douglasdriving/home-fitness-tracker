@@ -55,12 +55,22 @@ export default function AddManualWorkoutModal({ onSave, onClose }: AddManualWork
     const newExercises = [...selectedExercises];
     const newSets = [...newExercises[exerciseIndex].completedSets];
 
-    const numValue = parseInt(value) || undefined;
+    const numValue = value === '' ? undefined : (parseInt(value) || undefined);
 
-    newSets[setIndex] = {
-      ...newSets[setIndex],
-      [field]: numValue,
-    };
+    // Only update the specific field, preserve the type (reps vs duration)
+    if (field === 'actualReps') {
+      newSets[setIndex] = {
+        ...newSets[setIndex],
+        actualReps: numValue,
+        actualDuration: undefined, // Ensure duration stays undefined for rep-based exercises
+      };
+    } else {
+      newSets[setIndex] = {
+        ...newSets[setIndex],
+        actualDuration: numValue,
+        actualReps: undefined, // Ensure reps stays undefined for timed exercises
+      };
+    }
 
     newExercises[exerciseIndex] = {
       ...newExercises[exerciseIndex],
