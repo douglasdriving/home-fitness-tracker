@@ -76,9 +76,7 @@ export default function WorkoutComplete() {
       <div className="max-w-md w-full bg-gradient-to-br from-primary to-primary-dark text-white p-8 rounded-lg shadow-2xl space-y-6">
         {/* Success Icon & Message */}
         <div className="text-center">
-          <div className="text-8xl mb-4 animate-bounce">🏆</div>
           <h2 className="text-4xl font-display font-bold mb-2 tracking-wide">WORKOUT COMPLETE!</h2>
-          <p className="text-white/80 font-medium">Great job crushing it!</p>
         </div>
 
         {/* Workout Stats */}
@@ -115,7 +113,6 @@ export default function WorkoutComplete() {
           </div>
 
         {/* Exercises Completed */}
-          <h3 className="text-lg font-semibold mb-3">Exercises</h3>
           <div className="space-y-2">
             {workout.exercises.map((exercise, idx) => (
               <div

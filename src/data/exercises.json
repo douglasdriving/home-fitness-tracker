@@ -42,7 +42,7 @@
       "lowerBack",
       "abs"
     ],
-    "description": "Start on hands and knees in a tabletop position. Extend your right arm forward and left leg back simultaneously, forming a straight line. Hold briefly, then return to start. Repeat on the opposite side. Keep your core engaged and back flat throughout the movement. Note: Count total reps for both sides combined (e.g., 10 reps = 5 per side).",
+    "description": "Start on hands and knees in a tabletop position. Extend your right arm forward and left leg back simultaneously, forming a straight line. Hold briefly, then return to start. Repeat on the opposite side. Keep your core engaged and back flat throughout the movement.",
     "videoUrl": "https://www.youtube.com/watch?v=wiFNA3sqjCA",
     "source": "Mayo Clinic",
     "heavinessScore": {
@@ -51,7 +51,8 @@
       "lowerBack": 4
     },
     "type": "reps",
-    "defaultReps": 10
+    "defaultReps": 10,
+    "countingMethod": "per-side"
   },
   {
     "id": "crunches-001",
@@ -130,7 +131,7 @@
       "glutes",
       "lowerBack"
     ],
-    "description": "Lie on your back with one knee bent and foot flat on the floor. Extend the other leg straight. Push through your grounded heel to lift your hips, forming a straight line from shoulders to the extended leg. Squeeze your glutes at the top, then lower with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 10 reps = 5 per leg).",
+    "description": "Lie on your back with one knee bent and foot flat on the floor. Extend the other leg straight. Push through your grounded heel to lift your hips, forming a straight line from shoulders to the extended leg. Squeeze your glutes at the top, then lower with control. Complete all reps on one side before switching.",
     "videoUrl": "https://www.youtube.com/watch?v=AVAXhy6pl7o",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -139,7 +140,8 @@
       "lowerBack": 4
     },
     "type": "reps",
-    "defaultReps": 10
+    "defaultReps": 10,
+    "countingMethod": "per-side"
   },
   {
     "id": "mountain-climbers-001",
@@ -181,7 +183,7 @@
     "muscleGroups": [
       "glutes"
     ],
-    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg up behind you until your thigh is parallel to the ground. Squeeze your glutes at the top, then lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
+    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg up behind you until your thigh is parallel to the ground. Squeeze your glutes at the top, then lower back down with control. Complete all reps on one side before switching.",
     "videoUrl": "https://www.youtube.com/watch?v=SJ1Xuz9D-ZQ",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -190,7 +192,8 @@
       "lowerBack": 0
     },
     "type": "reps",
-    "defaultReps": 15
+    "defaultReps": 15,
+    "countingMethod": "per-side"
   },
   {
     "id": "side-plank-001",
@@ -199,7 +202,7 @@
       "abs",
       "lowerBack"
     ],
-    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides. Note: For timed exercises, hold the total duration per side (e.g., 20s = 20s per side).",
+    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides.",
     "videoUrl": "https://www.youtube.com/watch?v=K2VljzCC16g",
     "source": "American Council on Exercise",
     "heavinessScore": {
@@ -208,7 +211,8 @@
       "lowerBack": 4
     },
     "type": "timed",
-    "defaultDuration": 20
+    "defaultDuration": 20,
+    "countingMethod": "per-side"
   },
   {
     "id": "fire-hydrants-001",
@@ -216,7 +220,7 @@
     "muscleGroups": [
       "glutes"
     ],
-    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg out to the side until your thigh is parallel to the ground. Keep your hips level and avoid rotating your torso. Lower back down with control. Complete all reps on one side before switching. Note: Count total reps for both legs combined (e.g., 15 reps = 7-8 per leg).",
+    "description": "Start on hands and knees in a tabletop position. Keeping your knee bent at 90 degrees, lift one leg out to the side until your thigh is parallel to the ground. Keep your hips level and avoid rotating your torso. Lower back down with control. Complete all reps on one side before switching. Note: This exercise uses a loop resistance band (broad rubber band) placed around your thighs.",
     "videoUrl": "https://www.youtube.com/shorts/BLx5wSzafxg",
     "source": "ACE Fitness",
     "heavinessScore": {
@@ -225,7 +229,9 @@
       "lowerBack": 0
     },
     "type": "reps",
-    "defaultReps": 15
+    "defaultReps": 15,
+    "equipment": "elastic-band",
+    "countingMethod": "per-side"
   },
   {
     "id": "reverse-crunches-001",
@@ -269,7 +275,7 @@
     "muscleGroups": [
       "glutes"
     ],
-    "description": "Lie on your side with a loop resistance band around your thighs, just above your knees. Keep your feet together and knees bent. Lift your top knee as high as possible while keeping your feet touching. Lower back down with control. Complete all reps on one side before switching. Note: This exercise uses a loop resistance band (broad rubber band). Count total reps for both sides combined.",
+    "description": "Lie on your side with a loop resistance band around your thighs, just above your knees. Keep your feet together and knees bent. Lift your top knee as high as possible while keeping your feet touching. Lower back down with control. Complete all reps on one side before switching. Note: This exercise uses a loop resistance band (broad rubber band).",
     "videoUrl": "https://www.youtube.com/watch?v=m_ZPapmqeNM",
     "source": "Physical Therapy",
     "heavinessScore": {
@@ -279,7 +285,8 @@
     },
     "type": "reps",
     "defaultReps": 15,
-    "equipment": "elastic-band"
+    "equipment": "elastic-band",
+    "countingMethod": "per-side"
   },
   {
     "id": "band-lateral-walk-001",

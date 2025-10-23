@@ -30,6 +30,7 @@ export interface Set {
   completed: boolean;
   actualReps?: number;
   actualDuration?: number; // seconds
+  equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
 }
 
 export interface WorkoutHistoryEntry {
@@ -52,4 +53,5 @@ export interface CompletedSet {
   setNumber: number;
   actualReps?: number;
   actualDuration?: number;
+  equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
 }

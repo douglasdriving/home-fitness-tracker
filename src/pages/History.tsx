@@ -4,16 +4,29 @@ import { format } from 'date-fns';
 import { WorkoutHistoryEntry } from '../types/workout';
 import EditWorkoutModal from '../components/history/EditWorkoutModal';
 import AddManualWorkoutModal from '../components/history/AddManualWorkoutModal';
+import { db } from '../db/db';
+import { getExerciseById } from '../data/exerciseData';
 
 export default function History() {
   const { workoutHistory, loadHistory, deleteHistoryEntry, updateHistoryEntry, addManualWorkout } = useWorkoutStore();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<WorkoutHistoryEntry | null>(null);
   const [showAddManual, setShowAddManual] = useState(false);
+  const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({});
 
   useEffect(() => {
     loadHistory();
+    loadExerciseNotes();
   }, [loadHistory]);
+
+  const loadExerciseNotes = async () => {
+    const notes = await db.exerciseNotes.toArray();
+    const notesMap: Record<string, string> = {};
+    notes.forEach(note => {
+      notesMap[note.exerciseId] = note.note;
+    });
+    setExerciseNotes(notesMap);
+  };
 
   const handleDelete = async (historyId: string, workoutNumber: number) => {
     if (!confirm(`Are you sure you want to delete Workout #${workoutNumber}? This cannot be undone.`)) {
@@ -150,45 +163,66 @@ export default function History() {
 
               {/* Exercises */}
               <div className="space-y-3">
-                {entry.exercises.map((exercise, idx) => (
-                  <div key={idx} className="bg-background-light rounded-lg p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex-1">
-                        <div className="font-medium text-text">
-                          {exercise.exerciseName}
+                {entry.exercises.map((exercise, idx) => {
+                  const exerciseData = getExerciseById(exercise.exerciseId);
+                  const note = exerciseNotes[exercise.exerciseId];
+                  return (
+                    <div key={idx} className="bg-background-light rounded-lg p-3">
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="flex-1">
+                          <div className="font-medium text-text">
+                            {exercise.exerciseName}
+                          </div>
+                          <div className="flex gap-1 mt-1 flex-wrap">
+                            {exercise.muscleGroups.map((mg, mgIdx) => (
+                              <span
+                                key={mgIdx}
+                                className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase"
+                              >
+                                {mg}
+                              </span>
+                            ))}
+                            {exerciseData?.countingMethod === 'per-side' && (
+                              <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">
+                                Per Side
+                              </span>
+                            )}
+                          </div>
                         </div>
-                        <div className="flex gap-1 mt-1">
-                          {exercise.muscleGroups.map((mg, mgIdx) => (
-                            <span
-                              key={mgIdx}
-                              className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase"
-                            >
-                              {mg}
-                            </span>
-                          ))}
+                        <div className="text-sm text-text-muted ml-4">
+                          {exercise.completedSets.length} sets
                         </div>
                       </div>
-                      <div className="text-sm text-text-muted ml-4">
-                        {exercise.completedSets.length} sets
-                      </div>
-                    </div>
 
-                    {/* Sets */}
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {exercise.completedSets.map((set, setIdx) => (
-                        <div
-                          key={setIdx}
-                          className="text-xs bg-background-lighter text-text px-2 py-1 rounded"
-                        >
-                          Set {set.setNumber}:{' '}
-                          {set.actualReps
-                            ? `${set.actualReps} reps`
-                            : `${set.actualDuration}s`}
+                      {/* Sets */}
+                      <div className="space-y-2 mt-2">
+                        {exercise.completedSets.map((set, setIdx) => (
+                          <div key={setIdx} className="text-xs">
+                            <div className="bg-background-lighter text-text px-2 py-1 rounded inline-block">
+                              Set {set.setNumber}:{' '}
+                              {set.actualReps
+                                ? `${set.actualReps} reps${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`
+                                : `${set.actualDuration}s${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`}
+                            </div>
+                            {set.equipmentUsed && (
+                              <div className="text-text-muted mt-1 ml-2">
+                                Equipment: {set.equipmentUsed}
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Exercise Note */}
+                      {note && (
+                        <div className="mt-3 pt-3 border-t border-background-lighter">
+                          <div className="text-xs font-medium text-text-muted mb-1">Note:</div>
+                          <div className="text-sm text-text italic">{note}</div>
                         </div>
-                      ))}
+                      )}
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           );

@@ -97,7 +97,7 @@ export default function ExerciseLibrary() {
                       ))}
                     </div>
                   </div>
-                  <div className="ml-4">
+                  <div className="ml-4 flex flex-col gap-1">
                     <span
                       className={`inline-block px-3 py-1 rounded-full text-xs font-medium ${
                         exercise.type === 'reps'
@@ -107,6 +107,16 @@ export default function ExerciseLibrary() {
                     >
                       {exercise.type === 'reps' ? 'Reps' : 'Timed'}
                     </span>
+                    {exercise.countingMethod === 'per-side' && (
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-secondary/20 text-secondary">
+                        Per Side
+                      </span>
+                    )}
+                    {exercise.equipment === 'elastic-band' && (
+                      <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-purple-500/20 text-purple-600">
+                        Band
+                      </span>
+                    )}
                   </div>
                 </div>
 

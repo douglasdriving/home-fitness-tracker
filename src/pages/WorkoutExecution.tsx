@@ -22,6 +22,9 @@ export default function WorkoutExecution() {
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
   const [phase, setPhase] = useState<WorkoutPhase>('exercise');
   const [inputValue, setInputValue] = useState('');
+  const [equipmentInput, setEquipmentInput] = useState('');
+  const [exerciseNote, setExerciseNote] = useState('');
+  const [previousNote, setPreviousNote] = useState('');
   const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState(false);
@@ -58,10 +61,11 @@ export default function WorkoutExecution() {
     const currentSet = currentExercise?.sets[currentSetIndex];
 
     if (currentSet && !currentSet.completed) {
-      // For first-time exercises, leave input empty (except for Side Plank sets 2+)
+      // For first-time exercises, leave input empty (except for per-side timed exercises sets 2+)
       if (isFirstTime) {
-        // For Side Plank sets 2+, pre-fill with target time per side
-        if (currentExercise.exerciseId === 'side-plank-001' && currentSetIndex > 0) {
+        const exerciseData = getExerciseById(currentExercise.exerciseId);
+        // For per-side timed exercises sets 2+, pre-fill with target time per side
+        if (exerciseData?.countingMethod === 'per-side' && exerciseData.type === 'timed' && currentSetIndex > 0) {
           const value = currentSet.targetDuration || '';
           setInputValue(value.toString());
         } else {
@@ -90,7 +94,7 @@ export default function WorkoutExecution() {
     }
   }, [currentExerciseIndex, currentSetIndex, phase, currentWorkout, isInitialized, updateWorkoutPosition]);
 
-  // Check if this is the first time doing this exercise
+  // Check if this is the first time doing this exercise and load previous note
   useEffect(() => {
     const checkFirstTime = async () => {
       if (!currentWorkout) return;
@@ -105,6 +109,16 @@ export default function WorkoutExecution() {
       );
 
       setIsFirstTime(!hasBeenDone);
+
+      // Load previous note for this exercise
+      const noteRecord = await db.exerciseNotes.get(exerciseId);
+      if (noteRecord) {
+        setPreviousNote(noteRecord.note);
+        setExerciseNote(noteRecord.note); // Pre-fill with previous note
+      } else {
+        setPreviousNote('');
+        setExerciseNote('');
+      }
     };
 
     checkFirstTime();
@@ -144,12 +158,23 @@ export default function WorkoutExecution() {
     }
 
     try {
+      // Save exercise note if it has been updated
+      if (exerciseNote.trim() && exerciseNote !== previousNote) {
+        await db.exerciseNotes.put({
+          exerciseId: currentExercise.exerciseId,
+          note: exerciseNote.trim(),
+          lastUpdated: Date.now()
+        });
+        setPreviousNote(exerciseNote.trim());
+      }
+
       // Mark set as completed and update actual values
       const updates = {
         completed: true,
         ...(exercise?.type === 'reps'
           ? { actualReps: value }
           : { actualDuration: value }),
+        ...(equipmentInput.trim() && { equipmentUsed: equipmentInput.trim() }),
       };
 
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
@@ -354,11 +379,11 @@ export default function WorkoutExecution() {
         )}
 
         {/* Bilateral Exercise Banner */}
-        {currentExercise.exerciseId === 'side-plank-001' && currentSetIndex === 0 && (
+        {exercise?.countingMethod === 'per-side' && currentSetIndex === 0 && (
           <div className="bg-secondary/10 border-l-4 border-secondary p-4 rounded">
             <div className="flex items-start">
               <div className="flex-shrink-0">
-                <span className="text-2xl">⏱️</span>
+                <span className="text-2xl">{exercise.type === 'timed' ? '⏱️' : '🔄'}</span>
               </div>
               <div className="ml-3">
                 <h3 className="text-sm font-medium text-secondary mb-1">
@@ -368,13 +393,24 @@ export default function WorkoutExecution() {
                   <div className="text-sm text-text space-y-2">
                     <p><strong>Important:</strong> Do this exercise on BOTH sides (left and right).</p>
                     <p>• Don't push yourself too hard on the first set - stop at a comfortable level that you can repeat for multiple sets</p>
-                    <p>• Use the timer for ONE side, then manually reset and do the other side</p>
-                    <p>• Enter the <strong>time per side</strong> (not total time) when done</p>
-                    <p>• Future sets will automatically run the timer twice</p>
+                    {exercise.type === 'timed' ? (
+                      <>
+                        <p>• Use the timer for ONE side, then manually reset and do the other side</p>
+                        <p>• Enter the <strong>time per side</strong> (not total time) when done</p>
+                        <p>• Future sets will automatically run the timer twice</p>
+                      </>
+                    ) : (
+                      <>
+                        <p>• Do the reps on ONE side, then do the same number on the other side</p>
+                        <p>• Enter the <strong>reps per side</strong> (not total reps) when done</p>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <p className="text-sm text-text">
-                    The timer will run twice - once for your left side, then once for your right side. There will be a 10-second break to switch positions.
+                    {exercise.type === 'timed'
+                      ? 'The timer will run twice - once for your left side, then once for your right side. There will be a 10-second break to switch positions.'
+                      : 'Complete the target reps on one side, then repeat on the other side.'}
                   </p>
                 )}
               </div>
@@ -418,8 +454,8 @@ export default function WorkoutExecution() {
               <div className="text-sm text-text-muted">
                 Target:{' '}
                 {exercise?.type === 'reps'
-                  ? `${currentSet.targetReps} reps`
-                  : `${currentSet.targetDuration}s`}
+                  ? `${currentSet.targetReps} reps${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`
+                  : `${currentSet.targetDuration}s${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`}
               </div>
             )}
           </div>
@@ -432,7 +468,7 @@ export default function WorkoutExecution() {
                 duration={currentSet.targetDuration || 30}
                 countUp={isFirstTime && currentSetIndex === 0}
                 showSecondsOnly={isFirstTime && currentSetIndex === 0}
-                bilateral={currentExercise.exerciseId === 'side-plank-001' && !(isFirstTime && currentSetIndex === 0)}
+                bilateral={exercise?.countingMethod === 'per-side' && !(isFirstTime && currentSetIndex === 0)}
               />
             </div>
           )}
@@ -443,21 +479,58 @@ export default function WorkoutExecution() {
               type="number"
               label={
                 exercise?.type === 'reps'
-                  ? 'How many reps did you complete?'
-                  : currentExercise.exerciseId === 'side-plank-001'
-                    ? 'How many seconds did you hold PER SIDE?'
-                    : 'How many seconds did you hold?'
+                  ? (exercise?.countingMethod === 'per-side'
+                      ? 'How many reps did you complete PER SIDE?'
+                      : 'How many reps did you complete?')
+                  : (exercise?.countingMethod === 'per-side'
+                      ? 'How many seconds did you hold PER SIDE?'
+                      : 'How many seconds did you hold?')
               }
               placeholder={
                 isFirstTime
-                  ? (exercise?.type === 'reps' ? 'Enter reps' : 'Enter seconds per side')
+                  ? (exercise?.type === 'reps'
+                      ? (exercise?.countingMethod === 'per-side' ? 'Enter reps per side' : 'Enter reps')
+                      : (exercise?.countingMethod === 'per-side' ? 'Enter seconds per side' : 'Enter seconds'))
                   : (exercise?.type === 'reps'
-                    ? `Target: ${currentSet.targetReps}`
-                    : `Target: ${currentSet.targetDuration}s`)
+                    ? `Target: ${currentSet.targetReps}${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`
+                    : `Target: ${currentSet.targetDuration}s${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`)
               }
               value={inputValue}
               onChange={handleInputChange}
               min="1"
+            />
+          </div>
+
+          {/* Equipment input for elastic band exercises */}
+          {exercise?.equipment === 'elastic-band' && (
+            <div className="mb-4">
+              <Input
+                type="text"
+                label="Equipment used (optional)"
+                placeholder="e.g., Red band, Blue + Green bands"
+                value={equipmentInput}
+                onChange={(e) => setEquipmentInput(e.target.value)}
+              />
+            </div>
+          )}
+
+          {/* Exercise note section */}
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-text mb-2">
+              Personal note about this exercise (optional)
+            </label>
+            {previousNote && previousNote !== exerciseNote && (
+              <div className="mb-2 p-2 bg-secondary/10 border-l-2 border-secondary rounded text-sm text-text-muted">
+                <div className="font-medium text-xs text-secondary mb-1">Previous note:</div>
+                {previousNote}
+              </div>
+            )}
+            <textarea
+              className="w-full px-4 py-3 bg-background-light border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted resize-none"
+              placeholder="Add a note about form, difficulty, tips..."
+              value={exerciseNote}
+              onChange={(e) => setExerciseNote(e.target.value)}
+              rows={2}
             />
           </div>
 

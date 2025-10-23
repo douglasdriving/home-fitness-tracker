@@ -1,5 +1,6 @@
 export type MuscleGroup = 'abs' | 'glutes' | 'lowerBack';
 export type Equipment = 'none' | 'elastic-band';
+export type CountingMethod = 'total' | 'per-side';
 
 export interface Exercise {
   id: string;
@@ -14,4 +15,5 @@ export interface Exercise {
   defaultReps?: number;
   defaultDuration?: number; // in seconds
   equipment?: Equipment; // defaults to 'none' if not specified
+  countingMethod?: CountingMethod; // defaults to 'total' if not specified
 }
