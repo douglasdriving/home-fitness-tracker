@@ -4,29 +4,18 @@ import { format } from 'date-fns';
 import { WorkoutHistoryEntry } from '../types/workout';
 import EditWorkoutModal from '../components/history/EditWorkoutModal';
 import AddManualWorkoutModal from '../components/history/AddManualWorkoutModal';
-import { db } from '../db/db';
-import { getExerciseById } from '../data/exerciseData';
+import WorkoutDetailModal from '../components/history/WorkoutDetailModal';
 
 export default function History() {
   const { workoutHistory, loadHistory, deleteHistoryEntry, updateHistoryEntry, addManualWorkout } = useWorkoutStore();
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [editingWorkout, setEditingWorkout] = useState<WorkoutHistoryEntry | null>(null);
   const [showAddManual, setShowAddManual] = useState(false);
-  const [exerciseNotes, setExerciseNotes] = useState<Record<string, string>>({});
+  const [selectedWorkout, setSelectedWorkout] = useState<WorkoutHistoryEntry | null>(null);
 
   useEffect(() => {
     loadHistory();
-    loadExerciseNotes();
   }, [loadHistory]);
-
-  const loadExerciseNotes = async () => {
-    const notes = await db.exerciseNotes.toArray();
-    const notesMap: Record<string, string> = {};
-    notes.forEach(note => {
-      notesMap[note.exerciseId] = note.note;
-    });
-    setExerciseNotes(notesMap);
-  };
 
   const handleDelete = async (historyId: string, workoutNumber: number) => {
     if (!confirm(`Are you sure you want to delete Workout #${workoutNumber}? This cannot be undone.`)) {
@@ -36,6 +25,10 @@ export default function History() {
     setDeletingId(historyId);
     try {
       await deleteHistoryEntry(historyId);
+      // Close the detail modal if the deleted workout was being viewed
+      if (selectedWorkout?.id === historyId) {
+        setSelectedWorkout(null);
+      }
     } catch (error) {
       console.error('Failed to delete workout:', error);
       alert('Failed to delete workout. Please try again.');
@@ -46,6 +39,11 @@ export default function History() {
 
   const handleEdit = (entry: WorkoutHistoryEntry) => {
     setEditingWorkout(entry);
+    setSelectedWorkout(null); // Close detail modal when editing
+  };
+
+  const handleCardClick = (entry: WorkoutHistoryEntry) => {
+    setSelectedWorkout(entry);
   };
 
   const handleSaveEdit = async (updatedWorkout: WorkoutHistoryEntry) => {
@@ -107,128 +105,65 @@ export default function History() {
             </p>
           </div>
         ) : (
-          workoutHistory.map((entry) => {
-          const totalSets = entry.exercises.reduce(
-            (sum, ex) => sum + ex.completedSets.length,
-            0
-          );
+          <div className="space-y-3">
+            {workoutHistory.map((entry) => {
+              const totalSets = entry.exercises.reduce(
+                (sum, ex) => sum + ex.completedSets.length,
+                0
+              );
 
-          return (
-            <div key={entry.id} className="border-b border-background-lighter pb-6">
-              {/* Header */}
-              <div className="mb-4">
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <h3 className="text-lg font-bold text-text">
-                      Workout #{entry.workoutNumber}
-                    </h3>
-                    <p className="text-sm text-text-muted">
-                      {format(new Date(entry.completedDate), 'MMM d, yyyy • h:mm a')}
-                    </p>
-                  </div>
-                  <div className="flex items-start gap-3">
+              return (
+                <div
+                  key={entry.id}
+                  onClick={() => handleCardClick(entry)}
+                  className="bg-background-light rounded-lg p-4 cursor-pointer hover:bg-background-lighter transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-text">
+                        Workout #{entry.workoutNumber}
+                      </h3>
+                      <p className="text-sm text-text-muted">
+                        {format(new Date(entry.completedDate), 'MMM d, yyyy')}
+                      </p>
+                    </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold text-primary">
                         {entry.totalDuration}
                       </div>
                       <div className="text-xs text-text-muted">minutes</div>
                     </div>
-                    <button
-                      onClick={() => handleEdit(entry)}
-                      className="text-accent hover:text-accent-light p-1"
-                      title="Edit workout"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => handleDelete(entry.id, entry.workoutNumber)}
-                      disabled={deletingId === entry.id}
-                      className="text-red-400 hover:text-red-300 p-1 disabled:opacity-50"
-                      title="Delete workout"
-                    >
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                      </svg>
-                    </button>
+                  </div>
+                  <div className="flex gap-3 text-sm text-text-muted mb-2">
+                    <span>{entry.exercises.length} exercises</span>
+                    <span>•</span>
+                    <span>{totalSets} sets</span>
+                  </div>
+                  <div className="text-sm text-text-muted">
+                    {entry.exercises.map((ex, idx) => (
+                      <span key={idx}>
+                        {ex.exerciseName}
+                        {idx < entry.exercises.length - 1 ? ', ' : ''}
+                      </span>
+                    ))}
                   </div>
                 </div>
-                <div className="flex gap-3 text-sm text-text-muted">
-                  <span>{entry.exercises.length} exercises</span>
-                  <span>•</span>
-                  <span>{totalSets} sets</span>
-                </div>
-              </div>
-
-              {/* Exercises */}
-              <div className="space-y-3">
-                {entry.exercises.map((exercise, idx) => {
-                  const exerciseData = getExerciseById(exercise.exerciseId);
-                  const note = exerciseNotes[exercise.exerciseId];
-                  return (
-                    <div key={idx} className="bg-background-light rounded-lg p-3">
-                      <div className="flex justify-between items-start mb-2">
-                        <div className="flex-1">
-                          <div className="font-medium text-text">
-                            {exercise.exerciseName}
-                          </div>
-                          <div className="flex gap-1 mt-1 flex-wrap">
-                            {exercise.muscleGroups.map((mg, mgIdx) => (
-                              <span
-                                key={mgIdx}
-                                className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full uppercase"
-                              >
-                                {mg}
-                              </span>
-                            ))}
-                            {exerciseData?.countingMethod === 'per-side' && (
-                              <span className="text-xs bg-secondary/20 text-secondary px-2 py-0.5 rounded-full">
-                                Per Side
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-sm text-text-muted ml-4">
-                          {exercise.completedSets.length} sets
-                        </div>
-                      </div>
-
-                      {/* Sets */}
-                      <div className="space-y-2 mt-2">
-                        {exercise.completedSets.map((set, setIdx) => (
-                          <div key={setIdx} className="text-xs">
-                            <div className="bg-background-lighter text-text px-2 py-1 rounded inline-block">
-                              Set {set.setNumber}:{' '}
-                              {set.actualReps
-                                ? `${set.actualReps} reps${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`
-                                : `${set.actualDuration}s${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`}
-                            </div>
-                            {set.equipmentUsed && (
-                              <div className="text-text-muted mt-1 ml-2">
-                                Equipment: {set.equipmentUsed}
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-
-                      {/* Exercise Note */}
-                      {note && (
-                        <div className="mt-3 pt-3 border-t border-background-lighter">
-                          <div className="text-xs font-medium text-text-muted mb-1">Note:</div>
-                          <div className="text-sm text-text italic">{note}</div>
-                        </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          );
-        })
+              );
+            })}
+          </div>
         )}
       </div>
+
+      {/* Workout Detail Modal */}
+      {selectedWorkout && (
+        <WorkoutDetailModal
+          workout={selectedWorkout}
+          onClose={() => setSelectedWorkout(null)}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+          isDeleting={deletingId === selectedWorkout.id}
+        />
+      )}
 
       {/* Edit Modal */}
       {editingWorkout && (
