@@ -7,10 +7,20 @@ export interface ExerciseNote {
   lastUpdated: number; // timestamp
 }
 
+export interface StrengthLevelSnapshot {
+  id?: number; // Auto-incremented primary key
+  timestamp: number; // timestamp when snapshot was taken
+  workoutNumber: number; // which workout this snapshot is associated with
+  abs: number;
+  glutes: number;
+  lowerBack: number;
+}
+
 export class FitnessTrackerDB extends Dexie {
   workouts!: Table<Workout, string>;
   history!: Table<WorkoutHistoryEntry, string>;
   exerciseNotes!: Table<ExerciseNote, string>;
+  strengthHistory!: Table<StrengthLevelSnapshot, number>;
 
   constructor() {
     super('FitnessTrackerDB');
@@ -26,6 +36,14 @@ export class FitnessTrackerDB extends Dexie {
       workouts: 'id, workoutNumber, status, generatedDate',
       history: 'id, workoutId, completedDate, workoutNumber',
       exerciseNotes: 'exerciseId, lastUpdated'
+    });
+
+    // Version 3: Add strengthHistory table for tracking strength level progression
+    this.version(3).stores({
+      workouts: 'id, workoutNumber, status, generatedDate',
+      history: 'id, workoutId, completedDate, workoutNumber',
+      exerciseNotes: 'exerciseId, lastUpdated',
+      strengthHistory: '++id, timestamp, workoutNumber'
     });
   }
 }

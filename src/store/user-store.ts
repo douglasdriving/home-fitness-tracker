@@ -6,6 +6,7 @@ import {
   updateStrengthLevels as updateStrengthLevelsUtil,
 } from '../utils/userProfile';
 import { calculateStrengthFromCalibration } from '../lib/progression-calculator';
+import { db } from '../db/db';
 
 interface UserStore {
   profile: UserProfile | null;
@@ -27,7 +28,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set({ profile, isLoading: false });
   },
 
-  completeCalibration: (data: CalibrationData) => {
+  completeCalibration: async (data: CalibrationData) => {
     const profile = get().profile;
     if (!profile) return;
 
@@ -43,6 +44,15 @@ export const useUserStore = create<UserStore>((set, get) => ({
 
     saveUserProfile(updatedProfile);
     set({ profile: updatedProfile });
+
+    // Save initial strength level snapshot for progress tracking
+    await db.strengthHistory.add({
+      timestamp: data.calibrationDate,
+      workoutNumber: 0, // 0 indicates calibration baseline
+      abs: strengthLevels.abs,
+      glutes: strengthLevels.glutes,
+      lowerBack: strengthLevels.lowerBack,
+    });
   },
 
   updateStrengthLevels: (levels: Partial<StrengthLevels>) => {

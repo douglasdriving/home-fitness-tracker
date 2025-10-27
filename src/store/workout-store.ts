@@ -221,6 +221,15 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
       // Update user profile with new strength levels
       useUserStore.getState().updateStrengthLevels(updatedStrengthLevels);
+
+      // Save strength level snapshot for progress tracking
+      await db.strengthHistory.add({
+        timestamp: completedDate,
+        workoutNumber: currentWorkout.workoutNumber,
+        abs: updatedStrengthLevels.abs,
+        glutes: updatedStrengthLevels.glutes,
+        lowerBack: updatedStrengthLevels.lowerBack,
+      });
     }
 
     // Clear current workout from state

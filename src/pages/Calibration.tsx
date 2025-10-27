@@ -35,7 +35,7 @@ export default function Calibration() {
     setStep('exercise');
   };
 
-  const handleSubmitExercise = () => {
+  const handleSubmitExercise = async () => {
     const value = parseInt(inputValue);
 
     if (!value || value <= 0) {
@@ -64,7 +64,7 @@ export default function Calibration() {
       setCurrentExerciseIndex(currentExerciseIndex + 1);
     } else {
       // Save calibration and navigate
-      completeCalibration({
+      await completeCalibration({
         calibrationDate: Date.now(),
         exercises: newCalibrationData,
       });
