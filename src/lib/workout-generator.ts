@@ -29,6 +29,9 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
 
+  // Get exercise usage history for prioritization
+  const exerciseLastUsed = getExerciseLastUsed(workoutHistory);
+
   // Select exercises for each muscle group
   const selectedExercises: Exercise[] = [];
   const selectedExerciseIds = new Set<string>();
@@ -42,24 +45,23 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
     );
 
-    // Filter out recently used exercises AND already selected exercises
-    const unusedExercises = availableExercises.filter(
-      (ex) => !recentExerciseIds.includes(ex.id) && !selectedExerciseIds.has(ex.id)
-    );
-
-    // If all exercises were recently used, filter only by selected exercises
-    let poolToChooseFrom = unusedExercises.length > 0 ? unusedExercises : availableExercises.filter(
+    // Filter out already selected exercises
+    availableExercises = availableExercises.filter(
       (ex) => !selectedExerciseIds.has(ex.id)
     );
 
-    // If still no exercises (shouldn't happen), use all available
-    if (poolToChooseFrom.length === 0) {
-      poolToChooseFrom = availableExercises;
-    }
+    if (availableExercises.length === 0) continue;
 
-    // Pick a random exercise from the pool
-    const randomIndex = Math.floor(Math.random() * poolToChooseFrom.length);
-    const selectedExercise = poolToChooseFrom[randomIndex];
+    // Sort exercises by last used (least recently used first)
+    // Exercises never used get priority (treated as workoutNumber -1)
+    availableExercises.sort((a, b) => {
+      const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
+      const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
+      return aLastUsed - bLastUsed; // Ascending order (oldest first)
+    });
+
+    // Select the least recently used exercise
+    const selectedExercise = availableExercises[0];
 
     if (selectedExercise) {
       selectedExercises.push(selectedExercise);
@@ -67,12 +69,12 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     }
   }
 
-  // Optionally add a 4th exercise (50% chance) for variety
-  if (Math.random() > 0.5 && selectedExercises.length === 3) {
-    // Pick a random muscle group
-    const randomMuscleGroup = targetMuscleGroups[Math.floor(Math.random() * targetMuscleGroups.length)];
-    let availableExercises = getExercisesByMuscleGroup(randomMuscleGroup).filter(
-      (ex) => !selectedExerciseIds.has(ex.id) && !recentExerciseIds.includes(ex.id)
+  // Add a 4th exercise for variety (deterministic based on workout number)
+  // Rotate through muscle groups: workout 1 gets abs, 2 gets glutes, 3 gets lowerBack, 4 gets abs, etc.
+  if (selectedExercises.length === 3) {
+    const fourthMuscleGroup = targetMuscleGroups[workoutNumber % 3];
+    let availableExercises = getExercisesByMuscleGroup(fourthMuscleGroup).filter(
+      (ex) => !selectedExerciseIds.has(ex.id)
     );
 
     // Apply equipment filter
@@ -81,8 +83,14 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     );
 
     if (availableExercises.length > 0) {
-      const randomIndex = Math.floor(Math.random() * availableExercises.length);
-      const fourthExercise = availableExercises[randomIndex];
+      // Sort by last used and pick the least recently used
+      availableExercises.sort((a, b) => {
+        const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
+        const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
+        return aLastUsed - bLastUsed;
+      });
+
+      const fourthExercise = availableExercises[0];
       selectedExercises.push(fourthExercise);
       selectedExerciseIds.add(fourthExercise.id);
     }
@@ -218,6 +226,24 @@ export function getRecentExerciseIds(recentWorkouts: Workout[]): string[] {
   });
 
   return Array.from(exerciseIds);
+}
+
+/**
+ * Get a map of exercise IDs to their last used workout number
+ * Used to prioritize exercises that haven't been used recently
+ */
+export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<string, number> {
+  const lastUsedMap = new Map<string, number>();
+
+  // Process history chronologically
+  workoutHistory.forEach((workout) => {
+    workout.exercises.forEach((exercise) => {
+      // Always update with the latest workout number where this exercise was used
+      lastUsedMap.set(exercise.exerciseId, workout.workoutNumber);
+    });
+  });
+
+  return lastUsedMap;
 }
 
 /**
