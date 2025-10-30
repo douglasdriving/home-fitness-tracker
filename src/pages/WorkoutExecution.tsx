@@ -1,13 +1,19 @@
+/**
+ * WorkoutExecution Page
+ * Manages the workout execution flow including exercise progression,
+ * rest periods, and workout completion. Orchestrates state and delegates
+ * rendering to specialized phase components.
+ */
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutStore } from '../store/workout-store';
 import { getExerciseById } from '../data/exerciseData';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
-import Button from '../components/common/Button';
-import Input from '../components/common/Input';
-import Timer from '../components/workout/Timer';
-import ExerciseModal from '../components/workout/ExerciseModal';
+import WorkoutHeader from '../components/workout/WorkoutHeader';
+import RestPhase from '../components/workout/RestPhase';
+import ExercisePhase from '../components/workout/ExercisePhase';
 
 type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest';
 
@@ -21,11 +27,7 @@ export default function WorkoutExecution() {
   const [currentExerciseIndex, setCurrentExerciseIndex] = useState(0);
   const [currentSetIndex, setCurrentSetIndex] = useState(0);
   const [phase, setPhase] = useState<WorkoutPhase>('exercise');
-  const [inputValue, setInputValue] = useState('');
-  const [equipmentInput, setEquipmentInput] = useState('');
-  const [exerciseNote, setExerciseNote] = useState('');
   const [previousNote, setPreviousNote] = useState('');
-  const [showExerciseModal, setShowExerciseModal] = useState(false);
   const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
   const [isInitialized, setIsInitialized] = useState(false);
   const [nextSetPreview, setNextSetPreview] = useState<{reps?: number, duration?: number} | null>(null);
@@ -51,33 +53,6 @@ export default function WorkoutExecution() {
     setIsInitialized(true);
   }, [currentWorkout, navigate, isInitialized]);
 
-  useEffect(() => {
-    if (!currentWorkout || !isInitialized) {
-      return;
-    }
-
-    // Initialize input value ONLY when changing sets (not when workout updates)
-    const currentExercise = currentWorkout.exercises[currentExerciseIndex];
-    const currentSet = currentExercise?.sets[currentSetIndex];
-
-    if (currentSet && !currentSet.completed) {
-      // For first-time exercises, leave input empty (except for per-side timed exercises sets 2+)
-      if (isFirstTime) {
-        const exerciseData = getExerciseById(currentExercise.exerciseId);
-        // For per-side timed exercises sets 2+, pre-fill with target time per side
-        if (exerciseData?.countingMethod === 'per-side' && exerciseData.type === 'timed' && currentSetIndex > 0) {
-          const value = currentSet.targetDuration || '';
-          setInputValue(value.toString());
-        } else {
-          setInputValue('');
-        }
-      } else {
-        // For known exercises, use target value
-        const value = currentSet.targetReps || currentSet.targetDuration || '';
-        setInputValue(value.toString());
-      }
-    }
-  }, [currentExerciseIndex, currentSetIndex, isInitialized, isFirstTime]);
 
   // Save position whenever it changes (but avoid infinite loop)
   useEffect(() => {
@@ -114,10 +89,8 @@ export default function WorkoutExecution() {
       const noteRecord = await db.exerciseNotes.get(exerciseId);
       if (noteRecord) {
         setPreviousNote(noteRecord.note);
-        setExerciseNote(noteRecord.note); // Pre-fill with previous note
       } else {
         setPreviousNote('');
-        setExerciseNote('');
       }
     };
 
@@ -145,27 +118,16 @@ export default function WorkoutExecution() {
   );
   const progress = (completedSets / totalSets) * 100;
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-  };
-
-  const handleCompleteSet = async () => {
-    const value = parseInt(inputValue);
-
-    if (!value || value <= 0) {
-      alert('Please enter a valid number');
-      return;
-    }
-
+  const handleCompleteSet = async (value: number, equipment: string, note: string) => {
     try {
       // Save exercise note if it has been updated
-      if (exerciseNote.trim() && exerciseNote !== previousNote) {
+      if (note.trim() && note !== previousNote) {
         await db.exerciseNotes.put({
           exerciseId: currentExercise.exerciseId,
-          note: exerciseNote.trim(),
+          note: note.trim(),
           lastUpdated: Date.now()
         });
-        setPreviousNote(exerciseNote.trim());
+        setPreviousNote(note.trim());
       }
 
       // Mark set as completed and update actual values
@@ -174,7 +136,7 @@ export default function WorkoutExecution() {
         ...(exercise?.type === 'reps'
           ? { actualReps: value }
           : { actualDuration: value }),
-        ...(equipmentInput.trim() && { equipmentUsed: equipmentInput.trim() }),
+        ...(equipment.trim() && { equipmentUsed: equipment.trim() }),
       };
 
       await updateSet(currentExerciseIndex, currentSetIndex, updates);
@@ -225,7 +187,6 @@ export default function WorkoutExecution() {
   const handleRestComplete = () => {
     // Move to next set
     setCurrentSetIndex(currentSetIndex + 1);
-    setInputValue('');
     setNextSetPreview(null); // Clear preview when moving to next set
     setPhase('exercise');
   };
@@ -234,7 +195,6 @@ export default function WorkoutExecution() {
     // Move to next exercise
     setCurrentExerciseIndex(currentExerciseIndex + 1);
     setCurrentSetIndex(0);
-    setInputValue('');
     setPhase('exercise');
   };
 
@@ -264,319 +224,46 @@ export default function WorkoutExecution() {
       : null;
 
     return (
-      <div className="bg-background min-h-screen">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-primary to-primary-dark text-background p-4 shadow-lg">
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-display font-bold tracking-wide">WORKOUT #{currentWorkout.workoutNumber}</h1>
-            <button onClick={handleQuit} className="text-sm font-semibold underline hover:opacity-80 transition">
-              Quit
-            </button>
-          </div>
-          <div className="w-full bg-background/30 rounded-full h-2">
-            <div
-              className="bg-background h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Rest Timer */}
-        <div className="p-4">
-          <div className="bg-background-light rounded-lg shadow-lg p-6 text-center mb-6 border border-background-lighter">
-            <div className="text-6xl mb-4">😌</div>
-            <h2 className="text-2xl font-bold text-text mb-2">Rest Time</h2>
-            <p className="text-text-muted mb-6">
-              {isExerciseRest
-                ? 'Great work! Take a break before the next exercise'
-                : 'Take a break before your next set'}
-            </p>
-          </div>
-
-          <Timer
-            key={`rest-${currentExerciseIndex}-${currentSetIndex}`}
-            duration={isExerciseRest ? 60 : currentExercise.restTime}
-            onComplete={isExerciseRest ? handleExerciseRestComplete : handleRestComplete}
-            autoStart={true}
-          />
-
-          {/* Next Set/Exercise Preview */}
-          <div className="mt-6 bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-            <h3 className="text-sm font-medium text-text-muted mb-2">Up Next:</h3>
-            <div className="flex justify-between items-center">
-              <div>
-                <div className="font-medium text-text">
-                  {isExerciseRest ? nextExercise?.exerciseName : currentExercise.exerciseName}
-                </div>
-                <div className="text-sm text-text-muted">
-                  {isExerciseRest
-                    ? `Exercise ${currentExerciseIndex + 2} of ${currentWorkout.exercises.length}`
-                    : `Set ${currentSetIndex + 2} of ${currentExercise.sets.length}`}
-                </div>
-              </div>
-              <div className="text-lg font-bold text-primary">
-                {isExerciseRest
-                  ? (nextExerciseInfo?.type === 'reps'
-                      ? `${nextExercise?.sets[0]?.targetReps} reps`
-                      : `${nextExercise?.sets[0]?.targetDuration}s`)
-                  : (exercise?.type === 'reps'
-                      ? `${nextSetPreview?.reps || currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
-                      : `${nextSetPreview?.duration || currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`)}
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <RestPhase
+        workoutNumber={currentWorkout.workoutNumber}
+        progress={progress}
+        isExerciseRest={isExerciseRest}
+        restDuration={isExerciseRest ? 60 : currentExercise.restTime}
+        currentExercise={currentExercise}
+        currentExerciseIndex={currentExerciseIndex}
+        currentSetIndex={currentSetIndex}
+        totalExercises={currentWorkout.exercises.length}
+        nextExercise={nextExercise}
+        nextExerciseInfo={nextExerciseInfo}
+        nextSetPreview={nextSetPreview}
+        exerciseData={exercise}
+        onRestComplete={isExerciseRest ? handleExerciseRestComplete : handleRestComplete}
+        onQuit={handleQuit}
+      />
     );
   }
 
   return (
     <div className="bg-background min-h-screen">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-primary to-primary-dark text-background p-4 shadow-lg">
-        <div className="flex justify-between items-center mb-2">
-          <h1 className="text-2xl font-display font-bold tracking-wide">WORKOUT #{currentWorkout.workoutNumber}</h1>
-          <button onClick={handleQuit} className="text-sm font-semibold underline hover:opacity-80 transition">
-            Quit
-          </button>
-        </div>
-        <div className="w-full bg-background/30 rounded-full h-2">
-          <div
-            className="bg-background h-2 rounded-full transition-all"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-sm opacity-80 mt-2">
-          {completedSets} of {totalSets} sets completed
-        </p>
-      </div>
+      <WorkoutHeader
+        workoutNumber={currentWorkout.workoutNumber}
+        progress={progress}
+        completedSets={completedSets}
+        totalSets={totalSets}
+        onQuit={handleQuit}
+      />
 
-      <div className="p-4 space-y-6">
-        {/* First Time Exercise Banner */}
-        {isFirstTime && currentSetIndex === 0 && (
-          <div className="bg-accent/10 border-l-4 border-accent p-4 rounded">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">ℹ️</span>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-accent mb-1">
-                  First Time Doing This Exercise!
-                </h3>
-                <div className="text-sm text-text space-y-1">
-                  <p>
-                    {exercise?.type === 'reps'
-                      ? 'Do as many reps as you can with proper form, then enter that number.'
-                      : 'Hold the position for as long as you can with proper form, then enter the duration in seconds.'}
-                  </p>
-                  <p className="font-semibold">
-                    💡 Important: Don't push yourself too hard on the first set! Stop at a comfortable level that you can repeat for multiple sets. The app will adjust future targets based on your performance.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Bilateral Exercise Banner */}
-        {exercise?.countingMethod === 'per-side' && currentSetIndex === 0 && (
-          <div className="bg-secondary/10 border-l-4 border-secondary p-4 rounded">
-            <div className="flex items-start">
-              <div className="flex-shrink-0">
-                <span className="text-2xl">{exercise.type === 'timed' ? '⏱️' : '🔄'}</span>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-secondary mb-1">
-                  Both Sides Required
-                </h3>
-                {isFirstTime ? (
-                  <div className="text-sm text-text space-y-2">
-                    <p><strong>Important:</strong> Do this exercise on BOTH sides (left and right).</p>
-                    <p>• Don't push yourself too hard on the first set - stop at a comfortable level that you can repeat for multiple sets</p>
-                    {exercise.type === 'timed' ? (
-                      <>
-                        <p>• Use the timer for ONE side, then manually reset and do the other side</p>
-                        <p>• Enter the <strong>time per side</strong> (not total time) when done</p>
-                        <p>• Future sets will automatically run the timer twice</p>
-                      </>
-                    ) : (
-                      <>
-                        <p>• Do the reps on ONE side, then do the same number on the other side</p>
-                        <p>• Enter the <strong>reps per side</strong> (not total reps) when done</p>
-                      </>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-sm text-text">
-                    {exercise.type === 'timed'
-                      ? 'The timer will run twice - once for your left side, then once for your right side. There will be a 10-second break to switch positions.'
-                      : 'Complete the target reps on one side, then repeat on the other side.'}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Exercise Info */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-2xl font-bold text-text mb-1">{currentExercise.exerciseName}</h2>
-              <div className="flex gap-2">
-                {currentExercise.muscleGroups.map((mg, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs bg-primary text-background px-2 py-1 rounded-full uppercase font-semibold"
-                  >
-                    {mg}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-text-muted">Exercise</div>
-              <div className="text-lg font-bold text-primary">
-                {currentExerciseIndex + 1} / {currentWorkout.exercises.length}
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        {/* Current Set */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <div className="flex justify-between items-center mb-4">
-            <h3 className="text-lg font-semibold text-text">
-              Set {currentSetIndex + 1} of {currentExercise.sets.length}
-            </h3>
-            {!isFirstTime && (
-              <div className="text-sm text-text-muted">
-                Target:{' '}
-                {exercise?.type === 'reps'
-                  ? `${currentSet.targetReps} reps${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`
-                  : `${currentSet.targetDuration}s${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`}
-              </div>
-            )}
-          </div>
-
-          {/* Timer for timed exercises */}
-          {exercise?.type === 'timed' && (
-            <div className="mb-4">
-              <Timer
-                key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
-                duration={currentSet.targetDuration || 30}
-                countUp={isFirstTime && currentSetIndex === 0}
-                showSecondsOnly={isFirstTime && currentSetIndex === 0}
-                bilateral={exercise?.countingMethod === 'per-side' && !(isFirstTime && currentSetIndex === 0)}
-              />
-            </div>
-          )}
-
-          {/* Input for actual performance */}
-          <div className="mb-4">
-            <Input
-              type="number"
-              label={
-                exercise?.type === 'reps'
-                  ? (exercise?.countingMethod === 'per-side'
-                      ? 'How many reps did you complete PER SIDE?'
-                      : 'How many reps did you complete?')
-                  : (exercise?.countingMethod === 'per-side'
-                      ? 'How many seconds did you hold PER SIDE?'
-                      : 'How many seconds did you hold?')
-              }
-              placeholder={
-                isFirstTime
-                  ? (exercise?.type === 'reps'
-                      ? (exercise?.countingMethod === 'per-side' ? 'Enter reps per side' : 'Enter reps')
-                      : (exercise?.countingMethod === 'per-side' ? 'Enter seconds per side' : 'Enter seconds'))
-                  : (exercise?.type === 'reps'
-                    ? `Target: ${currentSet.targetReps}${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`
-                    : `Target: ${currentSet.targetDuration}s${exercise?.countingMethod === 'per-side' ? ' per side' : ''}`)
-              }
-              value={inputValue}
-              onChange={handleInputChange}
-              min="1"
-            />
-          </div>
-
-          {/* Equipment input for elastic band exercises */}
-          {exercise?.equipment === 'elastic-band' && (
-            <div className="mb-4">
-              <Input
-                type="text"
-                label="Equipment used (optional)"
-                placeholder="e.g., Red band, Blue + Green bands"
-                value={equipmentInput}
-                onChange={(e) => setEquipmentInput(e.target.value)}
-              />
-            </div>
-          )}
-
-          {/* Exercise note section */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-text mb-2">
-              Personal note about this exercise (optional)
-            </label>
-            {previousNote && previousNote !== exerciseNote && (
-              <div className="mb-2 p-2 bg-secondary/10 border-l-2 border-secondary rounded text-sm text-text-muted">
-                <div className="font-medium text-xs text-secondary mb-1">Previous note:</div>
-                {previousNote}
-              </div>
-            )}
-            <textarea
-              className="w-full px-4 py-3 bg-background-light border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted resize-none"
-              placeholder="Add a note about form, difficulty, tips..."
-              value={exerciseNote}
-              onChange={(e) => setExerciseNote(e.target.value)}
-              rows={2}
-            />
-          </div>
-
-          <Button onClick={handleCompleteSet} fullWidth>
-            Complete Set
-          </Button>
-        </div>
-
-        {/* All Sets Progress */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <h3 className="text-sm font-medium text-text-muted mb-3">Set Progress</h3>
-          <div className="flex gap-2">
-            {currentExercise.sets.map((set, index) => (
-              <div
-                key={index}
-                className={`flex-1 h-2 rounded-full transition-colors ${
-                  set.completed
-                    ? 'bg-primary'
-                    : index === currentSetIndex
-                    ? 'bg-primary/50'
-                    : 'bg-background-lighter'
-                }`}
-              />
-            ))}
-          </div>
-        </div>
-
-        {/* Exercise Help Button */}
-        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-          <button
-            onClick={() => setShowExerciseModal(true)}
-            className="w-full flex items-center justify-center gap-2 text-primary hover:text-primary-light transition-colors"
-          >
-            <span className="text-xl">❓</span>
-            <span className="text-sm font-medium">How to do this exercise</span>
-          </button>
-        </div>
-      </div>
-
-      {/* Exercise Modal */}
-      {showExerciseModal && exercise && (
-        <ExerciseModal
-          exercise={exercise}
-          onClose={() => setShowExerciseModal(false)}
-        />
-      )}
+      <ExercisePhase
+        currentExercise={currentExercise}
+        currentSet={currentSet}
+        currentExerciseIndex={currentExerciseIndex}
+        currentSetIndex={currentSetIndex}
+        totalExercises={currentWorkout.exercises.length}
+        exercise={exercise!}
+        isFirstTime={isFirstTime}
+        previousNote={previousNote}
+        onCompleteSet={handleCompleteSet}
+      />
     </div>
   );
 }
