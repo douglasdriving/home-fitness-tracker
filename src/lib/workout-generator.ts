@@ -11,6 +11,7 @@ interface GenerateWorkoutOptions {
   recentExerciseIds?: string[]; // IDs of exercises used in last 2-3 workouts
   workoutHistory?: WorkoutHistoryEntry[]; // For progressive overload
   hasElasticBands?: boolean; // Whether user has elastic bands
+  excludedExerciseIds?: string[]; // IDs of exercises user wants to exclude
 }
 
 /**
@@ -24,7 +25,7 @@ interface GenerateWorkoutOptions {
  * - Estimate total workout duration
  */
 export function generateWorkout(options: GenerateWorkoutOptions): Workout {
-  const { workoutNumber, strengthLevels, recentExerciseIds = [], workoutHistory = [], hasElasticBands = false } = options;
+  const { workoutNumber, strengthLevels, recentExerciseIds = [], workoutHistory = [], hasElasticBands = false, excludedExerciseIds = [] } = options;
 
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
@@ -45,12 +46,20 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
     );
 
+    // Filter out excluded exercises
+    availableExercises = availableExercises.filter(
+      (ex) => !excludedExerciseIds.includes(ex.id)
+    );
+
     // Filter out already selected exercises
     availableExercises = availableExercises.filter(
       (ex) => !selectedExerciseIds.has(ex.id)
     );
 
-    if (availableExercises.length === 0) continue;
+    if (availableExercises.length === 0) {
+      console.warn(`No available exercises for ${muscleGroup} after filtering. Consider reducing excluded exercises.`);
+      continue;
+    }
 
     // Sort exercises by last used (least recently used first)
     // Exercises never used get priority (treated as workoutNumber -1)
@@ -80,6 +89,11 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Apply equipment filter
     availableExercises = availableExercises.filter(
       (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
+    );
+
+    // Filter out excluded exercises
+    availableExercises = availableExercises.filter(
+      (ex) => !excludedExerciseIds.includes(ex.id)
     );
 
     if (availableExercises.length > 0) {

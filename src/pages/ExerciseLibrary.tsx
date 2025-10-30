@@ -1,10 +1,12 @@
 import { useState, useMemo } from 'react';
 import { allExercises } from '../data/exerciseData';
 import { MuscleGroup, Exercise } from '../types/exercise';
+import { useUserStore } from '../store/user-store';
 
 type FilterOption = 'all' | MuscleGroup;
 
 export default function ExerciseLibrary() {
+  const { profile, excludeExercise, includeExercise } = useUserStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [filter, setFilter] = useState<FilterOption>('all');
 
@@ -134,8 +136,25 @@ export default function ExerciseLibrary() {
                       Watch video
                     </a>
                   )}
-                  <div className="text-xs text-text-muted">
-                    Source: {exercise.source}
+                  <div className="flex items-center gap-2">
+                    <div className="text-xs text-text-muted">
+                      Source: {exercise.source}
+                    </div>
+                    {profile?.excludedExercises?.includes(exercise.id) ? (
+                      <button
+                        onClick={() => includeExercise(exercise.id)}
+                        className="px-3 py-1 text-xs bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+                      >
+                        Include
+                      </button>
+                    ) : (
+                      <button
+                        onClick={() => excludeExercise(exercise.id)}
+                        className="px-3 py-1 text-xs bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                      >
+                        Exclude
+                      </button>
+                    )}
                   </div>
                 </div>
 

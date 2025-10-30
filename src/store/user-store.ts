@@ -17,6 +17,8 @@ interface UserStore {
   completeCalibration: (data: CalibrationData) => void;
   updateStrengthLevels: (levels: Partial<StrengthLevels>) => void;
   updateEquipment: (equipment: { hasElasticBands?: boolean }) => void;
+  excludeExercise: (exerciseId: string) => void;
+  includeExercise: (exerciseId: string) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -73,6 +75,38 @@ export const useUserStore = create<UserStore>((set, get) => ({
         ...profile.equipment,
         ...equipment,
       },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  excludeExercise: (exerciseId: string) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const currentExcluded = profile.excludedExercises || [];
+    if (currentExcluded.includes(exerciseId)) return; // Already excluded
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      excludedExercises: [...currentExcluded, exerciseId],
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  includeExercise: (exerciseId: string) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const currentExcluded = profile.excludedExercises || [];
+    const updatedExcluded = currentExcluded.filter((id) => id !== exerciseId);
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      excludedExercises: updatedExcluded,
     };
 
     saveUserProfile(updatedProfile);

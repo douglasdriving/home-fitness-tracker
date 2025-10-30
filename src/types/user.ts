@@ -9,6 +9,7 @@ export interface UserProfile {
   equipment?: {
     hasElasticBands?: boolean;
   };
+  excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
   weight?: number; // kg
   height?: number; // cm
 }
