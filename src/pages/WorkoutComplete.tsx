@@ -2,14 +2,18 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { WorkoutHistoryEntry } from '../types/workout';
 import { useWorkoutStore } from '../store/workout-store';
+import { useUserStore } from '../store/user-store';
+import { totalStretchingDuration } from '../data/stretchingData';
 
 export default function WorkoutComplete() {
   const navigate = useNavigate();
   const location = useLocation();
   const workout = location.state?.workout as WorkoutHistoryEntry | undefined;
   const { loadWorkouts } = useWorkoutStore();
+  const { profile } = useUserStore();
 
   const [showConfetti, setShowConfetti] = useState(true);
+  const autoShowStretching = profile?.preferences?.autoShowStretching ?? true;
 
   useEffect(() => {
     if (!workout) {
@@ -128,15 +132,47 @@ export default function WorkoutComplete() {
           </div>
 
         {/* Actions */}
-        <button
-          onClick={async () => {
-            await loadWorkouts();
-            navigate('/');
-          }}
-          className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
-        >
-          🎉 Done
-        </button>
+        {autoShowStretching && (
+          <div className="space-y-3">
+            <div className="bg-white/10 rounded-lg p-4 backdrop-blur text-center">
+              <h3 className="font-semibold mb-1">🧘 Post-Workout Stretching</h3>
+              <p className="text-sm text-white/90">
+                Complete a {Math.ceil(totalStretchingDuration / 60)}-minute stretching routine to improve flexibility and recovery
+              </p>
+            </div>
+
+            <button
+              onClick={() => {
+                navigate('/stretching', { state: { workoutId: workout.id } });
+              }}
+              className="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            >
+              🧘 Start Stretching Routine
+            </button>
+
+            <button
+              onClick={async () => {
+                await loadWorkouts();
+                navigate('/');
+              }}
+              className="w-full bg-white/20 hover:bg-white/30 text-white font-semibold px-6 py-3 rounded-lg transition-colors"
+            >
+              Skip Stretching
+            </button>
+          </div>
+        )}
+
+        {!autoShowStretching && (
+          <button
+            onClick={async () => {
+              await loadWorkouts();
+              navigate('/');
+            }}
+            className="w-full bg-white text-primary hover:bg-white/90 font-semibold px-6 py-3 rounded-lg transition-colors"
+          >
+            🎉 Done
+          </button>
+        )}
       </div>
     </div>
   );

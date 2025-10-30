@@ -40,6 +40,7 @@ export interface WorkoutHistoryEntry {
   completedDate: number; // timestamp
   totalDuration: number; // actual minutes
   exercises: CompletedExercise[];
+  stretchingCompleted?: boolean; // Optional: tracks if post-workout stretching was done
 }
 
 export interface CompletedExercise {

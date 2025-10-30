@@ -12,7 +12,7 @@ import { allExercises } from '../data/exerciseData';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, initializeUser, updateEquipment, includeExercise } = useUserStore();
+  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -305,6 +305,27 @@ export default function Settings() {
                 <div className="font-medium text-text">Elastic Loop Bands</div>
                 <div className="text-xs text-text-muted">
                   Includes elastic loop band exercises like clamshells and fire hydrants.
+                </div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Preferences */}
+        <div className="border-b border-background-lighter pb-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Preferences</h2>
+          <div className="space-y-3">
+            <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
+              <input
+                type="checkbox"
+                checked={profile?.preferences?.autoShowStretching ?? true}
+                onChange={(e) => updatePreferences({ autoShowStretching: e.target.checked })}
+                className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-600"
+              />
+              <div>
+                <div className="font-medium text-text">Post-Workout Stretching</div>
+                <div className="text-xs text-text-muted">
+                  Automatically show stretching routine option after completing workouts.
                 </div>
               </div>
             </label>

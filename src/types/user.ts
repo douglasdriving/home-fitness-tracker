@@ -10,6 +10,9 @@ export interface UserProfile {
     hasElasticBands?: boolean;
   };
   excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
+  preferences?: {
+    autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
+  };
   weight?: number; // kg
   height?: number; // cm
 }
