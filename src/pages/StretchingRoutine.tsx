@@ -3,11 +3,12 @@
  * Guides users through a 5-minute post-workout stretching routine
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { stretchingRoutine, totalStretchingDuration } from '../data/stretchingData';
 import Timer from '../components/workout/Timer';
 import Button from '../components/common/Button';
+import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
 
 export default function StretchingRoutine() {
@@ -17,17 +18,13 @@ export default function StretchingRoutine() {
 
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
   const [isResting, setIsResting] = useState(false);
-  const [showInstructions, setShowInstructions] = useState(true);
+  const [showStretchModal, setShowStretchModal] = useState(false);
   const [completedStretches, setCompletedStretches] = useState<Set<number>>(new Set());
 
   const currentStretch = stretchingRoutine[currentStretchIndex];
   const isLastStretch = currentStretchIndex === stretchingRoutine.length - 1;
   const progress = ((currentStretchIndex + (isResting ? 0.5 : 0)) / stretchingRoutine.length) * 100;
 
-  useEffect(() => {
-    // Show instructions when starting a new stretch
-    setShowInstructions(true);
-  }, [currentStretchIndex]);
 
   const handleStretchComplete = () => {
     setCompletedStretches(prev => new Set(prev).add(currentStretchIndex));
@@ -173,39 +170,6 @@ export default function StretchingRoutine() {
             </div>
           </div>
 
-          {/* Instructions */}
-          {showInstructions && (
-            <div className="mb-4 p-4 bg-purple-50 rounded-lg border border-purple-200">
-              <h3 className="text-sm font-semibold text-purple-900 mb-2">Instructions:</h3>
-              <ol className="list-decimal list-inside space-y-1 text-sm text-purple-800">
-                {currentStretch.instructions.map((instruction, idx) => (
-                  <li key={idx}>{instruction}</li>
-                ))}
-              </ol>
-            </div>
-          )}
-
-          {/* Video Link */}
-          {currentStretch.videoUrl && (
-            <div className="mb-4">
-              <a
-                href={currentStretch.videoUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center text-sm text-purple-600 hover:text-purple-700"
-              >
-                <span className="mr-1">▶</span>
-                Watch demonstration video
-              </a>
-            </div>
-          )}
-
-          <button
-            onClick={() => setShowInstructions(!showInstructions)}
-            className="text-sm text-text-muted hover:text-text"
-          >
-            {showInstructions ? '▲ Hide instructions' : '▼ Show instructions'}
-          </button>
         </div>
 
         {/* Timer */}
@@ -240,6 +204,17 @@ export default function StretchingRoutine() {
           </div>
         </div>
 
+        {/* Stretch Help Button */}
+        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
+          <button
+            onClick={() => setShowStretchModal(true)}
+            className="w-full flex items-center justify-center gap-2 text-purple-600 hover:text-purple-700 transition-colors"
+          >
+            <span className="text-xl">❓</span>
+            <span className="text-sm font-medium">How to do this stretch</span>
+          </button>
+        </div>
+
         {/* Action Buttons */}
         <div className="space-y-3">
           <Button onClick={handleSkipStretch} fullWidth variant="secondary">
@@ -252,6 +227,11 @@ export default function StretchingRoutine() {
           Total routine: ~{Math.ceil(totalStretchingDuration / 60)} minutes
         </div>
       </div>
+
+      {/* Stretch Modal */}
+      {showStretchModal && (
+        <StretchModal stretch={currentStretch} onClose={() => setShowStretchModal(false)} />
+      )}
     </div>
   );
 }
