@@ -14,6 +14,7 @@ import Settings from './pages/Settings';
 import { useUserStore } from './store/user-store';
 import { backfillStrengthHistory, needsMigration } from './lib/strength-migration';
 
+// Workflow verification: Autonomous feedback refinement and implementation cycle working as expected
 function App() {
   const { initializeUser, isLoading, profile } = useUserStore();
 
