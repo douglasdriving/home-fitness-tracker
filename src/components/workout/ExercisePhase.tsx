@@ -10,7 +10,7 @@ import Input from '../common/Input';
 import FirstTimeExerciseBanner from './FirstTimeExerciseBanner';
 import BilateralExerciseBanner from './BilateralExerciseBanner';
 import ExerciseModal from './ExerciseModal';
-import { WorkoutExercise, WorkoutSet } from '../../types/workout';
+import { WorkoutExercise, Set as WorkoutSet } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
 
 interface ExercisePhaseProps {
