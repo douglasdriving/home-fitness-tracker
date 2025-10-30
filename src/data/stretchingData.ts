@@ -24,7 +24,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Focus on relaxing your lower back and abs'
     ],
     targetMuscles: ['Lower Back', 'Abs'],
-    videoUrl: 'https://www.youtube.com/watch?v=2MTd6RRNTRg'
+    videoUrl: 'https://www.youtube.com/watch?v=kH12QrSGedM'
   },
   {
     id: 'stretch-cat-cow',
@@ -50,7 +50,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 15 seconds, then switch sides'
     ],
     targetMuscles: ['Glutes', 'Lower Back'],
-    videoUrl: 'https://www.youtube.com/watch?v=MgQ4Met_zkw'
+    videoUrl: 'https://www.youtube.com/watch?v=Xb5gHdYtHnk'
   },
   {
     id: 'stretch-knee-to-chest',
@@ -63,7 +63,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 15 seconds, then switch legs'
     ],
     targetMuscles: ['Lower Back', 'Glutes'],
-    videoUrl: 'https://www.youtube.com/watch?v=MRbDH7r7pOA'
+    videoUrl: 'https://www.youtube.com/watch?v=o8gAyDUh2bs'
   },
   {
     id: 'stretch-lying-twist',
@@ -76,7 +76,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 20 seconds, then switch sides'
     ],
     targetMuscles: ['Lower Back', 'Abs', 'Glutes'],
-    videoUrl: 'https://www.youtube.com/watch?v=vOgxWp0WyiI'
+    videoUrl: 'https://www.youtube.com/watch?v=mNdJti7ZwKI'
   },
   {
     id: 'stretch-cobra',
@@ -89,7 +89,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold the stretch, breathing deeply'
     ],
     targetMuscles: ['Abs'],
-    videoUrl: 'https://www.youtube.com/watch?v=JDcdhTuycOI'
+    videoUrl: 'https://www.youtube.com/watch?v=XVgd8aktKTE'
   },
   {
     id: 'stretch-hip-flexor',
@@ -115,7 +115,7 @@ export const stretchingRoutine: StretchExercise[] = [
       'Great work on your stretching routine!'
     ],
     targetMuscles: ['Full Body'],
-    videoUrl: 'https://www.youtube.com/watch?v=2MTd6RRNTRg'
+    videoUrl: 'https://www.youtube.com/watch?v=kH12QrSGedM'
   }
 ];
 
