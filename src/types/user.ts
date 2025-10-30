@@ -13,6 +13,7 @@ export interface UserProfile {
   preferences?: {
     autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
   };
+  hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   weight?: number; // kg
   height?: number; // cm
 }

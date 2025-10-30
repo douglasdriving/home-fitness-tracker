@@ -12,13 +12,38 @@ import ExerciseLibrary from './pages/ExerciseLibrary';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
 import { useUserStore } from './store/user-store';
+import { backfillStrengthHistory, needsMigration } from './lib/strength-migration';
 
 function App() {
-  const { initializeUser, isLoading } = useUserStore();
+  const { initializeUser, isLoading, profile } = useUserStore();
 
   useEffect(() => {
     initializeUser();
   }, [initializeUser]);
+
+  // Auto-trigger strength history backfill on first app load if needed
+  useEffect(() => {
+    const runAutoBackfill = async () => {
+      if (!profile || profile.hasBackfilledStrengthData) return;
+
+      const migrationNeeded = await needsMigration();
+      if (migrationNeeded) {
+        console.log('Auto-running strength history backfill...');
+        try {
+          const result = await backfillStrengthHistory();
+          if (result.success) {
+            console.log(`Backfill complete: ${result.snapshotsCreated} snapshots created`);
+          } else {
+            console.error('Backfill completed with errors:', result.errors);
+          }
+        } catch (error) {
+          console.error('Auto-backfill failed:', error);
+        }
+      }
+    };
+
+    runAutoBackfill();
+  }, [profile]);
 
   if (isLoading) {
     return (

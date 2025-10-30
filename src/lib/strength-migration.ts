@@ -108,6 +108,9 @@ export async function backfillStrengthHistory(): Promise<MigrationResult> {
     // Update user's current strength levels to match the final calculated values
     useUserStore.getState().updateStrengthLevels(currentStrength);
 
+    // Mark backfill as completed
+    useUserStore.getState().setBackfillCompleted();
+
     result.success = result.errors.length === 0;
     return result;
   } catch (error) {

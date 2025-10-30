@@ -20,6 +20,7 @@ interface UserStore {
   updatePreferences: (preferences: { autoShowStretching?: boolean }) => void;
   excludeExercise: (exerciseId: string) => void;
   includeExercise: (exerciseId: string) => void;
+  setBackfillCompleted: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -124,6 +125,19 @@ export const useUserStore = create<UserStore>((set, get) => ({
     const updatedProfile: UserProfile = {
       ...profile,
       excludedExercises: updatedExcluded,
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  setBackfillCompleted: () => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      hasBackfilledStrengthData: true,
     };
 
     saveUserProfile(updatedProfile);
