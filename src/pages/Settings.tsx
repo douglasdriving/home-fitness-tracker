@@ -7,6 +7,7 @@ import { getExerciseById } from '../data/exerciseData';
 import { format } from 'date-fns';
 import Button from '../components/common/Button';
 import FeedbackForm from '../components/feedback/FeedbackForm';
+import { backfillStrengthHistory, needsMigration } from '../lib/strength-migration';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -16,6 +17,8 @@ export default function Settings() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isInstallable, setIsInstallable] = useState(false);
   const [showFeedbackForm, setShowFeedbackForm] = useState(false);
+  const [showMigration, setShowMigration] = useState(false);
+  const [isMigrating, setIsMigrating] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -31,6 +34,15 @@ export default function Settings() {
     return () => {
       window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     };
+  }, []);
+
+  useEffect(() => {
+    // Check if migration is needed on component mount
+    const checkMigration = async () => {
+      const migrationNeeded = await needsMigration();
+      setShowMigration(migrationNeeded);
+    };
+    checkMigration();
   }, []);
 
   const handleInstallApp = async () => {
@@ -194,6 +206,8 @@ export default function Settings() {
       // Clear database
       await db.workouts.clear();
       await db.history.clear();
+      await db.strengthHistory.clear();
+      await db.exerciseNotes.clear();
 
       // Clear user profile
       localStorage.clear();
@@ -203,6 +217,40 @@ export default function Settings() {
     } catch (error) {
       console.error('Failed to clear data:', error);
       alert('Failed to clear data. Please try again.');
+    }
+  };
+
+  const handleMigrateStrengthHistory = async () => {
+    if (isMigrating) return;
+
+    if (!confirm('This will backfill strength progression data for all your past workouts. Continue?')) {
+      return;
+    }
+
+    setIsMigrating(true);
+    try {
+      const result = await backfillStrengthHistory();
+
+      if (result.success) {
+        alert(
+          `Migration complete!\n\n` +
+          `Total workouts processed: ${result.totalWorkouts}\n` +
+          `Strength snapshots created: ${result.snapshotsCreated}\n\n` +
+          `Your Progress tab now shows your complete fitness journey!`
+        );
+        setShowMigration(false);
+      } else {
+        alert(
+          `Migration completed with errors:\n\n` +
+          `${result.errors.join('\n')}\n\n` +
+          `Snapshots created: ${result.snapshotsCreated} / ${result.totalWorkouts}`
+        );
+      }
+    } catch (error) {
+      console.error('Migration error:', error);
+      alert('Migration failed. Please try again or contact support.');
+    } finally {
+      setIsMigrating(false);
     }
   };
 
@@ -261,6 +309,23 @@ export default function Settings() {
             </label>
           </div>
         </div>
+
+        {/* Progress Data Migration */}
+        {showMigration && (
+          <div className="border-b border-background-lighter pb-6">
+            <h2 className="text-lg font-semibold text-text mb-4">Progress Data Available</h2>
+            <p className="text-sm text-text-muted mb-4">
+              We can now show your complete strength progression from your first workout! Click below to backfill your historical progress data.
+            </p>
+            <Button
+              onClick={handleMigrateStrengthHistory}
+              fullWidth
+              disabled={isMigrating}
+            >
+              {isMigrating ? 'Migrating...' : 'Backfill Progress History'}
+            </Button>
+          </div>
+        )}
 
         {/* Install App */}
         {isInstallable && (
