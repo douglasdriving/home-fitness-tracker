@@ -10,7 +10,6 @@ import Progress from './pages/Progress';
 import ExerciseLibrary from './pages/ExerciseLibrary';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
-import DietTips from './pages/DietTips';
 import { useUserStore } from './store/user-store';
 
 function App() {
@@ -44,7 +43,6 @@ function App() {
             <Route path="/progress" element={<Progress />} />
             <Route path="/exercises" element={<ExerciseLibrary />} />
             <Route path="/calibration" element={<Calibration />} />
-            <Route path="/diet" element={<DietTips />} />
             <Route path="/settings" element={<Settings />} />
           </Routes>
         </div>

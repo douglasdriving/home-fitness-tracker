@@ -9,8 +9,7 @@ export default function BottomNav() {
     { path: '/', label: 'Home', icon: '🏠' },
     { path: '/history', label: 'History', icon: '📊' },
     { path: '/progress', label: 'Progress', icon: '📈' },
-    { path: '/diet', label: 'Diet', icon: '🥗' },
-    // { path: '/exercises', label: 'Exercises', icon: '💪' }, // Hidden - not currently used
+    { path: '/exercises', label: 'Exercises', icon: '💪' },
     { path: '/settings', label: 'Settings', icon: '⚙️' },
   ];
 
