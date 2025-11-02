@@ -150,21 +150,21 @@ export default function Progress() {
             <div className="text-xs text-text-muted mb-1">Abs</div>
             <div className="text-2xl font-bold text-primary">{latestData.abs}</div>
             <div className="text-xs text-text-muted mt-1">
-              {absGain > 0 ? '+' : ''}{absGain}
+              {absGain > 0 ? '+' : ''}{absGain} since start
             </div>
           </div>
           <div className="bg-background-light rounded-lg p-3">
             <div className="text-xs text-text-muted mb-1">Glutes</div>
             <div className="text-2xl font-bold text-secondary">{latestData.glutes}</div>
             <div className="text-xs text-text-muted mt-1">
-              {glutesGain > 0 ? '+' : ''}{glutesGain}
+              {glutesGain > 0 ? '+' : ''}{glutesGain} since start
             </div>
           </div>
           <div className="bg-background-light rounded-lg p-3">
             <div className="text-xs text-text-muted mb-1">Lower Back</div>
             <div className="text-2xl font-bold text-accent">{latestData.lowerBack}</div>
             <div className="text-xs text-text-muted mt-1">
-              {lowerBackGain > 0 ? '+' : ''}{lowerBackGain}
+              {lowerBackGain > 0 ? '+' : ''}{lowerBackGain} since start
             </div>
           </div>
         </div>
@@ -187,7 +187,7 @@ export default function Progress() {
               <YAxis
                 stroke="#9CA3AF"
                 tick={{ fill: '#9CA3AF', fontSize: 12 }}
-                domain={[0, 100]}
+                domain={[0, 'auto']}
               />
               <Tooltip content={<CustomTooltip />} />
               <Legend
