@@ -12,7 +12,7 @@ interface WorkoutStore {
 
   // Actions
   loadWorkouts: () => Promise<void>;
-  generateNewWorkout: () => Promise<void>;
+  generateNewWorkout: (timeConstraintMinutes?: number) => Promise<void>;
   startWorkout: (workoutId: string) => Promise<void>;
   updateSet: (exerciseIndex: number, setIndex: number, updates: Partial<Set>) => Promise<void>;
   updateWorkoutPosition: (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => Promise<void>;
@@ -54,7 +54,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
   /**
    * Generate a new workout based on user's strength levels
    */
-  generateNewWorkout: async () => {
+  generateNewWorkout: async (timeConstraintMinutes?: number) => {
     const userProfile = useUserStore.getState().profile;
 
     if (!userProfile || !userProfile.strengthLevels) {
@@ -89,6 +89,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         workoutHistory,
         hasElasticBands: userProfile.equipment?.hasElasticBands || false,
         excludedExerciseIds: userProfile.excludedExercises || [],
+        timeConstraintMinutes,
       });
 
       // Save to database

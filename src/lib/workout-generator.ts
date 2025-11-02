@@ -12,6 +12,7 @@ interface GenerateWorkoutOptions {
   workoutHistory?: WorkoutHistoryEntry[]; // For progressive overload
   hasElasticBands?: boolean; // Whether user has elastic bands
   excludedExerciseIds?: string[]; // IDs of exercises user wants to exclude
+  timeConstraintMinutes?: number; // Optional time limit for workout in minutes
 }
 
 /**
@@ -25,7 +26,7 @@ interface GenerateWorkoutOptions {
  * - Estimate total workout duration
  */
 export function generateWorkout(options: GenerateWorkoutOptions): Workout {
-  const { workoutNumber, strengthLevels, workoutHistory = [], hasElasticBands = false, excludedExerciseIds = [] } = options;
+  const { workoutNumber, strengthLevels, workoutHistory = [], hasElasticBands = false, excludedExerciseIds = [], timeConstraintMinutes } = options;
 
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
@@ -135,6 +136,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     }
 
     // Determine number of sets (3-4 sets based on strength level)
+    // Will be adjusted later if time constraint is specified
     const numSets = strengthLevel > 50 ? 4 : 3;
 
     // Apply a sustainable multiplier for multiple sets ONLY for new exercises
@@ -167,7 +169,37 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   });
 
   // Calculate estimated duration
-  const estimatedDuration = calculateEstimatedDuration(workoutExercises);
+  let estimatedDuration = calculateEstimatedDuration(workoutExercises);
+
+  // Adjust workout if time constraint is specified
+  if (timeConstraintMinutes && estimatedDuration > timeConstraintMinutes) {
+    // Strategy: Reduce sets per exercise first, then remove exercises if needed
+    let adjustedExercises = [...workoutExercises];
+
+    // First pass: Reduce each exercise to 3 sets (minimum)
+    adjustedExercises = adjustedExercises.map(ex => ({
+      ...ex,
+      sets: ex.sets.slice(0, Math.max(3, ex.sets.length - 1))
+    }));
+    estimatedDuration = calculateEstimatedDuration(adjustedExercises);
+
+    // Second pass: If still too long, reduce to 2 sets per exercise
+    if (estimatedDuration > timeConstraintMinutes) {
+      adjustedExercises = adjustedExercises.map(ex => ({
+        ...ex,
+        sets: ex.sets.slice(0, 2)
+      }));
+      estimatedDuration = calculateEstimatedDuration(adjustedExercises);
+    }
+
+    // Third pass: If still too long, remove the 4th exercise (if present)
+    if (estimatedDuration > timeConstraintMinutes && adjustedExercises.length === 4) {
+      adjustedExercises = adjustedExercises.slice(0, 3);
+      estimatedDuration = calculateEstimatedDuration(adjustedExercises);
+    }
+
+    workoutExercises = adjustedExercises;
+  }
 
   const workout: Workout = {
     id: `workout-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,

@@ -14,6 +14,7 @@ export default function Dashboard() {
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
   const [showDietTips, setShowDietTips] = useState(false);
   const [hasCompletedWorkoutToday, setHasCompletedWorkoutToday] = useState(false);
+  const [timeConstraint, setTimeConstraint] = useState<string>('');
 
   useEffect(() => {
     // Load current workout and history
@@ -67,7 +68,9 @@ export default function Dashboard() {
 
   const handleGenerateWorkout = async () => {
     try {
-      await generateNewWorkout();
+      const timeLimit = timeConstraint ? parseInt(timeConstraint) : undefined;
+      await generateNewWorkout(timeLimit);
+      setTimeConstraint(''); // Reset after generation
     } catch (error) {
       console.error('Error generating workout:', error);
       alert('Failed to generate workout. Please try again.');
@@ -200,9 +203,32 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
+          <div className="bg-background-light rounded-lg shadow-lg p-6">
+            <h2 className="text-lg font-semibold text-text mb-4">Generate New Workout</h2>
+
+            {/* Time Constraint Input */}
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-text mb-2">
+                Time limit (optional)
+              </label>
+              <input
+                type="number"
+                value={timeConstraint}
+                onChange={(e) => setTimeConstraint(e.target.value)}
+                placeholder="e.g., 15 minutes"
+                min="5"
+                max="60"
+                className="w-full px-4 py-3 bg-background border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted"
+              />
+              <p className="text-xs text-text-muted mt-1">
+                Leave empty for a regular workout, or set a time limit for a shorter session.
+              </p>
+            </div>
+
             <Button onClick={handleGenerateWorkout} fullWidth>
-              New Workout
+              Generate Workout
             </Button>
+          </div>
         )}
 
         {/* Diet Tips Button - Show after completing workout today */}
