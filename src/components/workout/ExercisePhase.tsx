@@ -35,8 +35,13 @@ export default function ExercisePhase({
   previousNote,
   onCompleteSet,
 }: ExercisePhaseProps) {
+  // Get equipment from previous set to auto-fill
+  const previousSetEquipment = currentSetIndex > 0
+    ? currentExercise.sets[currentSetIndex - 1].equipmentUsed || ''
+    : '';
+
   const [inputValue, setInputValue] = useState('');
-  const [equipmentInput, setEquipmentInput] = useState('');
+  const [equipmentInput, setEquipmentInput] = useState(previousSetEquipment);
   const [exerciseNote, setExerciseNote] = useState(previousNote);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
 
