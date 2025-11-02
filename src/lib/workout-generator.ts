@@ -297,7 +297,8 @@ export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<
 
 /**
  * Find the last performance for a specific exercise
- * Returns the average performance from the most recent workout containing this exercise
+ * Returns the first set performance from the most recent workout containing this exercise
+ * (First set represents true capacity before fatigue sets in)
  */
 function findLastPerformance(
   exerciseId: string,
@@ -309,12 +310,9 @@ function findLastPerformance(
     const exercise = historyEntry.exercises.find((ex) => ex.exerciseId === exerciseId);
 
     if (exercise && exercise.completedSets.length > 0) {
-      // Calculate average performance across all sets
-      const totalPerformance = exercise.completedSets.reduce((sum, set) => {
-        return sum + (set.actualReps || set.actualDuration || 0);
-      }, 0);
-
-      return Math.round(totalPerformance / exercise.completedSets.length);
+      // Use first set performance (before fatigue) for progressive overload
+      const firstSet = exercise.completedSets[0];
+      return firstSet.actualReps || firstSet.actualDuration || 0;
     }
   }
 
