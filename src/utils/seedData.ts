@@ -11,6 +11,7 @@ import { allExercises } from '../data/exerciseData';
 /**
  * Generates seed workout history data for development and testing.
  * Creates 15 workouts over 6 weeks with realistic progression.
+ * Workouts are numbered 1-15 with dates from oldest (1) to newest (15).
  */
 export async function seedWorkoutHistory(): Promise<void> {
   // Check if history already exists
@@ -41,13 +42,17 @@ export async function seedWorkoutHistory(): Promise<void> {
   const recentExercises: string[] = [];
   const maxRecentTracking = 6; // Track last 6 exercises per muscle group
 
+  // Track performance per exercise for proper progression
+  const exercisePerformanceHistory: Map<string, number[]> = new Map();
+
   // Generate 15 workouts over 6 weeks (roughly 2-3 per week)
   for (let i = 0; i < 15; i++) {
     // Workout schedule: Week 1: Days 1,4,6 | Week 2: Days 2,5,7 | etc.
+    // Days are calculated backwards from now: workout 1 is oldest, workout 15 is newest
     const weekNumber = Math.floor(i / 3);
     const workoutInWeek = i % 3;
-    const daysFromNow = -(weekNumber * 7 + [1, 4, 6][workoutInWeek]);
-    const completedDate = now + daysFromNow * oneDay;
+    const daysAgo = (6 * 7) - (weekNumber * 7 + [1, 4, 6][workoutInWeek]); // Start 6 weeks ago, work forward
+    const completedDate = now - daysAgo * oneDay;
 
     // Select 3-4 exercises covering all muscle groups
     const exercises: CompletedExercise[] = [];
@@ -68,35 +73,61 @@ export async function seedWorkoutHistory(): Promise<void> {
         recentExercises.shift();
       }
 
-      // Calculate progressive performance
-      // Start at 60% capacity and increase by ~5% per workout
-      const progressionMultiplier = 0.6 + i * 0.05;
-
-      // Base performance on exercise heaviness and type
+      // Calculate progressive performance with proper 7.5% increase
       const avgHeaviness =
         Object.values(exercise.heavinessScore).reduce((sum, score) => sum + score, 0) / 3;
+
+      // Get previous performance for this exercise
+      const previousPerformances = exercisePerformanceHistory.get(exercise.id) || [];
+
+      let basePerformance: number;
+      if (previousPerformances.length > 0) {
+        // Use last performance + 7.5% increase (progressive overload)
+        const lastPerformance = previousPerformances[previousPerformances.length - 1];
+        basePerformance = Math.round(lastPerformance * 1.075);
+      } else {
+        // First time doing this exercise: start with capacity-based value
+        // Use higher multiplier to reach strength levels above 100 by workout 15
+        const startingMultiplier = 0.7 + i * 0.08; // Faster progression to test higher strength levels
+        if (exercise.type === 'reps') {
+          basePerformance = Math.round((30 / avgHeaviness) * startingMultiplier);
+        } else {
+          basePerformance = Math.round((180 / avgHeaviness) * startingMultiplier);
+        }
+      }
+
+      // Ensure minimum increases
+      if (previousPerformances.length > 0) {
+        const lastPerformance = previousPerformances[previousPerformances.length - 1];
+        if (exercise.type === 'reps') {
+          basePerformance = Math.max(basePerformance, lastPerformance + 1); // Min +1 rep
+        } else {
+          basePerformance = Math.max(basePerformance, lastPerformance + 5); // Min +5 seconds
+        }
+      }
 
       let completedSets: { setNumber: number; actualReps?: number; actualDuration?: number }[];
 
       if (exercise.type === 'reps') {
-        // Reps exercise: 3-4 sets with slight variation
-        const baseReps = Math.round((30 / avgHeaviness) * progressionMultiplier);
+        // Reps exercise: 3-4 sets with slight fatigue variation
         const setCount = 3 + (i % 2); // Alternate between 3 and 4 sets
 
         completedSets = Array.from({ length: setCount }, (_, setIdx) => ({
           setNumber: setIdx + 1,
-          actualReps: Math.max(1, baseReps - Math.floor(Math.random() * 3)), // Slight fatigue variation
+          actualReps: Math.max(1, basePerformance - setIdx), // Gradual fatigue: -1 per set
         }));
       } else {
-        // Timed exercise: 3-4 sets with slight variation
-        const baseDuration = Math.round((180 / avgHeaviness) * progressionMultiplier);
+        // Timed exercise: 3-4 sets with slight fatigue variation
         const setCount = 3 + (i % 2);
 
         completedSets = Array.from({ length: setCount }, (_, setIdx) => ({
           setNumber: setIdx + 1,
-          actualDuration: Math.max(5, baseDuration - Math.floor(Math.random() * 10)),
+          actualDuration: Math.max(5, basePerformance - (setIdx * 5)), // Gradual fatigue: -5s per set
         }));
       }
+
+      // Record this performance for progressive overload tracking
+      exercisePerformanceHistory.set(exercise.id, [...previousPerformances, basePerformance]);
 
       exercises.push({
         exerciseId: exercise.id,
@@ -118,25 +149,54 @@ export async function seedWorkoutHistory(): Promise<void> {
           recentExercises.shift();
         }
 
-        const progressionMultiplier = 0.6 + i * 0.05;
         const avgHeaviness =
           Object.values(exercise.heavinessScore).reduce((sum, score) => sum + score, 0) / 3;
+
+        // Get previous performance for this exercise
+        const previousPerformances = exercisePerformanceHistory.get(exercise.id) || [];
+
+        let basePerformance: number;
+        if (previousPerformances.length > 0) {
+          // Use last performance + 7.5% increase (progressive overload)
+          const lastPerformance = previousPerformances[previousPerformances.length - 1];
+          basePerformance = Math.round(lastPerformance * 1.075);
+        } else {
+          // First time doing this exercise: start with capacity-based value
+          // Use higher multiplier to reach strength levels above 100 by workout 15
+          const startingMultiplier = 0.7 + i * 0.08; // Faster progression to test higher strength levels
+          if (exercise.type === 'reps') {
+            basePerformance = Math.round((30 / avgHeaviness) * startingMultiplier);
+          } else {
+            basePerformance = Math.round((180 / avgHeaviness) * startingMultiplier);
+          }
+        }
+
+        // Ensure minimum increases
+        if (previousPerformances.length > 0) {
+          const lastPerformance = previousPerformances[previousPerformances.length - 1];
+          if (exercise.type === 'reps') {
+            basePerformance = Math.max(basePerformance, lastPerformance + 1);
+          } else {
+            basePerformance = Math.max(basePerformance, lastPerformance + 5);
+          }
+        }
 
         let completedSets: { setNumber: number; actualReps?: number; actualDuration?: number }[];
 
         if (exercise.type === 'reps') {
-          const baseReps = Math.round((30 / avgHeaviness) * progressionMultiplier);
           completedSets = Array.from({ length: 3 }, (_, setIdx) => ({
             setNumber: setIdx + 1,
-            actualReps: Math.max(1, baseReps - Math.floor(Math.random() * 3)),
+            actualReps: Math.max(1, basePerformance - setIdx),
           }));
         } else {
-          const baseDuration = Math.round((180 / avgHeaviness) * progressionMultiplier);
           completedSets = Array.from({ length: 3 }, (_, setIdx) => ({
             setNumber: setIdx + 1,
-            actualDuration: Math.max(5, baseDuration - Math.floor(Math.random() * 10)),
+            actualDuration: Math.max(5, basePerformance - (setIdx * 5)),
           }));
         }
+
+        // Record this performance for progressive overload tracking
+        exercisePerformanceHistory.set(exercise.id, [...previousPerformances, basePerformance]);
 
         exercises.push({
           exerciseId: exercise.id,
