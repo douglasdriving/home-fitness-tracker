@@ -112,7 +112,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   }
 
   // Build workout exercises with sets
-  const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => {
+  let workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => {
     // Determine primary muscle group for this exercise (first one in the array)
     const primaryMuscleGroup = exercise.muscleGroups[0];
     const strengthLevel = strengthLevels[primaryMuscleGroup];
