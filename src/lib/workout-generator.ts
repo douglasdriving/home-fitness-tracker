@@ -121,11 +121,19 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Check if user has done this exercise before (progressive overload)
     const lastPerformance = findLastPerformance(exercise.id, workoutHistory);
 
+    // DEBUG: Log the progression calculation
+    console.log(`[WORKOUT GEN] Exercise: ${exercise.name} (${exercise.id})`);
+    console.log(`[WORKOUT GEN] - Strength Level: ${strengthLevel}`);
+    console.log(`[WORKOUT GEN] - Heaviness: ${heavinessScore}`);
+    console.log(`[WORKOUT GEN] - Last Performance: ${lastPerformance}`);
+    console.log(`[WORKOUT GEN] - History entries: ${workoutHistory.length}`);
+
     let targetValue: number;
     if (lastPerformance !== null) {
       // Use progressive overload based on last performance
       // Last performance was already sustainable, so just add progression without multiplier
       targetValue = calculateProgression(lastPerformance, exercise.type);
+      console.log(`[WORKOUT GEN] - Using PROGRESSION: ${lastPerformance} → ${targetValue}`);
     } else {
       // First time doing this exercise, estimate based on strength level
       targetValue = estimateExerciseCapacity(
@@ -133,6 +141,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
         heavinessScore,
         exercise.type
       );
+      console.log(`[WORKOUT GEN] - Using ESTIMATION: ${targetValue}`);
     }
 
     // Determine number of sets (3-4 sets based on strength level)
@@ -146,6 +155,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     const sustainableTarget = lastPerformance !== null
       ? targetValue
       : Math.round(targetValue * 0.75);
+
+    console.log(`[WORKOUT GEN] - Final Target: ${sustainableTarget} (${exercise.type})\n`);
 
     // Create sets with the same target value for all sets
     const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({
@@ -304,6 +315,9 @@ function findLastPerformance(
   exerciseId: string,
   workoutHistory: WorkoutHistoryEntry[]
 ): number | null {
+  console.log(`[FIND LAST PERF] Searching for exercise: ${exerciseId}`);
+  console.log(`[FIND LAST PERF] Total history entries: ${workoutHistory.length}`);
+
   // Look through history in reverse (most recent first)
   for (let i = workoutHistory.length - 1; i >= 0; i--) {
     const historyEntry = workoutHistory[i];
@@ -312,9 +326,12 @@ function findLastPerformance(
     if (exercise && exercise.completedSets.length > 0) {
       // Use first set performance (before fatigue) for progressive overload
       const firstSet = exercise.completedSets[0];
-      return firstSet.actualReps || firstSet.actualDuration || 0;
+      const performance = firstSet.actualReps || firstSet.actualDuration || 0;
+      console.log(`[FIND LAST PERF] Found in workout #${historyEntry.workoutNumber}: ${performance} ${firstSet.actualReps ? 'reps' : 'seconds'}`);
+      return performance;
     }
   }
 
+  console.log(`[FIND LAST PERF] No history found for this exercise`);
   return null;
 }
