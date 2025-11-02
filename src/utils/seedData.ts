@@ -87,8 +87,9 @@ export async function seedWorkoutHistory(): Promise<void> {
         basePerformance = Math.round(lastPerformance * 1.075);
       } else {
         // First time doing this exercise: start with capacity-based value
-        // Use higher multiplier to reach strength levels above 100 by workout 15
-        const startingMultiplier = 0.7 + i * 0.08; // Faster progression to test higher strength levels
+        // Use higher starting values and faster progression to reach strength levels above 100 by workout 15
+        // Accelerated progression: workouts 1-5 start at 70%, workouts 6-10 at 110%, workouts 11-15 at 180%
+        const startingMultiplier = 0.7 + i * 0.12; // Much faster progression
         if (exercise.type === 'reps') {
           basePerformance = Math.round((30 / avgHeaviness) * startingMultiplier);
         } else {
@@ -109,20 +110,21 @@ export async function seedWorkoutHistory(): Promise<void> {
       let completedSets: { setNumber: number; actualReps?: number; actualDuration?: number }[];
 
       if (exercise.type === 'reps') {
-        // Reps exercise: 3-4 sets with slight fatigue variation
+        // Reps exercise: 3-4 sets with consistent performance
+        // (Progressive overload uses first set, so keep all sets at same level for realistic data)
         const setCount = 3 + (i % 2); // Alternate between 3 and 4 sets
 
         completedSets = Array.from({ length: setCount }, (_, setIdx) => ({
           setNumber: setIdx + 1,
-          actualReps: Math.max(1, basePerformance - setIdx), // Gradual fatigue: -1 per set
+          actualReps: basePerformance, // Consistent performance across sets
         }));
       } else {
-        // Timed exercise: 3-4 sets with slight fatigue variation
+        // Timed exercise: 3-4 sets with consistent performance
         const setCount = 3 + (i % 2);
 
         completedSets = Array.from({ length: setCount }, (_, setIdx) => ({
           setNumber: setIdx + 1,
-          actualDuration: Math.max(5, basePerformance - (setIdx * 5)), // Gradual fatigue: -5s per set
+          actualDuration: basePerformance, // Consistent performance across sets
         }));
       }
 
@@ -162,8 +164,9 @@ export async function seedWorkoutHistory(): Promise<void> {
           basePerformance = Math.round(lastPerformance * 1.075);
         } else {
           // First time doing this exercise: start with capacity-based value
-          // Use higher multiplier to reach strength levels above 100 by workout 15
-          const startingMultiplier = 0.7 + i * 0.08; // Faster progression to test higher strength levels
+          // Use higher starting values and faster progression to reach strength levels above 100 by workout 15
+          // Accelerated progression: workouts 1-5 start at 70%, workouts 6-10 at 110%, workouts 11-15 at 180%
+          const startingMultiplier = 0.7 + i * 0.12; // Much faster progression
           if (exercise.type === 'reps') {
             basePerformance = Math.round((30 / avgHeaviness) * startingMultiplier);
           } else {
@@ -186,12 +189,12 @@ export async function seedWorkoutHistory(): Promise<void> {
         if (exercise.type === 'reps') {
           completedSets = Array.from({ length: 3 }, (_, setIdx) => ({
             setNumber: setIdx + 1,
-            actualReps: Math.max(1, basePerformance - setIdx),
+            actualReps: basePerformance, // Consistent performance across sets
           }));
         } else {
           completedSets = Array.from({ length: 3 }, (_, setIdx) => ({
             setNumber: setIdx + 1,
-            actualDuration: Math.max(5, basePerformance - (setIdx * 5)),
+            actualDuration: basePerformance, // Consistent performance across sets
           }));
         }
 
