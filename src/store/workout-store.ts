@@ -77,9 +77,9 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         .reverse()
         .toArray();
 
-      // Get next workout number
-      const allWorkouts = await db.workouts.toArray();
-      const workoutNumber = allWorkouts.length + 1;
+      // Get next workout number based on history (completed workouts)
+      // This ensures workout numbers continue sequentially even after seeding data
+      const workoutNumber = workoutHistory.length + 1;
 
       // Generate new workout with progressive overload
       const newWorkout = generateWorkout({

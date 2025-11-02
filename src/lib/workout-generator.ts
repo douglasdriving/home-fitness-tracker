@@ -122,7 +122,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     const lastPerformance = findLastPerformance(exercise.id, workoutHistory);
 
     let targetValue: number;
-    if (lastPerformance) {
+    if (lastPerformance !== null) {
       // Use progressive overload based on last performance
       // Last performance was already sustainable, so just add progression without multiplier
       targetValue = calculateProgression(lastPerformance, exercise.type);
@@ -143,7 +143,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Calibration tests single-set max capacity, but workouts need sustainable targets
     // Use 75% of estimated capacity for all sets (allows completing all sets with good form)
     // For exercises with history, lastPerformance is already sustainable, so no multiplier needed
-    const sustainableTarget = lastPerformance
+    const sustainableTarget = lastPerformance !== null
       ? targetValue
       : Math.round(targetValue * 0.75);
 

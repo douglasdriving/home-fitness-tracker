@@ -227,6 +227,36 @@ export async function seedWorkoutHistory(): Promise<void> {
   // Add all workouts to database
   await db.history.bulkAdd(workouts);
 
+  // Calculate and update user strength levels based on all completed workouts
+  // This ensures strength levels match the workout history
+  const { updateStrengthLevelsFromWorkout } = await import('../lib/progression-calculator');
+  const { useUserStore } = await import('../store/user-store');
+
+  const userProfile = useUserStore.getState().profile;
+  if (userProfile && userProfile.strengthLevels) {
+    let currentStrengthLevels = { ...userProfile.strengthLevels };
+
+    // Process each workout chronologically to build up strength levels
+    for (const workout of workouts) {
+      currentStrengthLevels = updateStrengthLevelsFromWorkout(
+        currentStrengthLevels,
+        workout.exercises.map((ex) => ({
+          exerciseId: ex.exerciseId,
+          muscleGroups: ex.muscleGroups,
+          completedSets: ex.completedSets.map((set) => ({
+            actualReps: set.actualReps,
+            actualDuration: set.actualDuration,
+          })),
+        }))
+      );
+    }
+
+    // Update the user profile with final strength levels
+    useUserStore.getState().updateStrengthLevels(currentStrengthLevels);
+
+    console.log(`✅ Updated strength levels:`, currentStrengthLevels);
+  }
+
   console.log(`✅ Successfully seeded ${workouts.length} workout history entries`);
 }
 
