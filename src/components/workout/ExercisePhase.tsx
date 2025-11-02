@@ -3,7 +3,7 @@
  * Main exercise execution view with timer, input fields, and progress tracking
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Timer from './Timer';
 import Button from '../common/Button';
 import Input from '../common/Input';
@@ -40,10 +40,47 @@ export default function ExercisePhase({
     ? currentExercise.sets[currentSetIndex - 1].equipmentUsed || ''
     : '';
 
-  const [inputValue, setInputValue] = useState('');
+  // Auto-fill rep/duration input based on previous set or target
+  const getInitialInputValue = () => {
+    if (currentSetIndex > 0) {
+      // Use previous set's actual reps/duration
+      const previousSet = currentExercise.sets[currentSetIndex - 1];
+      if (exercise.type === 'reps' && previousSet.actualReps) {
+        return previousSet.actualReps.toString();
+      } else if (exercise.type === 'timed' && previousSet.actualDuration) {
+        return previousSet.actualDuration.toString();
+      }
+    }
+
+    // For first set, use target reps/duration
+    if (exercise.type === 'reps' && currentSet.targetReps) {
+      return currentSet.targetReps.toString();
+    } else if (exercise.type === 'timed' && currentSet.targetDuration) {
+      return currentSet.targetDuration.toString();
+    }
+
+    return '';
+  };
+
+  const [inputValue, setInputValue] = useState(getInitialInputValue());
   const [equipmentInput, setEquipmentInput] = useState(previousSetEquipment);
   const [exerciseNote, setExerciseNote] = useState(previousNote);
   const [showExerciseModal, setShowExerciseModal] = useState(false);
+
+  // Update input value when set changes (auto-fill for new sets)
+  useEffect(() => {
+    setInputValue(getInitialInputValue());
+  }, [currentSetIndex, currentExerciseIndex]);
+
+  // Update equipment when set changes
+  useEffect(() => {
+    setEquipmentInput(previousSetEquipment);
+  }, [currentSetIndex, previousSetEquipment]);
+
+  // Update note when exercise changes
+  useEffect(() => {
+    setExerciseNote(previousNote);
+  }, [previousNote]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInputValue(e.target.value);
