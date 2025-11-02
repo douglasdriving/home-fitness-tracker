@@ -318,8 +318,9 @@ function findLastPerformance(
   console.log(`[FIND LAST PERF] Searching for exercise: ${exerciseId}`);
   console.log(`[FIND LAST PERF] Total history entries: ${workoutHistory.length}`);
 
-  // Look through history in reverse (most recent first)
-  for (let i = workoutHistory.length - 1; i >= 0; i--) {
+  // History is already ordered newest-first by the database query
+  // Loop forward through the array to check newest workouts first
+  for (let i = 0; i < workoutHistory.length; i++) {
     const historyEntry = workoutHistory[i];
     const exercise = historyEntry.exercises.find((ex) => ex.exerciseId === exerciseId);
 
