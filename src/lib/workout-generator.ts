@@ -123,6 +123,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     let targetValue: number;
     if (lastPerformance) {
       // Use progressive overload based on last performance
+      // Last performance was already sustainable, so just add progression without multiplier
       targetValue = calculateProgression(lastPerformance, exercise.type);
     } else {
       // First time doing this exercise, estimate based on strength level
@@ -136,11 +137,13 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Determine number of sets (3-4 sets based on strength level)
     const numSets = strengthLevel > 50 ? 4 : 3;
 
-    // Apply a sustainable multiplier for multiple sets
+    // Apply a sustainable multiplier for multiple sets ONLY for new exercises
     // Calibration tests single-set max capacity, but workouts need sustainable targets
     // Use 75% of estimated capacity for all sets (allows completing all sets with good form)
-    const sustainableMultiplier = 0.75;
-    const sustainableTarget = Math.round(targetValue * sustainableMultiplier);
+    // For exercises with history, lastPerformance is already sustainable, so no multiplier needed
+    const sustainableTarget = lastPerformance
+      ? targetValue
+      : Math.round(targetValue * 0.75);
 
     // Create sets with the same target value for all sets
     const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({

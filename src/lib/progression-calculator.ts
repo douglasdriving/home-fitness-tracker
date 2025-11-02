@@ -42,8 +42,8 @@ export function calculateStrengthFromCalibration(
       rawScore = (calibExercise.achievedDuration / heavinessScore) * (10 / 6);
     }
 
-    // Cap strength level at 100
-    strengthLevels[muscleGroup] = Math.min(100, Math.round(rawScore));
+    // No cap on strength level - allow infinite growth
+    strengthLevels[muscleGroup] = Math.round(rawScore);
   });
 
   return strengthLevels;
@@ -158,11 +158,8 @@ export function updateStrengthLevelsFromWorkout(
         strengthIncrease = (avgPerformance / heavinessScore) / 12;
       }
 
-      // Update strength level (capped at 100)
-      updated[muscleGroup] = Math.min(
-        100,
-        Math.round(updated[muscleGroup] + strengthIncrease)
-      );
+      // Update strength level (no cap - allow infinite growth)
+      updated[muscleGroup] = Math.round(updated[muscleGroup] + strengthIncrease);
     });
   });
 
