@@ -41,6 +41,7 @@ export interface WorkoutHistoryEntry {
   totalDuration: number; // actual minutes
   exercises: CompletedExercise[];
   stretchingCompleted?: boolean; // Optional: tracks if post-workout stretching was done
+  intensityScore?: number; // Score representing workout difficulty/intensity (0-100)
 }
 
 export interface CompletedExercise {

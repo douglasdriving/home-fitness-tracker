@@ -127,11 +127,21 @@ export default function History() {
                         {format(new Date(entry.completedDate), 'MMM d, yyyy')}
                       </p>
                     </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">
-                        {entry.totalDuration}
+                    <div className="flex gap-3 items-center">
+                      {entry.intensityScore !== undefined && (
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent">
+                            {entry.intensityScore}
+                          </div>
+                          <div className="text-xs text-text-muted">intensity</div>
+                        </div>
+                      )}
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-primary">
+                          {entry.totalDuration}
+                        </div>
+                        <div className="text-xs text-text-muted">minutes</div>
                       </div>
-                      <div className="text-xs text-text-muted">minutes</div>
                     </div>
                   </div>
                   <div className="flex gap-3 text-sm text-text-muted mb-2">

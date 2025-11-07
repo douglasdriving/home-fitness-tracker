@@ -41,6 +41,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   for (const muscleGroup of targetMuscleGroups) {
     let availableExercises = getExercisesByMuscleGroup(muscleGroup);
 
+    console.log(`[WORKOUT GEN] Selecting exercise for ${muscleGroup}, ${availableExercises.length} available before filtering`);
+
     // Filter by equipment - include exercises with no equipment requirement
     // and band exercises only if user has bands
     availableExercises = availableExercises.filter(
@@ -70,42 +72,75 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       return aLastUsed - bLastUsed; // Ascending order (oldest first)
     });
 
+    // Log top 3 candidates for debugging
+    console.log(`[WORKOUT GEN] Top 3 candidates for ${muscleGroup}:`);
+    availableExercises.slice(0, 3).forEach(ex => {
+      const lastUsed = exerciseLastUsed.get(ex.id) ?? -1;
+      console.log(`  - ${ex.name}: last used workout #${lastUsed === -1 ? 'never' : lastUsed}`);
+    });
+
     // Select the least recently used exercise
     const selectedExercise = availableExercises[0];
 
     if (selectedExercise) {
+      console.log(`[WORKOUT GEN] Selected: ${selectedExercise.name}`);
       selectedExercises.push(selectedExercise);
       selectedExerciseIds.add(selectedExercise.id);
     }
   }
 
-  // Add a 4th exercise for variety (deterministic based on workout number)
-  // Rotate through muscle groups: workout 1 gets abs, 2 gets glutes, 3 gets lowerBack, 4 gets abs, etc.
+  // Add a 4th exercise for variety
+  // Try to find an exercise that provides balance or targets the least-represented muscle group
   if (selectedExercises.length === 3) {
-    const fourthMuscleGroup = targetMuscleGroups[workoutNumber % 3];
-    let availableExercises = getExercisesByMuscleGroup(fourthMuscleGroup).filter(
-      (ex) => !selectedExerciseIds.has(ex.id)
-    );
+    // Count how many times each muscle group appears in selected exercises
+    const muscleGroupCounts: Record<MuscleGroup, number> = {
+      abs: 0,
+      glutes: 0,
+      lowerBack: 0,
+    };
 
-    // Apply equipment filter
-    availableExercises = availableExercises.filter(
-      (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
-    );
-
-    // Filter out excluded exercises
-    availableExercises = availableExercises.filter(
-      (ex) => !excludedExerciseIds.includes(ex.id)
-    );
-
-    if (availableExercises.length > 0) {
-      // Sort by last used and pick the least recently used
-      availableExercises.sort((a, b) => {
-        const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
-        const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
-        return aLastUsed - bLastUsed;
+    selectedExercises.forEach(ex => {
+      ex.muscleGroups.forEach(mg => {
+        muscleGroupCounts[mg]++;
       });
+    });
 
-      const fourthExercise = availableExercises[0];
+    // Find the muscle group with the fewest exercises (for balance)
+    const sortedGroups = targetMuscleGroups.sort((a, b) =>
+      muscleGroupCounts[a] - muscleGroupCounts[b]
+    );
+
+    // Try each muscle group starting with the least-represented
+    let fourthExercise: Exercise | null = null;
+    for (const muscleGroup of sortedGroups) {
+      let availableExercises = getExercisesByMuscleGroup(muscleGroup).filter(
+        (ex) => !selectedExerciseIds.has(ex.id)
+      );
+
+      // Apply equipment filter
+      availableExercises = availableExercises.filter(
+        (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
+      );
+
+      // Filter out excluded exercises
+      availableExercises = availableExercises.filter(
+        (ex) => !excludedExerciseIds.includes(ex.id)
+      );
+
+      if (availableExercises.length > 0) {
+        // Sort by last used and pick the least recently used
+        availableExercises.sort((a, b) => {
+          const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
+          const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
+          return aLastUsed - bLastUsed;
+        });
+
+        fourthExercise = availableExercises[0];
+        break; // Found an exercise, exit the loop
+      }
+    }
+
+    if (fourthExercise) {
       selectedExercises.push(fourthExercise);
       selectedExerciseIds.add(fourthExercise.id);
     }
@@ -291,15 +326,22 @@ export function getRecentExerciseIds(recentWorkouts: Workout[]): string[] {
 /**
  * Get a map of exercise IDs to their last used workout number
  * Used to prioritize exercises that haven't been used recently
+ *
+ * NOTE: workoutHistory should be ordered newest-first (reverse chronological)
+ * We only update the map if the exercise hasn't been seen yet, so we capture
+ * the MOST RECENT usage of each exercise
  */
 export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<string, number> {
   const lastUsedMap = new Map<string, number>();
 
-  // Process history chronologically
+  // Process history from newest to oldest
+  // Only set the workout number the first time we see each exercise
+  // This gives us the MOST RECENT usage
   workoutHistory.forEach((workout) => {
     workout.exercises.forEach((exercise) => {
-      // Always update with the latest workout number where this exercise was used
-      lastUsedMap.set(exercise.exerciseId, workout.workoutNumber);
+      if (!lastUsedMap.has(exercise.exerciseId)) {
+        lastUsedMap.set(exercise.exerciseId, workout.workoutNumber);
+      }
     });
   });
 

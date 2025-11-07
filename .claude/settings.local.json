@@ -25,7 +25,10 @@
       "Bash(rmdir src/components/calibration src/components/exercises src/components/history)",
       "Bash(rm initial-idea.md feedback.md)",
       "Bash(where:*)",
-      "Bash(python:*)"
+      "Bash(python:*)",
+      "Bash(git show:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(timeout 10 npm run dev:*)"
     ],
     "deny": [],
     "ask": []

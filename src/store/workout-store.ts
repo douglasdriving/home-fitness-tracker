@@ -1,8 +1,9 @@
 import { create } from 'zustand';
 import { Workout, WorkoutHistoryEntry, Set } from '../types/workout';
 import { db } from '../db/db';
-import { generateWorkout, getRecentExerciseIds } from '../lib/workout-generator';
+import { generateWorkout } from '../lib/workout-generator';
 import { updateStrengthLevelsFromWorkout } from '../lib/progression-calculator';
+import { calculateIntensityScore } from '../lib/intensity-calculator';
 import { useUserStore } from './user-store';
 
 interface WorkoutStore {
@@ -62,14 +63,32 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     }
 
     try {
-      // Get recent workouts to avoid repeating exercises
-      const recentWorkouts = await db.workouts
-        .orderBy('generatedDate')
+      // Delete any existing pending or in-progress workouts to prevent duplicate workout numbers
+      const existingWorkouts = await db.workouts
+        .where('status')
+        .anyOf(['pending', 'in-progress'])
+        .toArray();
+
+      for (const workout of existingWorkouts) {
+        await db.workouts.delete(workout.id);
+      }
+
+      // Get recent COMPLETED workouts to avoid repeating exercises
+      // Use history instead of workouts table to only consider completed workouts
+      const recentHistory = await db.history
+        .orderBy('completedDate')
         .reverse()
         .limit(2)
         .toArray();
 
-      const recentExerciseIds = getRecentExerciseIds(recentWorkouts);
+      const recentExerciseIds: string[] = [];
+      recentHistory.forEach(historyEntry => {
+        historyEntry.exercises.forEach(ex => {
+          if (!recentExerciseIds.includes(ex.exerciseId)) {
+            recentExerciseIds.push(ex.exerciseId);
+          }
+        });
+      });
 
       // Get workout history for progressive overload
       const workoutHistory = await db.history
@@ -182,24 +201,30 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     await db.workouts.put(updatedWorkout);
 
     // Create history entry - only include completed sets with actual values
+    const completedExercises = currentWorkout.exercises.map((ex) => ({
+      exerciseId: ex.exerciseId,
+      exerciseName: ex.exerciseName,
+      muscleGroups: ex.muscleGroups,
+      completedSets: ex.sets
+        .filter((set) => set.completed && (set.actualReps || set.actualDuration))
+        .map((set) => ({
+          setNumber: set.setNumber,
+          actualReps: set.actualReps,
+          actualDuration: set.actualDuration,
+        })),
+    }));
+
+    // Calculate intensity score for this workout
+    const intensityScore = calculateIntensityScore(completedExercises);
+
     const historyEntry: WorkoutHistoryEntry = {
       id: `history-${completedDate}-${Math.random().toString(36).substr(2, 9)}`,
       workoutId: currentWorkout.id,
       workoutNumber: currentWorkout.workoutNumber,
       completedDate,
       totalDuration,
-      exercises: currentWorkout.exercises.map((ex) => ({
-        exerciseId: ex.exerciseId,
-        exerciseName: ex.exerciseName,
-        muscleGroups: ex.muscleGroups,
-        completedSets: ex.sets
-          .filter((set) => set.completed && (set.actualReps || set.actualDuration))
-          .map((set) => ({
-            setNumber: set.setNumber,
-            actualReps: set.actualReps,
-            actualDuration: set.actualDuration,
-          })),
-      })),
+      exercises: completedExercises,
+      intensityScore,
     };
 
     await db.history.add(historyEntry);

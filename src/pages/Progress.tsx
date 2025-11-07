@@ -198,27 +198,27 @@ export default function Progress() {
                 type="monotone"
                 dataKey="abs"
                 name="Abs"
-                stroke="#3B82F6"
+                stroke="#a78bfa"
                 strokeWidth={2}
-                dot={{ fill: '#3B82F6', r: 4 }}
+                dot={{ fill: '#a78bfa', r: 4 }}
                 activeDot={{ r: 6 }}
               />
               <Line
                 type="monotone"
                 dataKey="glutes"
                 name="Glutes"
-                stroke="#8B5CF6"
+                stroke="#fbbf24"
                 strokeWidth={2}
-                dot={{ fill: '#8B5CF6', r: 4 }}
+                dot={{ fill: '#fbbf24', r: 4 }}
                 activeDot={{ r: 6 }}
               />
               <Line
                 type="monotone"
                 dataKey="lowerBack"
                 name="Lower Back"
-                stroke="#10B981"
+                stroke="#34d399"
                 strokeWidth={2}
-                dot={{ fill: '#10B981', r: 4 }}
+                dot={{ fill: '#34d399', r: 4 }}
                 activeDot={{ r: 6 }}
               />
             </LineChart>
