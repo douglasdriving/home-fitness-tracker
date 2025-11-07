@@ -79,7 +79,6 @@ export default function Progress() {
     return (
       <div className="bg-background min-h-screen">
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-text mb-6">Progress</h1>
           <div className="p-8 text-center">
             <div className="text-6xl mb-4">📈</div>
             <h2 className="text-xl font-semibold text-text mb-2">
@@ -98,7 +97,6 @@ export default function Progress() {
     return (
       <div className="bg-background min-h-screen">
         <div className="p-4">
-          <h1 className="text-2xl font-bold text-text mb-6">Progress</h1>
           <div className="p-8 text-center">
             <div className="text-6xl mb-4">📊</div>
             <h2 className="text-xl font-semibold text-text mb-2">
@@ -142,8 +140,6 @@ export default function Progress() {
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
-        <h1 className="text-2xl font-bold text-text">Progress</h1>
-
         {/* Summary Stats */}
         <div className="grid grid-cols-3 gap-3">
           <div className="bg-background-light rounded-lg p-3">
@@ -171,7 +167,6 @@ export default function Progress() {
 
         {/* Chart */}
         <div className="bg-background-light rounded-lg p-4">
-          <h2 className="text-lg font-semibold text-text mb-4">Strength Level Over Time</h2>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart
               data={chartData}
@@ -223,20 +218,6 @@ export default function Progress() {
               />
             </LineChart>
           </ResponsiveContainer>
-        </div>
-
-        {/* Insight Text */}
-        <div className="bg-background-light rounded-lg p-4">
-          <h3 className="text-lg font-semibold text-text mb-2">Your Progress</h3>
-          <p className="text-sm text-text-muted">
-            You've completed {chartData.length - 1} workout{chartData.length - 1 !== 1 ? 's' : ''} since calibration.
-            {' '}
-            {absGain > 0 || glutesGain > 0 || lowerBackGain > 0 ? (
-              <>Keep up the great work! Your strength levels are improving.</>
-            ) : (
-              <>Keep working out consistently to see your strength levels improve.</>
-            )}
-          </p>
         </div>
       </div>
     </div>

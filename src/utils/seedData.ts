@@ -7,6 +7,7 @@ import { db } from '../db/db';
 import { WorkoutHistoryEntry, CompletedExercise } from '../types/workout';
 import { MuscleGroup } from '../types/exercise';
 import { allExercises } from '../data/exerciseData';
+import { calculateIntensityScore } from '../lib/intensity-calculator';
 
 /**
  * Generates seed workout history data for development and testing.
@@ -210,6 +211,9 @@ export async function seedWorkoutHistory(): Promise<void> {
       }
     }
 
+    // Calculate intensity score for this workout
+    const intensityScore = calculateIntensityScore(exercises);
+
     // Create workout history entry
     const historyEntry: WorkoutHistoryEntry = {
       id: `seed-history-${i + 1}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
@@ -219,6 +223,7 @@ export async function seedWorkoutHistory(): Promise<void> {
       totalDuration: 20 + Math.floor(Math.random() * 15), // 20-35 minutes
       exercises,
       stretchingCompleted: Math.random() > 0.3, // 70% chance of stretching
+      intensityScore,
     };
 
     workouts.push(historyEntry);

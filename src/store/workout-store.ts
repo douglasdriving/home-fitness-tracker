@@ -288,6 +288,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
 
   /**
    * Load workout history from database
+   * Automatically calculates intensity scores for old workouts that don't have them (backwards compatibility)
    */
   loadHistory: async () => {
     try {
@@ -296,7 +297,27 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         .reverse()
         .toArray();
 
-      set({ workoutHistory: history });
+      // Backwards compatibility: calculate intensity scores for workouts that don't have them
+      let needsUpdate = false;
+      const updatedHistory = history.map((entry) => {
+        if (entry.intensityScore === undefined) {
+          needsUpdate = true;
+          const intensityScore = calculateIntensityScore(entry.exercises);
+          return { ...entry, intensityScore };
+        }
+        return entry;
+      });
+
+      // Update database if any workouts were missing intensity scores
+      if (needsUpdate) {
+        for (const entry of updatedHistory) {
+          if (entry.intensityScore !== undefined) {
+            await db.history.put(entry);
+          }
+        }
+      }
+
+      set({ workoutHistory: updatedHistory });
     } catch (error) {
       console.error('Failed to load history:', error);
     }
@@ -327,6 +348,11 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
    */
   updateHistoryEntry: async (_historyId: string, updatedEntry: WorkoutHistoryEntry) => {
     try {
+      // Ensure intensity score is calculated for the updated entry
+      if (updatedEntry.intensityScore === undefined) {
+        updatedEntry.intensityScore = calculateIntensityScore(updatedEntry.exercises);
+      }
+
       // Get all history entries
       const allHistory = await db.history.toArray();
 
@@ -387,6 +413,11 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
    */
   addManualWorkout: async (workout: WorkoutHistoryEntry) => {
     try {
+      // Ensure intensity score is calculated for the manual workout
+      if (workout.intensityScore === undefined) {
+        workout.intensityScore = calculateIntensityScore(workout.exercises);
+      }
+
       // Get all history to determine the next workout number
       const allHistory = await db.history.toArray();
 
