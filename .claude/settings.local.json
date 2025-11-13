@@ -28,7 +28,8 @@
       "Bash(python:*)",
       "Bash(git show:*)",
       "Bash(gh issue comment:*)",
-      "Bash(timeout 10 npm run dev:*)"
+      "Bash(timeout 10 npm run dev:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

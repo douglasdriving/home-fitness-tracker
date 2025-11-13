@@ -6,6 +6,15 @@ import { db } from '../db/db';
 import Button from '../components/common/Button';
 import DietTipsModal from '../components/common/DietTipsModal';
 
+const STRETCH_STATE_KEY = 'stretchRoutineState';
+
+interface StretchState {
+  workoutId: string;
+  currentStretchIndex: number;
+  isResting: boolean;
+  completedStretches: number[];
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useUserStore();
@@ -15,12 +24,29 @@ export default function Dashboard() {
   const [showDietTips, setShowDietTips] = useState(false);
   const [hasCompletedWorkoutToday, setHasCompletedWorkoutToday] = useState(false);
   const [timeConstraint, setTimeConstraint] = useState<string>('');
+  const [activeStretchSession, setActiveStretchSession] = useState<StretchState | null>(null);
 
   useEffect(() => {
     // Load current workout and history
     loadWorkouts();
     loadHistory();
   }, [profile, loadWorkouts, loadHistory]);
+
+  // Check for active stretch session
+  useEffect(() => {
+    try {
+      const savedState = localStorage.getItem(STRETCH_STATE_KEY);
+      if (savedState) {
+        const state: StretchState = JSON.parse(savedState);
+        setActiveStretchSession(state);
+      } else {
+        setActiveStretchSession(null);
+      }
+    } catch (error) {
+      console.error('Failed to check stretch session:', error);
+      setActiveStretchSession(null);
+    }
+  }, []);
 
   // Check if user has completed a workout today
   useEffect(() => {
@@ -89,6 +115,23 @@ export default function Dashboard() {
     }
   };
 
+  const handleResumeStretching = () => {
+    if (activeStretchSession) {
+      navigate('/stretching', { state: { workoutId: activeStretchSession.workoutId } });
+    }
+  };
+
+  const handleDismissStretching = () => {
+    if (confirm('Are you sure you want to abandon the stretching routine? Your progress will be lost.')) {
+      try {
+        localStorage.removeItem(STRETCH_STATE_KEY);
+        setActiveStretchSession(null);
+      } catch (error) {
+        console.error('Failed to clear stretch session:', error);
+      }
+    }
+  };
+
   if (!profile) {
     return (
       <div className="bg-gray-50 flex items-center justify-center">
@@ -140,6 +183,37 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Resume Stretching Banner */}
+        {activeStretchSession && (
+          <div className="bg-purple-50 border-l-4 border-purple-600 rounded-lg p-4 shadow-lg">
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-2">
+                <span className="text-2xl">🧘</span>
+                <div>
+                  <h3 className="font-semibold text-purple-900">Stretching In Progress</h3>
+                  <p className="text-sm text-purple-700">
+                    You have an active stretching session (stretch {activeStretchSession.currentStretchIndex + 1})
+                  </p>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={handleResumeStretching}
+                className="flex-1 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors font-medium"
+              >
+                Resume Stretching
+              </button>
+              <button
+                onClick={handleDismissStretching}
+                className="bg-purple-100 text-purple-700 py-2 px-4 rounded-lg hover:bg-purple-200 transition-colors font-medium"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* Next Workout */}
         {currentWorkout ? (
