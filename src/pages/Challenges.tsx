@@ -183,7 +183,7 @@ export default function Challenges() {
 
         {/* Challenge Ladder */}
         <div className="space-y-4">
-          {[7, 6, 5, 4, 3, 2, 1].map((level) => {
+          {[1, 2, 3, 4, 5, 6, 7].map((level) => {
             const typedLevel = level as ChallengeLevel;
             const unlocked = isLevelUnlocked(typedLevel);
             const progress = getLevelProgress(typedLevel);
