@@ -43,14 +43,23 @@ export default function StretchingRoutine() {
   };
 
   const handleRoutineComplete = async () => {
-    // Mark stretching as completed in workout history
+    // Mark stretching as completed in workout history and add stretching time
     if (workoutId) {
       try {
-        const historyEntry = await db.history.get(workoutId);
+        // Find history entry by workoutId field (not by id)
+        const allHistory = await db.history.toArray();
+        const historyEntry = allHistory.find(entry => entry.workoutId === workoutId);
+
         if (historyEntry) {
+          // Calculate total stretching time including rests
+          const stretchDuration = stretchingRoutine.reduce((sum, s) => sum + s.duration, 0);
+          const restDuration = (stretchingRoutine.length - 1) * 10; // 10 second rests between stretches
+          const totalStretchMinutes = Math.round((stretchDuration + restDuration) / 60);
+
           await db.history.put({
             ...historyEntry,
-            stretchingCompleted: true
+            stretchingCompleted: true,
+            totalDuration: historyEntry.totalDuration + totalStretchMinutes
           });
         }
       } catch (error) {
