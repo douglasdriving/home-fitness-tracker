@@ -144,84 +144,9 @@ export default function Dashboard() {
     );
   }
 
-  // Calculate workouts this week and month
-  const now = new Date();
-  const startOfWeek = new Date(now);
-  // Start of week (Monday) - getDay() returns 0 for Sunday, 1 for Monday, etc.
-  const dayOfWeek = now.getDay();
-  const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // If Sunday, go back 6 days to Monday
-  startOfWeek.setDate(now.getDate() - daysToSubtract);
-  startOfWeek.setHours(0, 0, 0, 0);
-
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-  const workoutsThisWeek = workoutHistory.filter(
-    (workout) => new Date(workout.completedDate) >= startOfWeek
-  ).length;
-
-  const workoutsThisMonth = workoutHistory.filter(
-    (workout) => new Date(workout.completedDate) >= startOfMonth
-  ).length;
-
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
-        {/* Quick Stats */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6">
-          <h2 className="text-lg font-semibold text-text mb-4">Workouts</h2>
-          <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-primary">{workoutHistory.length}</div>
-              <div className="text-sm text-text-muted font-medium">Total</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-primary">{workoutsThisWeek}</div>
-              <div className="text-sm text-text-muted font-medium">This Week</div>
-            </div>
-            <div className="text-center">
-              <div className="text-4xl font-display font-bold text-primary">{workoutsThisMonth}</div>
-              <div className="text-sm text-text-muted font-medium">This Month</div>
-            </div>
-          </div>
-        </div>
-
-        {/* Streak Tracker */}
-        <StreakTracker />
-
-        {/* Challenge Journey Promotion */}
-        {profile.calibrationCompleted && (
-          <div
-            onClick={() => navigate('/challenges')}
-            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg p-6 cursor-pointer hover:scale-[1.02] transition-transform"
-          >
-            <div className="flex items-center justify-between text-white">
-              <div className="flex-1">
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-3xl">🏆</span>
-                  <h3 className="text-xl font-bold">Challenge Journey</h3>
-                </div>
-                <p className="text-white/90 text-sm mb-3">
-                  Take on core calisthenics challenges and climb the ladder from beginner to legend!
-                </p>
-                {profile.challengeState ? (
-                  <div className="flex items-center gap-4 text-sm">
-                    <span className="font-bold">
-                      Level {profile.challengeState.currentLevel} / 7
-                    </span>
-                    <span>•</span>
-                    <span>{profile.challengeState.totalChallengesCompleted} completed</span>
-                  </div>
-                ) : (
-                  <div className="inline-block bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
-                    Start Your Journey →
-                  </div>
-                )}
-              </div>
-              <div className="text-4xl ml-4">→</div>
-            </div>
-          </div>
-        )}
-
         {/* Resume Stretching Banner */}
         {activeStretchSession && (
           <div className="bg-purple-50 border-l-4 border-purple-600 rounded-lg p-4 shadow-lg">
@@ -253,7 +178,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Next Workout */}
+        {/* Next Workout / Generate Workout */}
         {currentWorkout ? (
           <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
             <div className="flex justify-between items-center mb-4">
@@ -265,26 +190,26 @@ export default function Dashboard() {
               </span>
             </div>
 
-            {/* Exercise List */}
-            <div className="space-y-3 mb-6">
-              {currentWorkout.exercises.map((exercise, index) => {
-                const firstSet = exercise.sets[0];
+            <div className="space-y-3">
+              {currentWorkout.exercises.map((exercise, idx) => {
                 const isNew = newExerciseIds.has(exercise.exerciseId);
-                const targetValue = firstSet.targetReps
-                  ? `${firstSet.targetReps} reps`
-                  : `${firstSet.targetDuration}s`;
+                const targetValue =
+                  exercise.sets[0].targetReps ||
+                  (exercise.sets[0].targetDuration ? `${exercise.sets[0].targetDuration}s` : '');
 
                 return (
                   <div
-                    key={index}
-                    className="flex justify-between items-center p-3 bg-background-lighter rounded-lg"
+                    key={idx}
+                    className={`flex items-center justify-between p-3 rounded-lg transition-colors ${
+                      isNew ? 'bg-primary/5 border border-primary/20' : 'bg-background'
+                    }`}
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <div className="font-medium text-text">{exercise.exerciseName}</div>
+                        <div className="font-semibold text-text">{exercise.exerciseName}</div>
                         {isNew && (
-                          <span className="text-xs bg-accent text-background px-2 py-0.5 rounded-full font-bold">
-                            NEW!
+                          <span className="text-xs bg-primary text-background px-2 py-0.5 rounded-full font-bold">
+                            NEW
                           </span>
                         )}
                       </div>
@@ -340,6 +265,43 @@ export default function Dashboard() {
             <Button onClick={handleGenerateWorkout} fullWidth>
               Generate Workout
             </Button>
+          </div>
+        )}
+
+        {/* Streak Tracker */}
+        <StreakTracker />
+
+        {/* Challenge Journey Promotion */}
+        {profile.calibrationCompleted && (
+          <div
+            onClick={() => navigate('/challenges')}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg p-6 cursor-pointer hover:scale-[1.02] transition-transform"
+          >
+            <div className="flex items-center justify-between text-white">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl">🏆</span>
+                  <h3 className="text-xl font-bold">Challenge Journey</h3>
+                </div>
+                <p className="text-white/90 text-sm mb-3">
+                  Take on core calisthenics challenges and climb the ladder from beginner to legend!
+                </p>
+                {profile.challengeState ? (
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="font-bold">
+                      Level {profile.challengeState.currentLevel} / 7
+                    </span>
+                    <span>•</span>
+                    <span>{profile.challengeState.totalChallengesCompleted} completed</span>
+                  </div>
+                ) : (
+                  <div className="inline-block bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                    Start Your Journey →
+                  </div>
+                )}
+              </div>
+              <div className="text-4xl ml-4">→</div>
+            </div>
           </div>
         )}
 

@@ -78,9 +78,46 @@ export default function History() {
     setShowAddManual(false);
   };
 
+  // Calculate workouts this week and month
+  const now = new Date();
+  const startOfWeek = new Date(now);
+  const dayOfWeek = now.getDay();
+  const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+  startOfWeek.setDate(now.getDate() - daysToSubtract);
+  startOfWeek.setHours(0, 0, 0, 0);
+
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const workoutsThisWeek = workoutHistory.filter(
+    (workout) => new Date(workout.completedDate) >= startOfWeek
+  ).length;
+
+  const workoutsThisMonth = workoutHistory.filter(
+    (workout) => new Date(workout.completedDate) >= startOfMonth
+  ).length;
+
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
+        {/* Workout Summary Stats */}
+        <div className="bg-background-light rounded-lg shadow-lg p-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Workouts</h2>
+          <div className="grid grid-cols-3 gap-4">
+            <div className="text-center">
+              <div className="text-4xl font-display font-bold text-primary">{workoutHistory.length}</div>
+              <div className="text-sm text-text-muted font-medium">Total</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-display font-bold text-primary">{workoutsThisWeek}</div>
+              <div className="text-sm text-text-muted font-medium">This Week</div>
+            </div>
+            <div className="text-center">
+              <div className="text-4xl font-display font-bold text-primary">{workoutsThisMonth}</div>
+              <div className="text-sm text-text-muted font-medium">This Month</div>
+            </div>
+          </div>
+        </div>
+
         {/* Add Manual Workout Button */}
         <div className="flex justify-end">
           <button
