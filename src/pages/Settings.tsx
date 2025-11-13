@@ -12,7 +12,7 @@ import { seedWorkoutHistory, clearWorkoutHistory } from '../utils/seedData';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
+  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise, updateWorkoutFrequencyGoal } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -315,6 +315,32 @@ export default function Settings() {
                   Automatically show stretching routine option after completing workouts.
                 </div>
               </div>
+            </label>
+          </div>
+        </div>
+
+        {/* Workout Goal */}
+        <div className="border-b border-background-lighter pb-6">
+          <h2 className="text-lg font-semibold text-text mb-4">Workout Goal</h2>
+          <p className="text-sm text-text-muted mb-4">
+            Set your weekly workout frequency goal. This affects your streak tracker.
+          </p>
+          <div className="space-y-3">
+            <label className="block">
+              <span className="text-sm font-medium text-text">Workouts per week</span>
+              <select
+                value={profile?.workoutFrequencyGoal || 3}
+                onChange={(e) => updateWorkoutFrequencyGoal(Number(e.target.value))}
+                className="mt-2 block w-full p-3 bg-background-light rounded-lg text-text border border-background-lighter focus:ring-2 focus:ring-primary focus:border-transparent"
+              >
+                <option value={1}>1 time per week</option>
+                <option value={2}>2 times per week</option>
+                <option value={3}>3 times per week</option>
+                <option value={4}>4 times per week</option>
+                <option value={5}>5 times per week</option>
+                <option value={6}>6 times per week</option>
+                <option value={7}>Every day</option>
+              </select>
             </label>
           </div>
         </div>

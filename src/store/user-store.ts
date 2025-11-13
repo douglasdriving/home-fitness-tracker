@@ -21,6 +21,8 @@ interface UserStore {
   excludeExercise: (exerciseId: string) => void;
   includeExercise: (exerciseId: string) => void;
   setBackfillCompleted: () => void;
+  updateWorkoutFrequencyGoal: (workoutsPerWeek: number) => void;
+  updateStreakData: (completedWorkoutDate: number) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -138,6 +140,58 @@ export const useUserStore = create<UserStore>((set, get) => ({
     const updatedProfile: UserProfile = {
       ...profile,
       hasBackfilledStrengthData: true,
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  updateWorkoutFrequencyGoal: (workoutsPerWeek: number) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      workoutFrequencyGoal: workoutsPerWeek,
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  updateStreakData: (completedWorkoutDate: number) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const frequencyGoal = profile.workoutFrequencyGoal || 3; // Default to 3x/week
+    const currentStreak = profile.streakData?.currentStreak || 0;
+    const longestStreak = profile.streakData?.longestStreak || 0;
+    const lastWorkoutDate = profile.streakData?.lastWorkoutDate;
+
+    // Calculate days between workouts
+    const daysPerWorkout = 7 / frequencyGoal;
+    const allowedGapDays = Math.ceil(daysPerWorkout * 1.5); // Allow 50% grace period
+
+    let newCurrentStreak = 1;
+
+    if (lastWorkoutDate) {
+      const daysSinceLastWorkout = (completedWorkoutDate - lastWorkoutDate) / (1000 * 60 * 60 * 24);
+
+      // Continue streak if within allowed gap
+      if (daysSinceLastWorkout <= allowedGapDays) {
+        newCurrentStreak = currentStreak + 1;
+      }
+    }
+
+    const newLongestStreak = Math.max(longestStreak, newCurrentStreak);
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      streakData: {
+        currentStreak: newCurrentStreak,
+        longestStreak: newLongestStreak,
+        lastWorkoutDate: completedWorkoutDate,
+      },
     };
 
     saveUserProfile(updatedProfile);

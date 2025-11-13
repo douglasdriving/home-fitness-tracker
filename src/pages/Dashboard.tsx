@@ -5,6 +5,7 @@ import { useWorkoutStore } from '../store/workout-store';
 import { db } from '../db/db';
 import Button from '../components/common/Button';
 import DietTipsModal from '../components/common/DietTipsModal';
+import StreakTracker from '../components/common/StreakTracker';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -183,6 +184,9 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* Streak Tracker */}
+        <StreakTracker />
 
         {/* Resume Stretching Banner */}
         {activeStretchSession && (

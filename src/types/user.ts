@@ -16,6 +16,12 @@ export interface UserProfile {
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   weight?: number; // kg
   height?: number; // cm
+  workoutFrequencyGoal?: number; // Target number of workouts per week (default: 3)
+  streakData?: {
+    currentStreak: number; // Current streak count
+    longestStreak: number; // Best streak ever
+    lastWorkoutDate?: number; // Timestamp of last completed workout
+  };
 }
 
 export interface CalibrationData {

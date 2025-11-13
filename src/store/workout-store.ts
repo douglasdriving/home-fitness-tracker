@@ -257,6 +257,9 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         glutes: updatedStrengthLevels.glutes,
         lowerBack: updatedStrengthLevels.lowerBack,
       });
+
+      // Update streak data
+      useUserStore.getState().updateStreakData(completedDate);
     }
 
     // Clear current workout from state
