@@ -10,11 +10,15 @@ import Timer from '../components/workout/Timer';
 import Button from '../components/common/Button';
 import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
+import { useWakeLock } from '../hooks/useWakeLock';
 
 export default function StretchingRoutine() {
   const navigate = useNavigate();
   const location = useLocation();
   const workoutId = location.state?.workoutId;
+
+  // Keep screen awake during stretching routine
+  useWakeLock();
 
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
   const [isResting, setIsResting] = useState(false);
