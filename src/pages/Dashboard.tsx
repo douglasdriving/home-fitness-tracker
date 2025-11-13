@@ -188,6 +188,40 @@ export default function Dashboard() {
         {/* Streak Tracker */}
         <StreakTracker />
 
+        {/* Challenge Journey Promotion */}
+        {profile.calibrationCompleted && (
+          <div
+            onClick={() => navigate('/challenges')}
+            className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg p-6 cursor-pointer hover:scale-[1.02] transition-transform"
+          >
+            <div className="flex items-center justify-between text-white">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-3xl">🏆</span>
+                  <h3 className="text-xl font-bold">Challenge Journey</h3>
+                </div>
+                <p className="text-white/90 text-sm mb-3">
+                  Take on core calisthenics challenges and climb the ladder from beginner to legend!
+                </p>
+                {profile.challengeState ? (
+                  <div className="flex items-center gap-4 text-sm">
+                    <span className="font-bold">
+                      Level {profile.challengeState.currentLevel} / 7
+                    </span>
+                    <span>•</span>
+                    <span>{profile.challengeState.totalChallengesCompleted} completed</span>
+                  </div>
+                ) : (
+                  <div className="inline-block bg-white/20 px-3 py-1 rounded-full text-sm font-medium">
+                    Start Your Journey →
+                  </div>
+                )}
+              </div>
+              <div className="text-4xl ml-4">→</div>
+            </div>
+          </div>
+        )}
+
         {/* Resume Stretching Banner */}
         {activeStretchSession && (
           <div className="bg-purple-50 border-l-4 border-purple-600 rounded-lg p-4 shadow-lg">

@@ -11,6 +11,8 @@ import Progress from './pages/Progress';
 import ExerciseLibrary from './pages/ExerciseLibrary';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
+import Challenges from './pages/Challenges';
+import ChallengeAttempt from './pages/ChallengeAttempt';
 import { useUserStore } from './store/user-store';
 import { backfillStrengthHistory, needsMigration } from './lib/strength-migration';
 
@@ -72,6 +74,8 @@ function App() {
             <Route path="/exercises" element={<ExerciseLibrary />} />
             <Route path="/calibration" element={<Calibration />} />
             <Route path="/settings" element={<Settings />} />
+            <Route path="/challenges" element={<Challenges />} />
+            <Route path="/challenge-attempt" element={<ChallengeAttempt />} />
           </Routes>
         </div>
         <BottomNav />

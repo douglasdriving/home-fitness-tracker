@@ -7,9 +7,9 @@ export default function BottomNav() {
 
   const navItems = [
     { path: '/', label: 'Home', icon: '🏠' },
+    { path: '/challenges', label: 'Challenges', icon: '🏆' },
     { path: '/history', label: 'History', icon: '📊' },
     { path: '/progress', label: 'Progress', icon: '📈' },
-    { path: '/exercises', label: 'Exercises', icon: '💪' },
     { path: '/settings', label: 'Settings', icon: '⚙️' },
   ];
 

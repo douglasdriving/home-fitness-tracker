@@ -1,0 +1,507 @@
+import { Challenge } from '../types/challenge';
+
+export const ALL_CHALLENGES: Challenge[] = [
+  // ========================================
+  // LEVEL 1: FOUNDATION 🌱
+  // ========================================
+  {
+    id: 'challenge-001',
+    name: 'Plank Master',
+    level: 1,
+    type: 'timed',
+    targetValue: 60,
+    description: 'Hold a solid plank position for 60 seconds with perfect form',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=pSHjTRCQxIw',
+    tips: [
+      'Keep your body in a straight line from head to heels',
+      'Engage your core by pulling belly button to spine',
+      'Don\'t let your hips sag or pike up',
+      'Breathe steadily throughout the hold',
+    ],
+    strengthMultiplier: 1.0,
+  },
+  {
+    id: 'challenge-002',
+    name: 'Glute Bridge Endurance',
+    level: 1,
+    type: 'reps',
+    targetValue: 30,
+    description: 'Perform 30 controlled glute bridges with 2-second holds at the top',
+    muscleGroups: ['glutes', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=wPM8icPu6H8',
+    tips: [
+      'Push through your heels, not your toes',
+      'Squeeze glutes at the top for 2 seconds each rep',
+      'Keep core engaged to protect lower back',
+      'Lower slowly and with control',
+    ],
+    strengthMultiplier: 1.0,
+  },
+  {
+    id: 'challenge-003',
+    name: 'Dead Bug Coordination',
+    level: 1,
+    type: 'reps-per-side',
+    targetValue: 15,
+    description: 'Master 15 perfect dead bugs per side with full extension',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=g_BYB0R-4Ws',
+    tips: [
+      'Keep lower back pressed to floor throughout',
+      'Extend opposite arm and leg fully',
+      'Move slowly and with control',
+      'Exhale as you extend, inhale as you return',
+    ],
+    strengthMultiplier: 1.0,
+  },
+
+  // ========================================
+  // LEVEL 2: BUILDER 💪
+  // ========================================
+  {
+    id: 'challenge-004',
+    name: 'Side Plank Steel',
+    level: 2,
+    type: 'timed',
+    targetValue: 45,
+    description: 'Hold a side plank for 45 seconds on each side',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=K2VljzCC1g8',
+    tips: [
+      'Stack your feet or stagger them for easier balance',
+      'Keep body in straight line - don\'t let hips sag',
+      'Engage obliques by lifting hips up',
+      'Look forward, not down',
+    ],
+    strengthMultiplier: 1.2,
+  },
+  {
+    id: 'challenge-005',
+    name: 'Hollow Body Hold',
+    level: 2,
+    type: 'timed',
+    targetValue: 30,
+    description: 'Hold a perfect hollow body position for 30 seconds',
+    muscleGroups: ['abs'],
+    videoUrl: 'https://www.youtube.com/watch?v=LlDNef_Ztsc',
+    tips: [
+      'Press lower back into floor completely',
+      'Lift shoulders and legs off ground',
+      'Keep arms extended by ears',
+      'Create a "hollow" shape with your body',
+    ],
+    strengthMultiplier: 1.3,
+  },
+  {
+    id: 'challenge-006',
+    name: 'Single-Leg Glute Bridge',
+    level: 2,
+    type: 'reps-per-side',
+    targetValue: 15,
+    description: 'Perform 15 single-leg glute bridges on each side',
+    muscleGroups: ['glutes', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=AVAXhy6pl7o',
+    tips: [
+      'Extend one leg straight while bridging on the other',
+      'Keep hips level - don\'t let one side drop',
+      'Squeeze glute at the top',
+      'Use arms for balance if needed',
+    ],
+    strengthMultiplier: 1.2,
+  },
+  {
+    id: 'challenge-007',
+    name: 'Mountain Climber Mastery',
+    level: 2,
+    type: 'reps',
+    targetValue: 40,
+    description: 'Perform 40 mountain climbers with controlled tempo',
+    muscleGroups: ['abs', 'glutes'],
+    videoUrl: 'https://www.youtube.com/watch?v=nmwgirgXLYM',
+    tips: [
+      'Start in plank position',
+      'Drive knees to chest alternating',
+      'Keep hips level and core tight',
+      'Control the movement - don\'t rush',
+    ],
+    strengthMultiplier: 1.1,
+  },
+
+  // ========================================
+  // LEVEL 3: WARRIOR ⚔️
+  // ========================================
+  {
+    id: 'challenge-008',
+    name: 'Ab Wheel Rollout',
+    level: 3,
+    type: 'reps',
+    targetValue: 10,
+    description: 'Complete 10 ab wheel rollouts from knees with full extension',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=EXm0eT2lY08',
+    tips: [
+      'Start on knees if you don\'t have ab wheel, use a ball',
+      'Roll out as far as you can while maintaining form',
+      'Keep core braced throughout',
+      'Roll back using abs, not momentum',
+    ],
+    strengthMultiplier: 1.5,
+  },
+  {
+    id: 'challenge-009',
+    name: 'Hanging Knee Raises',
+    level: 3,
+    type: 'reps',
+    targetValue: 15,
+    description: 'Hang from a bar and perform 15 controlled knee raises',
+    muscleGroups: ['abs'],
+    videoUrl: 'https://www.youtube.com/watch?v=hdng3Nm1x_E',
+    tips: [
+      'Hang from pullup bar with arms straight',
+      'Raise knees to chest without swinging',
+      'Control the descent',
+      'Exhale as you raise, inhale as you lower',
+    ],
+    strengthMultiplier: 1.4,
+  },
+  {
+    id: 'challenge-010',
+    name: 'Plank to Pike',
+    level: 3,
+    type: 'reps',
+    targetValue: 12,
+    description: 'From plank, pike your hips up 12 times with control',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=LwyyCanic7w',
+    tips: [
+      'Start in plank position',
+      'Pike hips up toward ceiling',
+      'Keep legs as straight as possible',
+      'Return to plank with control',
+    ],
+    strengthMultiplier: 1.4,
+  },
+  {
+    id: 'challenge-011',
+    name: 'Copenhagen Plank',
+    level: 3,
+    type: 'timed',
+    targetValue: 30,
+    description: 'Hold a Copenhagen plank for 30 seconds per side',
+    muscleGroups: ['abs', 'glutes'],
+    videoUrl: 'https://www.youtube.com/watch?v=MguYjmTMEis',
+    tips: [
+      'Support yourself on forearm and inside of top foot on bench',
+      'Keep body in straight line',
+      'Extremely challenging for adductors and core',
+      'Start with bent knee version if needed',
+    ],
+    strengthMultiplier: 1.6,
+  },
+
+  // ========================================
+  // LEVEL 4: CHAMPION 🏆
+  // ========================================
+  {
+    id: 'challenge-012',
+    name: 'L-Sit Hold',
+    level: 4,
+    type: 'timed',
+    targetValue: 20,
+    description: 'Hold an L-sit position for 20 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=IKHu98y3rGQ',
+    tips: [
+      'Sit on floor, hands by hips, press down to lift body',
+      'Extend legs straight out parallel to ground',
+      'Keep shoulders down, not shrugged',
+      'Start with bent knees if needed',
+    ],
+    strengthMultiplier: 1.8,
+  },
+  {
+    id: 'challenge-013',
+    name: 'Toes to Bar',
+    level: 4,
+    type: 'reps',
+    targetValue: 10,
+    description: 'Hang from bar and bring toes to touch the bar 10 times',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=_03pCKOv4l4',
+    tips: [
+      'Hang from pullup bar',
+      'Raise legs all the way up to touch bar with toes',
+      'Control the swing',
+      'Use momentum efficiently but don\'t lose control',
+    ],
+    strengthMultiplier: 2.0,
+  },
+  {
+    id: 'challenge-014',
+    name: 'Dragon Flag Negative',
+    level: 4,
+    type: 'reps',
+    targetValue: 5,
+    description: 'Perform 5 controlled dragon flag negatives',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=moyFIvRbe0E',
+    tips: [
+      'Lie on bench, grip behind your head',
+      'Raise body to vertical (or start there)',
+      'Lower entire body as one unit over 5 seconds',
+      'Keep body straight - this is HARD',
+    ],
+    strengthMultiplier: 2.2,
+  },
+  {
+    id: 'challenge-015',
+    name: 'Windshield Wipers',
+    level: 4,
+    type: 'reps',
+    targetValue: 8,
+    description: 'Hang from bar and perform 8 windshield wiper reps',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=7u3jdT2FYS8',
+    tips: [
+      'Hang from bar with legs raised to horizontal',
+      'Rotate legs side to side like windshield wipers',
+      'Keep upper body stable',
+      'Control the rotation',
+    ],
+    strengthMultiplier: 1.9,
+  },
+
+  // ========================================
+  // LEVEL 5: MASTER 👑
+  // ========================================
+  {
+    id: 'challenge-016',
+    name: 'Ab Wheel Rollout Standing',
+    level: 5,
+    type: 'reps',
+    targetValue: 5,
+    description: 'Complete 5 standing ab wheel rollouts',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=qQE79wx-UVY',
+    tips: [
+      'Start standing, roll out to full extension',
+      'This is extremely difficult',
+      'Keep core maximally braced',
+      'Work up from kneeling rollouts first',
+    ],
+    strengthMultiplier: 2.5,
+  },
+  {
+    id: 'challenge-017',
+    name: 'Full Dragon Flag',
+    level: 5,
+    type: 'reps',
+    targetValue: 3,
+    description: 'Perform 3 full dragon flags with controlled lowering and raising',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=moyFIvRbe0E',
+    tips: [
+      'Lie on bench, grip behind head',
+      'Raise entire body to vertical',
+      'Lower as one unit, then raise back up',
+      'Made famous by Bruce Lee',
+    ],
+    strengthMultiplier: 2.8,
+  },
+  {
+    id: 'challenge-018',
+    name: 'Advanced L-Sit',
+    level: 5,
+    type: 'timed',
+    targetValue: 30,
+    description: 'Hold a perfect L-sit on parallettes for 30 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=IKHu98y3rGQ',
+    tips: [
+      'Use parallettes or pushup bars',
+      'Legs perfectly straight and horizontal',
+      'Shoulders depressed',
+      'This is a test of pure strength',
+    ],
+    strengthMultiplier: 2.4,
+  },
+  {
+    id: 'challenge-019',
+    name: 'Hanging Leg Raises',
+    level: 5,
+    type: 'reps',
+    targetValue: 15,
+    description: 'Perform 15 strict hanging leg raises with straight legs',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=M_oIL0eVkj4',
+    tips: [
+      'Hang from bar, keep legs completely straight',
+      'Raise legs to horizontal or higher',
+      'No swinging or momentum',
+      'Control every inch of the movement',
+    ],
+    strengthMultiplier: 2.3,
+  },
+
+  // ========================================
+  // LEVEL 6: ELITE ⭐
+  // ========================================
+  {
+    id: 'challenge-020',
+    name: 'V-Sit Hold',
+    level: 6,
+    type: 'timed',
+    targetValue: 20,
+    description: 'Hold a V-sit position for 20 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=6FTmGYcamCo',
+    tips: [
+      'Balance on glutes with arms and legs raised',
+      'Form a "V" shape with your body',
+      'Keep legs straight, arms reaching forward',
+      'This requires exceptional core strength',
+    ],
+    strengthMultiplier: 3.0,
+  },
+  {
+    id: 'challenge-021',
+    name: 'Human Flag Progression',
+    level: 6,
+    type: 'timed',
+    targetValue: 5,
+    description: 'Hold a human flag (or advanced tuck flag) for 5 seconds per side',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=kJU7V-O3peM',
+    tips: [
+      'Grip vertical pole, push with top hand, pull with bottom',
+      'Extend body horizontally perpendicular to pole',
+      'Start with tuck flag progression',
+      'One of the most impressive calisthenics moves',
+    ],
+    strengthMultiplier: 3.5,
+  },
+  {
+    id: 'challenge-022',
+    name: 'Front Lever Tuck',
+    level: 6,
+    type: 'timed',
+    targetValue: 15,
+    description: 'Hold a tuck front lever for 15 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=LnbBvIZdLqo',
+    tips: [
+      'Hang from bar, pull body horizontal with knees tucked',
+      'Body parallel to ground, face up',
+      'Keep core maximally engaged',
+      'Progress to straddle, then full front lever',
+    ],
+    strengthMultiplier: 2.9,
+  },
+  {
+    id: 'challenge-023',
+    name: 'Planche Lean Hold',
+    level: 6,
+    type: 'timed',
+    targetValue: 30,
+    description: 'Hold a planche lean position for 30 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=TBm3jOOAv9U',
+    tips: [
+      'Start in pushup position',
+      'Lean forward until shoulders go past hands',
+      'Keep body straight and tight',
+      'First step toward planche mastery',
+    ],
+    strengthMultiplier: 2.7,
+  },
+
+  // ========================================
+  // LEVEL 7: LEGEND 🔥
+  // ========================================
+  {
+    id: 'challenge-024',
+    name: 'Full Planche',
+    level: 7,
+    type: 'timed',
+    targetValue: 5,
+    description: 'Hold a full planche for 5 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=7Q-xr7lGhj0',
+    tips: [
+      'Body parallel to ground, supported only by hands',
+      'Legs straight and together',
+      'This is one of the ultimate calisthenics skills',
+      'Requires years of training for most people',
+    ],
+    strengthMultiplier: 4.0,
+  },
+  {
+    id: 'challenge-025',
+    name: 'Full Front Lever',
+    level: 7,
+    type: 'timed',
+    targetValue: 10,
+    description: 'Hold a full front lever for 10 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=LnbBvIZdLqo',
+    tips: [
+      'Hang from bar with body horizontal, face up',
+      'Legs completely straight',
+      'Requires incredible lat and core strength',
+      'One of the ultimate gymnastic moves',
+    ],
+    strengthMultiplier: 4.0,
+  },
+  {
+    id: 'challenge-026',
+    name: 'Human Flag Extended',
+    level: 7,
+    type: 'timed',
+    targetValue: 10,
+    description: 'Hold a full extended human flag for 10 seconds per side',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=kJU7V-O3peM',
+    tips: [
+      'Full horizontal body perpendicular to pole',
+      'Legs extended and together',
+      'Requires exceptional oblique and lat strength',
+      'One of the most impressive calisthenics feats',
+    ],
+    strengthMultiplier: 4.5,
+  },
+  {
+    id: 'challenge-027',
+    name: 'Manna Progression',
+    level: 7,
+    type: 'timed',
+    targetValue: 5,
+    description: 'Hold a manna progression (advanced V-sit compression) for 5 seconds',
+    muscleGroups: ['abs', 'lowerBack'],
+    videoUrl: 'https://www.youtube.com/watch?v=oXCNu8GqcWE',
+    tips: [
+      'Like a V-sit but compress legs toward shoulders',
+      'Eventually legs go behind you',
+      'One of the hardest compression exercises',
+      'Requires extreme flexibility and strength',
+    ],
+    strengthMultiplier: 4.2,
+  },
+];
+
+// Helper functions
+export function getChallengesByLevel(level: number): Challenge[] {
+  return ALL_CHALLENGES.filter((c) => c.level === level);
+}
+
+export function getChallengeById(id: string): Challenge | undefined {
+  return ALL_CHALLENGES.find((c) => c.id === id);
+}
+
+export function getTotalChallengesInLevel(level: number): number {
+  return getChallengesByLevel(level).length;
+}
+
+export function getNextLevel(currentLevel: number): number | null {
+  return currentLevel < 7 ? currentLevel + 1 : null;
+}

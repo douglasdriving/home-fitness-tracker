@@ -1,4 +1,5 @@
 import { MuscleGroup } from './exercise';
+import { UserChallengeState } from './challenge';
 
 export interface UserProfile {
   userId: string;
@@ -22,6 +23,7 @@ export interface UserProfile {
     longestStreak: number; // Best streak ever
     lastWorkoutDate?: number; // Timestamp of last completed workout
   };
+  challengeState?: UserChallengeState; // Challenge mode progress
 }
 
 export interface CalibrationData {

@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { UserProfile, CalibrationData, StrengthLevels } from '../types/user';
+import { ChallengeProgress } from '../types/challenge';
 import {
   initializeUserProfile,
   saveUserProfile,
@@ -23,6 +24,9 @@ interface UserStore {
   setBackfillCompleted: () => void;
   updateWorkoutFrequencyGoal: (workoutsPerWeek: number) => void;
   updateStreakData: (completedWorkoutDate: number) => void;
+  initializeChallengeState: (startingLevel: number) => void;
+  completeChallenge: (challengeId: string, value: number) => void;
+  updateChallengeLevel: (newLevel: number) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -191,6 +195,91 @@ export const useUserStore = create<UserStore>((set, get) => ({
         currentStreak: newCurrentStreak,
         longestStreak: newLongestStreak,
         lastWorkoutDate: completedWorkoutDate,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  initializeChallengeState: (startingLevel: number) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      challengeState: {
+        currentLevel: startingLevel,
+        completedChallenges: [],
+        totalChallengesCompleted: 0,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  completeChallenge: (challengeId: string, value: number) => {
+    const profile = get().profile;
+    if (!profile || !profile.challengeState) return;
+
+    const existingProgress = profile.challengeState.completedChallenges.find(
+      (p) => p.challengeId === challengeId
+    );
+
+    let updatedCompletedChallenges: ChallengeProgress[];
+
+    if (existingProgress) {
+      // Update existing progress
+      updatedCompletedChallenges = profile.challengeState.completedChallenges.map((p) =>
+        p.challengeId === challengeId
+          ? {
+              ...p,
+              completed: true,
+              completedDate: Date.now(),
+              bestValue: Math.max(p.bestValue || 0, value),
+              attempts: p.attempts + 1,
+            }
+          : p
+      );
+    } else {
+      // Add new progress
+      updatedCompletedChallenges = [
+        ...profile.challengeState.completedChallenges,
+        {
+          challengeId,
+          completed: true,
+          completedDate: Date.now(),
+          bestValue: value,
+          attempts: 1,
+        },
+      ];
+    }
+
+    const totalCompleted = updatedCompletedChallenges.filter((p) => p.completed).length;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      challengeState: {
+        ...profile.challengeState,
+        completedChallenges: updatedCompletedChallenges,
+        totalChallengesCompleted: totalCompleted,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  updateChallengeLevel: (newLevel: number) => {
+    const profile = get().profile;
+    if (!profile || !profile.challengeState) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      challengeState: {
+        ...profile.challengeState,
+        currentLevel: Math.max(profile.challengeState.currentLevel, newLevel),
       },
     };
 
