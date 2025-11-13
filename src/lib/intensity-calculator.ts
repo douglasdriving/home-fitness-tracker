@@ -57,10 +57,9 @@ export function calculateIntensityScore(exercises: CompletedExercise[]): number 
   // Final score with bonuses
   const rawScore = totalScore + muscleGroupBonus + exerciseCountBonus;
 
-  // Normalize to 0-100 scale
-  // Typical workout might score 60-120 raw, so divide by 1.5 to get ~40-80 range
-  // Add some scaling to make scores more intuitive
-  const normalizedScore = Math.min(Math.round(rawScore / 1.5), 100);
+  // Normalize score by dividing by 1.5 to make scores more intuitive
+  // No upper cap - allows tracking progress beyond baseline as users get stronger
+  const normalizedScore = Math.round(rawScore / 1.5);
 
   return normalizedScore;
 }
