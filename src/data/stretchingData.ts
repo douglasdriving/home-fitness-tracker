@@ -10,6 +10,7 @@ export interface StretchExercise {
   instructions: string[];
   targetMuscles: string[];
   videoUrl?: string;
+  bilateral?: boolean; // If true, timer will split duration and indicate when to switch sides
 }
 
 export const stretchingRoutine: StretchExercise[] = [
@@ -50,7 +51,8 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 15 seconds, then switch sides'
     ],
     targetMuscles: ['Glutes', 'Lower Back'],
-    videoUrl: 'https://www.youtube.com/watch?v=Xb5gHdYtHnk'
+    videoUrl: 'https://www.youtube.com/watch?v=Xb5gHdYtHnk',
+    bilateral: true
   },
   {
     id: 'stretch-knee-to-chest',
@@ -63,7 +65,8 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 15 seconds, then switch legs'
     ],
     targetMuscles: ['Lower Back', 'Glutes'],
-    videoUrl: 'https://www.youtube.com/watch?v=o8gAyDUh2bs'
+    videoUrl: 'https://www.youtube.com/watch?v=o8gAyDUh2bs',
+    bilateral: true
   },
   {
     id: 'stretch-lying-twist',
@@ -76,7 +79,8 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 20 seconds, then switch sides'
     ],
     targetMuscles: ['Lower Back', 'Abs', 'Glutes'],
-    videoUrl: 'https://www.youtube.com/watch?v=mNdJti7ZwKI'
+    videoUrl: 'https://www.youtube.com/watch?v=mNdJti7ZwKI',
+    bilateral: true
   },
   {
     id: 'stretch-cobra',
@@ -102,7 +106,8 @@ export const stretchingRoutine: StretchExercise[] = [
       'Hold for 15 seconds, then switch sides'
     ],
     targetMuscles: ['Glutes', 'Abs'],
-    videoUrl: 'https://www.youtube.com/watch?v=YQmpO9VT2X4'
+    videoUrl: 'https://www.youtube.com/watch?v=YQmpO9VT2X4',
+    bilateral: true
   },
   {
     id: 'stretch-final-child-pose',

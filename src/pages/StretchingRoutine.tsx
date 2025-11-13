@@ -256,6 +256,7 @@ export default function StretchingRoutine() {
             duration={currentStretch.duration}
             onComplete={handleStretchComplete}
             autoStart={false}
+            bilateral={currentStretch.bilateral}
           />
         </div>
 
