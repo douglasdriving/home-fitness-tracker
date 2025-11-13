@@ -7,104 +7,93 @@ export default function StreakTracker() {
     return null;
   }
 
-  const currentStreak = profile.streakData?.currentStreak || 0;
-  const longestStreak = profile.streakData?.longestStreak || 0;
   const frequencyGoal = profile.workoutFrequencyGoal || 3;
+  const streakData = profile.streakData || {
+    currentStreakWeeks: 0,
+    longestStreakWeeks: 0,
+    thisWeekWorkouts: 0,
+    lastWeekStart: Date.now(),
+    lastWeekMeetGoal: false,
+  };
 
-  // Calculate days until streak expires
-  const lastWorkoutDate = profile.streakData?.lastWorkoutDate;
-  const daysPerWorkout = 7 / frequencyGoal;
-  const allowedGapDays = Math.ceil(daysPerWorkout * 1.5);
+  const thisWeekWorkouts = streakData.thisWeekWorkouts;
+  const currentStreakWeeks = streakData.currentStreakWeeks;
+  const longestStreakWeeks = streakData.longestStreakWeeks;
 
-  let daysRemaining = 0;
-  let streakStatus: 'active' | 'expiring' | 'expired' = 'active';
-
-  if (lastWorkoutDate && currentStreak > 0) {
-    const daysSinceLastWorkout = (Date.now() - lastWorkoutDate) / (1000 * 60 * 60 * 24);
-    daysRemaining = Math.max(0, Math.ceil(allowedGapDays - daysSinceLastWorkout));
-
-    if (daysRemaining === 0) {
-      streakStatus = 'expired';
-    } else if (daysRemaining <= 2) {
-      streakStatus = 'expiring';
-    }
-  }
+  // Calculate progress percentage
+  const progressPercentage = Math.min((thisWeekWorkouts / frequencyGoal) * 100, 100);
+  const goalMet = thisWeekWorkouts >= frequencyGoal;
 
   // Get motivational message
-  const getStreakMessage = () => {
-    if (currentStreak === 0) {
-      return 'Complete a workout to start your streak!';
+  const getMessage = () => {
+    if (goalMet) {
+      return `Goal complete! ${thisWeekWorkouts}/${frequencyGoal} workouts this week 🎉`;
     }
-    if (streakStatus === 'expired') {
-      return 'Your streak has ended. Start a new one today!';
+    const remaining = frequencyGoal - thisWeekWorkouts;
+    if (remaining === 1) {
+      return `One more workout to reach your weekly goal!`;
     }
-    if (streakStatus === 'expiring') {
-      return `Keep it going! ${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} left.`;
-    }
-    if (currentStreak === longestStreak && currentStreak >= 5) {
-      return 'Personal record! Keep crushing it!';
-    }
-    return `${daysRemaining} ${daysRemaining === 1 ? 'day' : 'days'} to next workout.`;
+    return `${remaining} workouts left this week`;
   };
 
-  const getStreakColor = () => {
-    if (currentStreak === 0 || streakStatus === 'expired') {
-      return 'text-gray-400';
-    }
-    if (streakStatus === 'expiring') {
-      return 'text-orange-500';
-    }
-    if (currentStreak === longestStreak && currentStreak >= 5) {
-      return 'text-purple-500';
-    }
-    return 'text-green-500';
-  };
-
+  // Get fire emoji based on streak
   const getFireEmoji = () => {
-    if (currentStreak === 0) return '';
-    if (currentStreak >= 20) return '🔥🔥🔥';
-    if (currentStreak >= 10) return '🔥🔥';
-    if (currentStreak >= 5) return '🔥';
+    if (currentStreakWeeks === 0) return '💪';
+    if (currentStreakWeeks >= 12) return '🔥🔥🔥';
+    if (currentStreakWeeks >= 6) return '🔥🔥';
+    if (currentStreakWeeks >= 2) return '🔥';
     return '✨';
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-lg font-semibold text-gray-800">Workout Streak</h3>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-semibold text-gray-800">Weekly Goal</h3>
         <span className="text-2xl">{getFireEmoji()}</span>
       </div>
 
-      <div className="flex items-center justify-around mb-3">
-        <div className="text-center">
-          <div className={`text-3xl font-bold ${getStreakColor()}`}>
-            {currentStreak}
-          </div>
-          <div className="text-xs text-gray-500">Current</div>
+      {/* This Week Progress */}
+      <div className="mb-4">
+        <div className="flex items-baseline justify-between mb-2">
+          <span className="text-sm font-medium text-gray-700">This Week</span>
+          <span className={`text-sm font-bold ${goalMet ? 'text-green-500' : 'text-blue-500'}`}>
+            {thisWeekWorkouts} / {frequencyGoal} workouts
+          </span>
         </div>
 
-        <div className="h-12 w-px bg-gray-200"></div>
-
-        <div className="text-center">
-          <div className="text-3xl font-bold text-gray-700">
-            {longestStreak}
-          </div>
-          <div className="text-xs text-gray-500">Best</div>
+        {/* Progress Bar */}
+        <div className="h-3 bg-gray-200 rounded-full overflow-hidden">
+          <div
+            className={`h-full transition-all duration-500 ${
+              goalMet ? 'bg-green-500' : 'bg-blue-500'
+            }`}
+            style={{ width: `${progressPercentage}%` }}
+          />
         </div>
 
-        <div className="h-12 w-px bg-gray-200"></div>
-
-        <div className="text-center">
-          <div className="text-3xl font-bold text-blue-500">
-            {frequencyGoal}x
-          </div>
-          <div className="text-xs text-gray-500">Per Week</div>
-        </div>
+        <p className={`text-xs mt-2 ${goalMet ? 'text-green-600' : 'text-gray-600'}`}>
+          {getMessage()}
+        </p>
       </div>
 
-      <p className={`text-sm text-center ${getStreakColor()}`}>
-        {getStreakMessage()}
-      </p>
+      {/* Streak Stats */}
+      <div className="flex items-center justify-around pt-3 border-t border-gray-200">
+        <div className="text-center">
+          <div className={`text-3xl font-bold ${currentStreakWeeks > 0 ? 'text-orange-500' : 'text-gray-400'}`}>
+            {currentStreakWeeks}
+          </div>
+          <div className="text-xs text-gray-500">Week Streak</div>
+        </div>
+
+        <div className="h-12 w-px bg-gray-200"></div>
+
+        <div className="text-center">
+          <div className="text-3xl font-bold text-purple-500">
+            {longestStreakWeeks}
+          </div>
+          <div className="text-xs text-gray-500">Best Streak</div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -19,9 +19,11 @@ export interface UserProfile {
   height?: number; // cm
   workoutFrequencyGoal?: number; // Target number of workouts per week (default: 3)
   streakData?: {
-    currentStreak: number; // Current streak count
-    longestStreak: number; // Best streak ever
-    lastWorkoutDate?: number; // Timestamp of last completed workout
+    currentStreakWeeks: number; // Current streak in weeks (consecutive weeks meeting goal)
+    longestStreakWeeks: number; // Best streak ever in weeks
+    thisWeekWorkouts: number; // Workouts completed this week
+    lastWeekStart: number; // Timestamp of start of current week being tracked
+    lastWeekMeetGoal: boolean; // Did last completed week meet the goal?
   };
   challengeState?: UserChallengeState; // Challenge mode progress
 }
