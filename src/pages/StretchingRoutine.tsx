@@ -3,7 +3,7 @@
  * Guides users through a 5-minute post-workout stretching routine
  */
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { stretchingRoutine, totalStretchingDuration } from '../data/stretchingData';
 import Timer from '../components/workout/Timer';
@@ -11,6 +11,15 @@ import Button from '../components/common/Button';
 import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
+
+const STRETCH_STATE_KEY = 'stretchRoutineState';
+
+interface StretchState {
+  workoutId: string;
+  currentStretchIndex: number;
+  isResting: boolean;
+  completedStretches: number[];
+}
 
 export default function StretchingRoutine() {
   const navigate = useNavigate();
@@ -24,6 +33,48 @@ export default function StretchingRoutine() {
   const [isResting, setIsResting] = useState(false);
   const [showStretchModal, setShowStretchModal] = useState(false);
   const [completedStretches, setCompletedStretches] = useState<Set<number>>(new Set());
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  // Restore state from localStorage on mount
+  useEffect(() => {
+    if (!workoutId) return;
+
+    try {
+      const savedState = localStorage.getItem(STRETCH_STATE_KEY);
+      if (savedState) {
+        const state: StretchState = JSON.parse(savedState);
+
+        // Only restore if it's for the same workout
+        if (state.workoutId === workoutId) {
+          setCurrentStretchIndex(state.currentStretchIndex);
+          setIsResting(state.isResting);
+          setCompletedStretches(new Set(state.completedStretches));
+        }
+      }
+    } catch (error) {
+      console.error('Failed to restore stretch state:', error);
+    } finally {
+      setIsInitialized(true);
+    }
+  }, [workoutId]);
+
+  // Save state to localStorage whenever it changes
+  useEffect(() => {
+    if (!workoutId || !isInitialized) return;
+
+    const state: StretchState = {
+      workoutId,
+      currentStretchIndex,
+      isResting,
+      completedStretches: Array.from(completedStretches)
+    };
+
+    try {
+      localStorage.setItem(STRETCH_STATE_KEY, JSON.stringify(state));
+    } catch (error) {
+      console.error('Failed to save stretch state:', error);
+    }
+  }, [workoutId, currentStretchIndex, isResting, completedStretches, isInitialized]);
 
   const currentStretch = stretchingRoutine[currentStretchIndex];
   const isLastStretch = currentStretchIndex === stretchingRoutine.length - 1;
@@ -71,11 +122,24 @@ export default function StretchingRoutine() {
       }
     }
 
+    // Clear saved state when routine is completed
+    try {
+      localStorage.removeItem(STRETCH_STATE_KEY);
+    } catch (error) {
+      console.error('Failed to clear stretch state:', error);
+    }
+
     navigate('/', { state: { stretchingCompleted: true } });
   };
 
   const handleSkip = () => {
     if (confirm('Are you sure you want to skip the stretching routine?')) {
+      // Clear saved state when skipping
+      try {
+        localStorage.removeItem(STRETCH_STATE_KEY);
+      } catch (error) {
+        console.error('Failed to clear stretch state:', error);
+      }
       navigate('/');
     }
   };
