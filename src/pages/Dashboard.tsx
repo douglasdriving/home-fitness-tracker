@@ -6,6 +6,7 @@ import { db } from '../db/db';
 import Button from '../components/common/Button';
 import DietTipsModal from '../components/common/DietTipsModal';
 import StreakTracker from '../components/common/StreakTracker';
+import StorageWarning from '../components/common/StorageWarning';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -147,6 +148,9 @@ export default function Dashboard() {
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
+        {/* Storage Warning */}
+        <StorageWarning />
+
         {/* Resume Stretching Banner */}
         {activeStretchSession && (
           <div className="bg-purple-50 border-l-4 border-purple-600 rounded-lg p-4 shadow-lg">
