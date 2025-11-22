@@ -17,14 +17,7 @@ export interface UserProfile {
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   weight?: number; // kg
   height?: number; // cm
-  workoutFrequencyGoal?: number; // Target number of workouts per week (default: 3)
-  streakData?: {
-    currentStreakWeeks: number; // Current streak in weeks (consecutive weeks meeting goal)
-    longestStreakWeeks: number; // Best streak ever in weeks
-    thisWeekWorkouts: number; // Workouts completed this week
-    lastWeekStart: number; // Timestamp of start of current week being tracked
-    lastWeekMeetGoal: boolean; // Did last completed week meet the goal?
-  };
+  workoutFrequencyDays?: number; // Target frequency: work out every X days (default: 2, meaning max 1 day gap)
   challengeState?: UserChallengeState; // Challenge mode progress
 }
 

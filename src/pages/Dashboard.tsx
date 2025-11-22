@@ -151,6 +151,9 @@ export default function Dashboard() {
         {/* Storage Warning */}
         <StorageWarning />
 
+        {/* Streak Tracker */}
+        <StreakTracker />
+
         {/* Resume Stretching Banner */}
         {activeStretchSession && (
           <div className="bg-purple-50 border-l-4 border-purple-600 rounded-lg p-4 shadow-lg">
@@ -272,11 +275,8 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Streak Tracker */}
-        <StreakTracker />
-
-        {/* Challenge Journey Promotion */}
-        {profile.calibrationCompleted && (
+        {/* Challenge Journey Promotion - HIDDEN (Work in Progress) */}
+        {/* {profile.calibrationCompleted && (
           <div
             onClick={() => navigate('/challenges')}
             className="bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg shadow-lg p-6 cursor-pointer hover:scale-[1.02] transition-transform"
@@ -307,7 +307,7 @@ export default function Dashboard() {
               <div className="text-4xl ml-4">→</div>
             </div>
           </div>
-        )}
+        )} */}
 
         {/* Diet Tips Button - Show after completing workout today */}
         {hasCompletedWorkoutToday && !currentWorkout && (

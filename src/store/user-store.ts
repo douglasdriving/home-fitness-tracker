@@ -22,8 +22,7 @@ interface UserStore {
   excludeExercise: (exerciseId: string) => void;
   includeExercise: (exerciseId: string) => void;
   setBackfillCompleted: () => void;
-  updateWorkoutFrequencyGoal: (workoutsPerWeek: number) => void;
-  updateStreakData: (completedWorkoutDate: number) => void;
+  updateWorkoutFrequencyDays: (days: number) => void;
   initializeChallengeState: (startingLevel: number) => void;
   completeChallenge: (challengeId: string, value: number) => void;
   updateChallengeLevel: (newLevel: number) => void;
@@ -150,85 +149,13 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set({ profile: updatedProfile });
   },
 
-  updateWorkoutFrequencyGoal: (workoutsPerWeek: number) => {
+  updateWorkoutFrequencyDays: (days: number) => {
     const profile = get().profile;
     if (!profile) return;
 
     const updatedProfile: UserProfile = {
       ...profile,
-      workoutFrequencyGoal: workoutsPerWeek,
-    };
-
-    saveUserProfile(updatedProfile);
-    set({ profile: updatedProfile });
-  },
-
-  updateStreakData: (completedWorkoutDate: number) => {
-    const profile = get().profile;
-    if (!profile) return;
-
-    const frequencyGoal = profile.workoutFrequencyGoal || 3;
-
-    // Get start of current week (Monday)
-    const workoutDate = new Date(completedWorkoutDate);
-    const currentWeekStart = new Date(workoutDate);
-    const dayOfWeek = currentWeekStart.getDay();
-    const daysToSubtract = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    currentWeekStart.setDate(currentWeekStart.getDate() - daysToSubtract);
-    currentWeekStart.setHours(0, 0, 0, 0);
-    const currentWeekStartTimestamp = currentWeekStart.getTime();
-
-    // Initialize or get current streak data
-    const streakData = profile.streakData || {
-      currentStreakWeeks: 0,
-      longestStreakWeeks: 0,
-      thisWeekWorkouts: 0,
-      lastWeekStart: currentWeekStartTimestamp,
-      lastWeekMeetGoal: false,
-    };
-
-    let newCurrentStreakWeeks = streakData.currentStreakWeeks;
-    let newThisWeekWorkouts = streakData.thisWeekWorkouts;
-    let newLastWeekMeetGoal = streakData.lastWeekMeetGoal;
-
-    // Check if we're in a new week
-    const isNewWeek = currentWeekStartTimestamp > streakData.lastWeekStart;
-
-    if (isNewWeek) {
-      // Previous week just ended - check if goal was met
-      const previousWeekMetGoal = streakData.thisWeekWorkouts >= frequencyGoal;
-
-      if (previousWeekMetGoal) {
-        // Previous week met goal - increment or start streak
-        newCurrentStreakWeeks = streakData.currentStreakWeeks + 1;
-      } else if (streakData.thisWeekWorkouts > 0) {
-        // Previous week had workouts but didn't meet goal - break streak
-        newCurrentStreakWeeks = 0;
-      }
-      // If previous week had 0 workouts, keep streak as is (grace period for missed weeks)
-
-      // Start counting for new week
-      newThisWeekWorkouts = 1; // This workout
-      newLastWeekMeetGoal = previousWeekMetGoal;
-    } else {
-      // Same week - increment workout count
-      newThisWeekWorkouts = streakData.thisWeekWorkouts + 1;
-    }
-
-    const newLongestStreakWeeks = Math.max(
-      streakData.longestStreakWeeks,
-      newCurrentStreakWeeks
-    );
-
-    const updatedProfile: UserProfile = {
-      ...profile,
-      streakData: {
-        currentStreakWeeks: newCurrentStreakWeeks,
-        longestStreakWeeks: newLongestStreakWeeks,
-        thisWeekWorkouts: newThisWeekWorkouts,
-        lastWeekStart: currentWeekStartTimestamp,
-        lastWeekMeetGoal: newLastWeekMeetGoal,
-      },
+      workoutFrequencyDays: days,
     };
 
     saveUserProfile(updatedProfile);
