@@ -29,7 +29,9 @@
       "Bash(git show:*)",
       "Bash(gh issue comment:*)",
       "Bash(timeout 10 npm run dev:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(timeout 15 npm run dev:*)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
