@@ -211,6 +211,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
           setNumber: set.setNumber,
           actualReps: set.actualReps,
           actualDuration: set.actualDuration,
+          equipmentUsed: set.equipmentUsed,
         })),
     }));
 
