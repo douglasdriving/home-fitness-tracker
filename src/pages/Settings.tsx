@@ -9,6 +9,8 @@ import Button from '../components/common/Button';
 import FeedbackForm from '../components/feedback/FeedbackForm';
 import { allExercises } from '../data/exerciseData';
 import { seedWorkoutHistory, clearWorkoutHistory } from '../utils/seedData';
+import { isIOS, isStandalone } from '../utils/deviceDetection';
+import IOSInstallPrompt from '../components/common/IOSInstallPrompt';
 
 export default function Settings() {
   const navigate = useNavigate();
@@ -381,7 +383,11 @@ export default function Settings() {
         )}
 
         {/* Install App */}
-        {isInstallable && (
+        {/* Show iOS instructions if on iOS and not already installed */}
+        {isIOS() && !isStandalone() && <IOSInstallPrompt />}
+
+        {/* Show standard install button for Android/Desktop */}
+        {isInstallable && !isIOS() && (
           <div className="border-b border-background-lighter pb-6">
             <h2 className="text-lg font-semibold text-text mb-4">Install App</h2>
             <p className="text-sm text-text-muted mb-4">
