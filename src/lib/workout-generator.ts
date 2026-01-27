@@ -179,9 +179,11 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       console.log(`[WORKOUT GEN] - Using ESTIMATION: ${targetValue}`);
     }
 
-    // Determine number of sets (3-4 sets based on strength level)
+    // Determine number of sets based on exercise type
+    // Per-side (unilateral) exercises: 3 sets (since each set takes double time)
+    // Other exercises: 4 sets
     // Will be adjusted later if time constraint is specified
-    const numSets = strengthLevel > 50 ? 4 : 3;
+    const numSets = exercise.countingMethod === 'per-side' ? 3 : 4;
 
     // Apply a sustainable multiplier for multiple sets ONLY for new exercises
     // Calibration tests single-set max capacity, but workouts need sustainable targets
