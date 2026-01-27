@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { Workout, WorkoutHistoryEntry, Set } from '../types/workout';
+import { Workout, WorkoutHistoryEntry, Set, IntensityRating } from '../types/workout';
 import { db } from '../db/db';
 import { generateWorkout } from '../lib/workout-generator';
 import { updateStrengthLevelsFromWorkout } from '../lib/progression-calculator';
@@ -17,7 +17,7 @@ interface WorkoutStore {
   startWorkout: (workoutId: string) => Promise<void>;
   updateSet: (exerciseIndex: number, setIndex: number, updates: Partial<Set>) => Promise<void>;
   updateWorkoutPosition: (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => Promise<void>;
-  completeWorkout: () => Promise<WorkoutHistoryEntry>;
+  completeWorkout: (intensityFeedbackMap?: Record<number, IntensityRating>) => Promise<WorkoutHistoryEntry>;
   loadHistory: () => Promise<void>;
   deleteHistoryEntry: (historyId: string) => Promise<void>;
   updateHistoryEntry: (historyId: string, updatedEntry: WorkoutHistoryEntry) => Promise<void>;
@@ -176,8 +176,9 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
   /**
    * Complete the current workout and save to history
    * Returns the history entry for the completion screen
+   * @param intensityFeedbackMap - Optional map of exercise index to intensity rating
    */
-  completeWorkout: async (): Promise<WorkoutHistoryEntry> => {
+  completeWorkout: async (intensityFeedbackMap?: Record<number, IntensityRating>): Promise<WorkoutHistoryEntry> => {
     const { currentWorkout } = get();
 
     if (!currentWorkout) {
@@ -201,7 +202,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     await db.workouts.put(updatedWorkout);
 
     // Create history entry - only include completed sets with actual values
-    const completedExercises = currentWorkout.exercises.map((ex) => ({
+    // Also attach intensity feedback per exercise if provided
+    const completedExercises = currentWorkout.exercises.map((ex, index) => ({
       exerciseId: ex.exerciseId,
       exerciseName: ex.exerciseName,
       muscleGroups: ex.muscleGroups,
@@ -213,6 +215,10 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
           actualDuration: set.actualDuration,
           equipmentUsed: set.equipmentUsed,
         })),
+      // Attach intensity feedback if provided
+      ...(intensityFeedbackMap && intensityFeedbackMap[index] !== undefined
+        ? { intensityFeedback: intensityFeedbackMap[index] }
+        : {}),
     }));
 
     // Calculate intensity score for this workout

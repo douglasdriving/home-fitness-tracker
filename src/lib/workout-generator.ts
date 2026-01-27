@@ -1,9 +1,9 @@
-import { Workout, WorkoutExercise, WorkoutHistoryEntry } from '../types/workout';
+import { Workout, WorkoutExercise, WorkoutHistoryEntry, IntensityRating } from '../types/workout';
 import type { Set } from '../types/workout';
 import { StrengthLevels } from '../types/user';
 import { MuscleGroup, Exercise } from '../types/exercise';
 import { getExercisesByMuscleGroup } from '../data/exerciseData';
-import { estimateExerciseCapacity, calculateProgression } from './progression-calculator';
+import { calculateProgressionWithFeedback } from './progression-calculator';
 
 interface GenerateWorkoutOptions {
   workoutNumber: number;
@@ -21,7 +21,9 @@ interface GenerateWorkoutOptions {
  * Strategy:
  * - Select 3-4 exercises covering all muscle groups
  * - Avoid recently used exercises
- * - Calculate sets/reps based on strength levels
+ * - Calculate sets/reps based on:
+ *   - Exercise defaults for first-time exercises
+ *   - Intensity feedback + progression for returning exercises
  * - Set rest times based on exercise difficulty
  * - Estimate total workout duration
  */
@@ -151,32 +153,37 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Determine primary muscle group for this exercise (first one in the array)
     const primaryMuscleGroup = exercise.muscleGroups[0];
     const strengthLevel = strengthLevels[primaryMuscleGroup];
-    const heavinessScore = exercise.heavinessScore[primaryMuscleGroup];
 
     // Check if user has done this exercise before (progressive overload)
-    const lastPerformance = findLastPerformance(exercise.id, workoutHistory);
+    const lastPerformanceData = findLastPerformanceWithFeedback(exercise.id, workoutHistory);
 
     // DEBUG: Log the progression calculation
     console.log(`[WORKOUT GEN] Exercise: ${exercise.name} (${exercise.id})`);
     console.log(`[WORKOUT GEN] - Strength Level: ${strengthLevel}`);
-    console.log(`[WORKOUT GEN] - Heaviness: ${heavinessScore}`);
-    console.log(`[WORKOUT GEN] - Last Performance: ${lastPerformance}`);
+    console.log(`[WORKOUT GEN] - Last Performance: ${lastPerformanceData?.performance ?? 'none'}`);
+    console.log(`[WORKOUT GEN] - Last Feedback: ${lastPerformanceData?.feedback ?? 'none'}`);
     console.log(`[WORKOUT GEN] - History entries: ${workoutHistory.length}`);
 
     let targetValue: number;
-    if (lastPerformance !== null) {
-      // Use progressive overload based on last performance
-      // Last performance was already sustainable, so just add progression without multiplier
-      targetValue = calculateProgression(lastPerformance, exercise.type);
-      console.log(`[WORKOUT GEN] - Using PROGRESSION: ${lastPerformance} → ${targetValue}`);
-    } else {
-      // First time doing this exercise, estimate based on strength level
-      targetValue = estimateExerciseCapacity(
-        strengthLevel,
-        heavinessScore,
-        exercise.type
+    if (lastPerformanceData !== null) {
+      // Use feedback-based progression
+      // Default to rating 3 (just right) if no feedback recorded
+      const feedback = lastPerformanceData.feedback ?? 3;
+      targetValue = calculateProgressionWithFeedback(
+        lastPerformanceData.performance,
+        exercise.type,
+        feedback
       );
-      console.log(`[WORKOUT GEN] - Using ESTIMATION: ${targetValue}`);
+      console.log(`[WORKOUT GEN] - Using FEEDBACK PROGRESSION: ${lastPerformanceData.performance} (feedback: ${feedback}) → ${targetValue}`);
+    } else {
+      // First time doing this exercise - use exercise default
+      // This provides beginner-friendly starting values
+      if (exercise.type === 'reps') {
+        targetValue = exercise.defaultReps ?? 10; // Fallback to 10 if somehow missing
+      } else {
+        targetValue = exercise.defaultDuration ?? 30; // Fallback to 30 seconds
+      }
+      console.log(`[WORKOUT GEN] - Using EXERCISE DEFAULT: ${targetValue}`);
     }
 
     // Determine number of sets based on exercise type
@@ -185,26 +192,19 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Will be adjusted later if time constraint is specified
     const numSets = exercise.countingMethod === 'per-side' ? 3 : 4;
 
-    // Apply a sustainable multiplier for multiple sets ONLY for new exercises
-    // Calibration tests single-set max capacity, but workouts need sustainable targets
-    // Use 75% of estimated capacity for all sets (allows completing all sets with good form)
-    // For exercises with history, lastPerformance is already sustainable, so no multiplier needed
-    const sustainableTarget = lastPerformance !== null
-      ? targetValue
-      : Math.round(targetValue * 0.75);
-
-    console.log(`[WORKOUT GEN] - Final Target: ${sustainableTarget} (${exercise.type})\n`);
+    console.log(`[WORKOUT GEN] - Final Target: ${targetValue} (${exercise.type})\n`);
 
     // Create sets with the same target value for all sets
     const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({
       setNumber: index + 1,
-      targetReps: exercise.type === 'reps' ? sustainableTarget : undefined,
-      targetDuration: exercise.type === 'timed' ? sustainableTarget : undefined,
+      targetReps: exercise.type === 'reps' ? targetValue : undefined,
+      targetDuration: exercise.type === 'timed' ? targetValue : undefined,
       completed: false,
     }));
 
     // Calculate rest time (30-60 seconds based on heaviness)
     // Heavier exercises need more rest
+    const heavinessScore = exercise.heavinessScore[primaryMuscleGroup];
     const restTime = Math.round(30 + (heavinessScore / 10) * 30);
 
     return {
@@ -351,14 +351,13 @@ export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<
 }
 
 /**
- * Find the last performance for a specific exercise
- * Returns the first set performance from the most recent workout containing this exercise
- * (First set represents true capacity before fatigue sets in)
+ * Find the last performance AND intensity feedback for a specific exercise
+ * Returns both the performance value and the feedback rating from the most recent workout
  */
-function findLastPerformance(
+function findLastPerformanceWithFeedback(
   exerciseId: string,
   workoutHistory: WorkoutHistoryEntry[]
-): number | null {
+): { performance: number; feedback: IntensityRating | undefined } | null {
   console.log(`[FIND LAST PERF] Searching for exercise: ${exerciseId}`);
   console.log(`[FIND LAST PERF] Total history entries: ${workoutHistory.length}`);
 
@@ -372,8 +371,11 @@ function findLastPerformance(
       // Use first set performance (before fatigue) for progressive overload
       const firstSet = exercise.completedSets[0];
       const performance = firstSet.actualReps || firstSet.actualDuration || 0;
-      console.log(`[FIND LAST PERF] Found in workout #${historyEntry.workoutNumber}: ${performance} ${firstSet.actualReps ? 'reps' : 'seconds'}`);
-      return performance;
+      const feedback = exercise.intensityFeedback;
+
+      console.log(`[FIND LAST PERF] Found in workout #${historyEntry.workoutNumber}: ${performance} ${firstSet.actualReps ? 'reps' : 'seconds'}, feedback: ${feedback ?? 'none'}`);
+
+      return { performance, feedback };
     }
   }
 

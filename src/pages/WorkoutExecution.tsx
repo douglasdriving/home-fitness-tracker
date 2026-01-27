@@ -1,8 +1,7 @@
 /**
  * WorkoutExecution Page
  * Manages the workout execution flow including exercise progression,
- * rest periods, and workout completion. Orchestrates state and delegates
- * rendering to specialized phase components.
+ * rest periods, intensity feedback, and workout completion.
  */
 
 import { useState, useEffect } from 'react';
@@ -11,11 +10,13 @@ import { useWorkoutStore } from '../store/workout-store';
 import { getExerciseById } from '../data/exerciseData';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
+import { IntensityRating } from '../types/workout';
 import WorkoutHeader from '../components/workout/WorkoutHeader';
 import RestPhase from '../components/workout/RestPhase';
 import ExercisePhase from '../components/workout/ExercisePhase';
+import IntensityFeedback from '../components/workout/IntensityFeedback';
 
-type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest';
+type WorkoutPhase = 'exercise' | 'rest' | 'exercise-rest' | 'intensity-feedback';
 
 export default function WorkoutExecution() {
   const navigate = useNavigate();
@@ -32,6 +33,9 @@ export default function WorkoutExecution() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [nextSetPreview, setNextSetPreview] = useState<{reps?: number, duration?: number} | null>(null);
 
+  // Store intensity feedback for each exercise (keyed by exercise index)
+  const [intensityFeedbackMap, setIntensityFeedbackMap] = useState<Record<number, IntensityRating>>({});
+
   // Initialize position from saved state on mount
   useEffect(() => {
     if (!currentWorkout || isInitialized) {
@@ -47,25 +51,29 @@ export default function WorkoutExecution() {
       setCurrentSetIndex(currentWorkout.currentSetIndex);
     }
     if (currentWorkout.currentPhase) {
-      setPhase(currentWorkout.currentPhase);
+      // Handle legacy phases that don't include intensity-feedback
+      const savedPhase = currentWorkout.currentPhase as WorkoutPhase;
+      setPhase(savedPhase);
     }
 
     setIsInitialized(true);
   }, [currentWorkout, navigate, isInitialized]);
 
-
   // Save position whenever it changes (but avoid infinite loop)
   useEffect(() => {
     if (!currentWorkout || !isInitialized) return;
+
+    // Only save standard phases to workout position (not intensity-feedback)
+    const phaseToSave = phase === 'intensity-feedback' ? 'exercise-rest' : phase;
 
     // Only update if position actually changed
     const positionChanged =
       currentWorkout.currentExerciseIndex !== currentExerciseIndex ||
       currentWorkout.currentSetIndex !== currentSetIndex ||
-      currentWorkout.currentPhase !== phase;
+      currentWorkout.currentPhase !== phaseToSave;
 
     if (positionChanged) {
-      updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phase);
+      updateWorkoutPosition(currentExerciseIndex, currentSetIndex, phaseToSave as 'exercise' | 'rest' | 'exercise-rest');
     }
   }, [currentExerciseIndex, currentSetIndex, phase, currentWorkout, isInitialized, updateWorkoutPosition]);
 
@@ -143,37 +151,11 @@ export default function WorkoutExecution() {
 
       // Check if this is the last set of the current exercise
       const isLastSetOfExercise = currentSetIndex === currentExercise.sets.length - 1;
-      const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
-
-      // For new exercises on first set, store preview value and update remaining sets
-      if (isFirstTime && currentSetIndex === 0 && !isLastSetOfExercise) {
-        // Store the value for preview display (prevents flickering)
-        if (exercise?.type === 'reps') {
-          setNextSetPreview({ reps: value });
-        } else {
-          setNextSetPreview({ duration: value });
-        }
-
-        // Update all remaining sets
-        for (let i = 1; i < currentExercise.sets.length; i++) {
-          if (exercise?.type === 'reps') {
-            await updateSet(currentExerciseIndex, i, { targetReps: value });
-          } else {
-            await updateSet(currentExerciseIndex, i, { targetDuration: value });
-          }
-        }
-      }
 
       // Move to next phase
       if (isLastSetOfExercise) {
-        // Move to next exercise or complete workout
-        if (isLastExercise) {
-          // Complete the workout
-          await handleCompleteWorkout();
-        } else {
-          // Rest between exercises before moving to next one
-          setPhase('exercise-rest');
-        }
+        // Show intensity feedback after completing all sets of an exercise
+        setPhase('intensity-feedback');
       } else {
         // Move to rest phase between sets
         setPhase('rest');
@@ -184,10 +166,31 @@ export default function WorkoutExecution() {
     }
   };
 
+  const handleIntensityFeedback = (rating: IntensityRating) => {
+    // Store the feedback for this exercise
+    setIntensityFeedbackMap(prev => ({
+      ...prev,
+      [currentExerciseIndex]: rating,
+    }));
+
+    const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
+
+    if (isLastExercise) {
+      // Complete the workout with all feedback
+      handleCompleteWorkout({
+        ...intensityFeedbackMap,
+        [currentExerciseIndex]: rating,
+      });
+    } else {
+      // Move to rest between exercises
+      setPhase('exercise-rest');
+    }
+  };
+
   const handleRestComplete = () => {
     // Move to next set
     setCurrentSetIndex(currentSetIndex + 1);
-    setNextSetPreview(null); // Clear preview when moving to next set
+    setNextSetPreview(null);
     setPhase('exercise');
   };
 
@@ -198,9 +201,9 @@ export default function WorkoutExecution() {
     setPhase('exercise');
   };
 
-  const handleCompleteWorkout = async () => {
+  const handleCompleteWorkout = async (feedbackMap: Record<number, IntensityRating>) => {
     try {
-      const historyEntry = await completeWorkout();
+      const historyEntry = await completeWorkout(feedbackMap);
       navigate('/workout-complete', { state: { workout: historyEntry } });
     } catch (error) {
       console.error('Error completing workout:', error);
@@ -214,6 +217,17 @@ export default function WorkoutExecution() {
     }
   };
 
+  // Intensity Feedback Phase
+  if (phase === 'intensity-feedback') {
+    return (
+      <IntensityFeedback
+        exerciseName={currentExercise.exerciseName}
+        onSubmit={handleIntensityFeedback}
+      />
+    );
+  }
+
+  // Rest Phase (between sets or exercises)
   if (phase === 'rest' || phase === 'exercise-rest') {
     const isExerciseRest = phase === 'exercise-rest';
     const nextExercise = isExerciseRest
@@ -243,6 +257,7 @@ export default function WorkoutExecution() {
     );
   }
 
+  // Exercise Phase
   return (
     <div className="bg-background min-h-screen">
       <WorkoutHeader

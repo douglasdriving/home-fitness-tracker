@@ -44,11 +44,16 @@ export interface WorkoutHistoryEntry {
   intensityScore?: number; // Score representing workout difficulty/intensity (0-100)
 }
 
+// Intensity feedback scale: 1-5
+// 1 = Way too easy, 2 = A bit too easy, 3 = Just right, 4 = A bit too hard, 5 = Way too hard
+export type IntensityRating = 1 | 2 | 3 | 4 | 5;
+
 export interface CompletedExercise {
   exerciseId: string;
   exerciseName: string;
   muscleGroups: MuscleGroup[];
   completedSets: CompletedSet[];
+  intensityFeedback?: IntensityRating; // User's feedback on exercise difficulty
 }
 
 export interface CompletedSet {

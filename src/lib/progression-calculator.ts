@@ -1,6 +1,7 @@
 import { CalibrationData, StrengthLevels } from '../types/user';
 import { getExerciseById } from '../data/exerciseData';
 import { MuscleGroup } from '../types/exercise';
+import { IntensityRating } from '../types/workout';
 
 /**
  * Calculate strength levels from calibration data
@@ -77,12 +78,13 @@ export function estimateExerciseCapacity(
 }
 
 /**
- * Calculate progression for next workout
+ * Calculate progression for next workout (legacy - without feedback)
  * Increases by 5-10% based on performance
  *
  * @param lastPerformance - Previous reps or duration achieved
  * @param exerciseType - 'reps' or 'timed'
  * @returns New target value
+ * @deprecated Use calculateProgressionWithFeedback instead
  */
 export function calculateProgression(
   lastPerformance: number,
@@ -98,6 +100,74 @@ export function calculateProgression(
     // For timed, round to nearest 5 seconds, minimum increase of 5
     const newValue = lastPerformance + increase;
     return Math.max(lastPerformance + 5, Math.round(newValue / 5) * 5);
+  }
+}
+
+/**
+ * Intensity feedback adjustment multipliers
+ * Based on user's rating of exercise difficulty:
+ * - 1 (Way too easy): +20% increase
+ * - 2 (A bit too easy): +10% increase
+ * - 3 (Just right): +5% increase (gentle progression)
+ * - 4 (A bit too hard): -10% decrease
+ * - 5 (Way too hard): -20% decrease
+ */
+const INTENSITY_ADJUSTMENTS: Record<IntensityRating, number> = {
+  1: 0.20,   // Way too easy: +20%
+  2: 0.10,   // A bit too easy: +10%
+  3: 0.05,   // Just right: +5%
+  4: -0.10,  // A bit too hard: -10%
+  5: -0.20,  // Way too hard: -20%
+};
+
+/**
+ * Calculate progression based on intensity feedback
+ * Adjusts next workout targets based on user's difficulty rating
+ *
+ * @param lastPerformance - Previous reps or duration
+ * @param exerciseType - 'reps' or 'timed'
+ * @param intensityFeedback - User's difficulty rating (1-5), defaults to 3 (just right)
+ * @returns New target value
+ */
+export function calculateProgressionWithFeedback(
+  lastPerformance: number,
+  exerciseType: 'reps' | 'timed',
+  intensityFeedback: IntensityRating = 3
+): number {
+  const adjustmentPercent = INTENSITY_ADJUSTMENTS[intensityFeedback];
+  const adjustment = lastPerformance * adjustmentPercent;
+
+  if (exerciseType === 'reps') {
+    // For reps exercises
+    const newValue = lastPerformance + adjustment;
+
+    // Ensure minimum change based on feedback direction
+    if (adjustmentPercent > 0) {
+      // Increasing: minimum +1 rep
+      return Math.max(lastPerformance + 1, Math.round(newValue));
+    } else if (adjustmentPercent < 0) {
+      // Decreasing: minimum -1 rep, but never below 5 reps
+      return Math.max(5, Math.min(lastPerformance - 1, Math.round(newValue)));
+    }
+    // Rating 3 with 5%: could stay same or increase by 1
+    return Math.max(lastPerformance, Math.round(newValue));
+  } else {
+    // For timed exercises (in seconds)
+    const newValue = lastPerformance + adjustment;
+
+    // Round to nearest 5 seconds
+    const rounded = Math.round(newValue / 5) * 5;
+    const lastRounded = Math.round(lastPerformance / 5) * 5;
+
+    if (adjustmentPercent > 0) {
+      // Increasing: minimum +5 seconds from the rounded last value
+      return Math.max(lastRounded + 5, rounded);
+    } else if (adjustmentPercent < 0) {
+      // Decreasing: minimum -5 seconds from the rounded last value, but never below 10 seconds
+      return Math.max(10, Math.min(lastRounded - 5, rounded));
+    }
+    // Rating 3: could stay same or increase slightly
+    return Math.max(lastRounded, rounded);
   }
 }
 
