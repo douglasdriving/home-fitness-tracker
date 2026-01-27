@@ -7,10 +7,12 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useWorkoutStore } from '../store/workout-store';
+import { useUserStore } from '../store/user-store';
 import { getExerciseById } from '../data/exerciseData';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { IntensityRating } from '../types/workout';
+import { checkWorkoutAchievements } from '../lib/achievement-tracker';
 import WorkoutHeader from '../components/workout/WorkoutHeader';
 import RestPhase from '../components/workout/RestPhase';
 import ExercisePhase from '../components/workout/ExercisePhase';
@@ -204,7 +206,48 @@ export default function WorkoutExecution() {
   const handleCompleteWorkout = async (feedbackMap: Record<number, IntensityRating>) => {
     try {
       const historyEntry = await completeWorkout(feedbackMap);
-      navigate('/workout-complete', { state: { workout: historyEntry } });
+
+      // Check for new achievements (unlocks/retirements)
+      const { profile, addUnlockedExercises, addRetiredExercises } = useUserStore.getState();
+      const achievements = profile?.exerciseAchievements ?? {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      // Get full workout history for achievement checking
+      const fullHistory = await db.history
+        .orderBy('completedDate')
+        .reverse()
+        .toArray();
+
+      const { newUnlocks, newRetirements, unlockReasons, retirementReasons } = checkWorkoutAchievements(
+        historyEntry,
+        fullHistory.filter(h => h.id !== historyEntry.id), // Exclude the one we just added
+        achievements
+      );
+
+      // Save achievements
+      if (newUnlocks.length > 0) {
+        addUnlockedExercises(newUnlocks);
+      }
+      if (newRetirements.length > 0) {
+        addRetiredExercises(newRetirements);
+      }
+
+      // Navigate to milestones if there are any, otherwise to workout complete
+      if (newUnlocks.length > 0 || newRetirements.length > 0) {
+        navigate('/milestones', {
+          state: {
+            unlockedExerciseIds: newUnlocks,
+            retiredExerciseIds: newRetirements,
+            unlockReasons,
+            retirementReasons,
+            workoutId: historyEntry.id,
+          },
+        });
+      } else {
+        navigate('/workout-complete', { state: { workout: historyEntry } });
+      }
     } catch (error) {
       console.error('Error completing workout:', error);
       alert('Failed to complete workout. Please try again.');

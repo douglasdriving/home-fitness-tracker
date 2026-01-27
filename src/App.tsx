@@ -5,9 +5,10 @@ import ScrollToTop from './components/common/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import WorkoutExecution from './pages/WorkoutExecution';
 import WorkoutComplete from './pages/WorkoutComplete';
+import Milestones from './pages/Milestones';
 import StretchingRoutine from './pages/StretchingRoutine';
 import History from './pages/History';
-import Progress from './pages/Progress';
+import ExerciseStatus from './pages/ExerciseStatus';
 import ExerciseLibrary from './pages/ExerciseLibrary';
 import Calibration from './pages/Calibration';
 import Settings from './pages/Settings';
@@ -68,10 +69,11 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/workout" element={<WorkoutExecution />} />
             <Route path="/workout-complete" element={<WorkoutComplete />} />
+            <Route path="/milestones" element={<Milestones />} />
             <Route path="/stretching" element={<StretchingRoutine />} />
             <Route path="/history" element={<History />} />
-            <Route path="/progress" element={<Progress />} />
-            <Route path="/exercises" element={<ExerciseLibrary />} />
+            <Route path="/exercises" element={<ExerciseStatus />} />
+            <Route path="/exercise-library" element={<ExerciseLibrary />} />
             <Route path="/calibration" element={<Calibration />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="/challenges" element={<Challenges />} />

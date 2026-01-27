@@ -1,6 +1,12 @@
 import { MuscleGroup } from './exercise';
 import { UserChallengeState } from './challenge';
 
+// Tracks exercise unlock and retirement achievements
+export interface ExerciseAchievements {
+  unlockedExercises: string[];   // IDs of exercises unlocked via achievements
+  retiredExercises: string[];    // IDs of exercises auto-retired (mastered)
+}
+
 export interface UserProfile {
   userId: string;
   createdDate: number; // timestamp
@@ -19,6 +25,7 @@ export interface UserProfile {
   height?: number; // cm
   workoutFrequencyDays?: number; // Target frequency: work out every X days (default: 2, meaning max 1 day gap)
   challengeState?: UserChallengeState; // Challenge mode progress
+  exerciseAchievements?: ExerciseAchievements; // Exercise unlock/retirement tracking
 }
 
 export interface CalibrationData {

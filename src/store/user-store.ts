@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { UserProfile, CalibrationData, StrengthLevels } from '../types/user';
+import { UserProfile, CalibrationData, StrengthLevels, ExerciseAchievements } from '../types/user';
 import { ChallengeProgress } from '../types/challenge';
 import {
   initializeUserProfile,
@@ -25,6 +25,10 @@ interface UserStore {
   initializeChallengeState: (startingLevel: number) => void;
   completeChallenge: (challengeId: string, value: number) => void;
   updateChallengeLevel: (newLevel: number) => void;
+  // Exercise achievement actions
+  addUnlockedExercises: (exerciseIds: string[]) => void;
+  addRetiredExercises: (exerciseIds: string[]) => void;
+  restoreRetiredExercise: (exerciseId: string) => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -226,6 +230,82 @@ export const useUserStore = create<UserStore>((set, get) => ({
       challengeState: {
         ...profile.challengeState,
         currentLevel: Math.max(profile.challengeState.currentLevel, newLevel),
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  addUnlockedExercises: (exerciseIds: string[]) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const currentAchievements: ExerciseAchievements = profile.exerciseAchievements ?? {
+      unlockedExercises: [],
+      retiredExercises: [],
+    };
+
+    // Only add IDs that aren't already in the list
+    const newUnlocks = exerciseIds.filter(
+      id => !currentAchievements.unlockedExercises.includes(id)
+    );
+
+    if (newUnlocks.length === 0) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      exerciseAchievements: {
+        ...currentAchievements,
+        unlockedExercises: [...currentAchievements.unlockedExercises, ...newUnlocks],
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  addRetiredExercises: (exerciseIds: string[]) => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const currentAchievements: ExerciseAchievements = profile.exerciseAchievements ?? {
+      unlockedExercises: [],
+      retiredExercises: [],
+    };
+
+    // Only add IDs that aren't already in the list
+    const newRetirements = exerciseIds.filter(
+      id => !currentAchievements.retiredExercises.includes(id)
+    );
+
+    if (newRetirements.length === 0) return;
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      exerciseAchievements: {
+        ...currentAchievements,
+        retiredExercises: [...currentAchievements.retiredExercises, ...newRetirements],
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  restoreRetiredExercise: (exerciseId: string) => {
+    const profile = get().profile;
+    if (!profile || !profile.exerciseAchievements) return;
+
+    const updatedRetired = profile.exerciseAchievements.retiredExercises.filter(
+      id => id !== exerciseId
+    );
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      exerciseAchievements: {
+        ...profile.exerciseAchievements,
+        retiredExercises: updatedRetired,
       },
     };
 

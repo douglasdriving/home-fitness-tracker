@@ -1,9 +1,9 @@
 import { Workout, WorkoutExercise, WorkoutHistoryEntry, IntensityRating } from '../types/workout';
 import type { Set } from '../types/workout';
-import { StrengthLevels } from '../types/user';
+import { StrengthLevels, ExerciseAchievements } from '../types/user';
 import { MuscleGroup, Exercise } from '../types/exercise';
-import { getExercisesByMuscleGroup } from '../data/exerciseData';
 import { calculateProgressionWithFeedback } from './progression-calculator';
+import { getAvailableExercises } from './achievement-tracker';
 
 interface GenerateWorkoutOptions {
   workoutNumber: number;
@@ -13,6 +13,7 @@ interface GenerateWorkoutOptions {
   hasElasticBands?: boolean; // Whether user has elastic bands
   excludedExerciseIds?: string[]; // IDs of exercises user wants to exclude
   timeConstraintMinutes?: number; // Optional time limit for workout in minutes
+  exerciseAchievements?: ExerciseAchievements; // For filtering locked/retired exercises
 }
 
 /**
@@ -28,10 +29,31 @@ interface GenerateWorkoutOptions {
  * - Estimate total workout duration
  */
 export function generateWorkout(options: GenerateWorkoutOptions): Workout {
-  const { workoutNumber, strengthLevels, workoutHistory = [], hasElasticBands = false, excludedExerciseIds = [], timeConstraintMinutes } = options;
+  const {
+    workoutNumber,
+    strengthLevels,
+    workoutHistory = [],
+    hasElasticBands = false,
+    excludedExerciseIds = [],
+    timeConstraintMinutes,
+    exerciseAchievements = { unlockedExercises: [], retiredExercises: [] }
+  } = options;
 
   // Define muscle groups to target (all 3)
   const targetMuscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
+
+  // Get all available exercises (filters out locked and retired)
+  const allAvailableExercises = getAvailableExercises(
+    workoutHistory,
+    exerciseAchievements,
+    hasElasticBands,
+    excludedExerciseIds
+  );
+
+  // Helper to get available exercises for a muscle group
+  const getAvailableForMuscleGroup = (muscleGroup: MuscleGroup): Exercise[] => {
+    return allAvailableExercises.filter(ex => ex.muscleGroups.includes(muscleGroup));
+  };
 
   // Get exercise usage history for prioritization
   const exerciseLastUsed = getExerciseLastUsed(workoutHistory);
@@ -41,20 +63,9 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   const selectedExerciseIds = new Set<string>();
 
   for (const muscleGroup of targetMuscleGroups) {
-    let availableExercises = getExercisesByMuscleGroup(muscleGroup);
+    let availableExercises = getAvailableForMuscleGroup(muscleGroup);
 
-    console.log(`[WORKOUT GEN] Selecting exercise for ${muscleGroup}, ${availableExercises.length} available before filtering`);
-
-    // Filter by equipment - include exercises with no equipment requirement
-    // and band exercises only if user has bands
-    availableExercises = availableExercises.filter(
-      (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
-    );
-
-    // Filter out excluded exercises
-    availableExercises = availableExercises.filter(
-      (ex) => !excludedExerciseIds.includes(ex.id)
-    );
+    console.log(`[WORKOUT GEN] Selecting exercise for ${muscleGroup}, ${availableExercises.length} available after unlock/retirement filtering`);
 
     // Filter out already selected exercises
     availableExercises = availableExercises.filter(
@@ -115,18 +126,9 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     // Try each muscle group starting with the least-represented
     let fourthExercise: Exercise | null = null;
     for (const muscleGroup of sortedGroups) {
-      let availableExercises = getExercisesByMuscleGroup(muscleGroup).filter(
+      // Use the same available exercises pool (already filtered for unlock/retirement)
+      const availableExercises = getAvailableForMuscleGroup(muscleGroup).filter(
         (ex) => !selectedExerciseIds.has(ex.id)
-      );
-
-      // Apply equipment filter
-      availableExercises = availableExercises.filter(
-        (ex) => !ex.equipment || ex.equipment === 'none' || (ex.equipment === 'elastic-band' && hasElasticBands)
-      );
-
-      // Filter out excluded exercises
-      availableExercises = availableExercises.filter(
-        (ex) => !excludedExerciseIds.includes(ex.id)
       );
 
       if (availableExercises.length > 0) {

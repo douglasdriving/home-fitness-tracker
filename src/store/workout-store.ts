@@ -109,6 +109,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         hasElasticBands: userProfile.equipment?.hasElasticBands || false,
         excludedExerciseIds: userProfile.excludedExercises || [],
         timeConstraintMinutes,
+        exerciseAchievements: userProfile.exerciseAchievements || { unlockedExercises: [], retiredExercises: [] },
       });
 
       // Save to database

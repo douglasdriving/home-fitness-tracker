@@ -9,7 +9,7 @@ export default function BottomNav() {
     { path: '/', label: 'Home', icon: '🏠' },
     // { path: '/challenges', label: 'Challenges', icon: '🏆' }, // Hidden - work in progress
     { path: '/history', label: 'History', icon: '📊' },
-    { path: '/progress', label: 'Progress', icon: '📈' },
+    { path: '/exercises', label: 'Exercises', icon: '💪' },
     { path: '/settings', label: 'Settings', icon: '⚙️' },
   ];
 
