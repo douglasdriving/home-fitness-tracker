@@ -493,15 +493,3 @@ export const ALL_CHALLENGES: Challenge[] = [
 export function getChallengesByLevel(level: number): Challenge[] {
   return ALL_CHALLENGES.filter((c) => c.level === level);
 }
-
-export function getChallengeById(id: string): Challenge | undefined {
-  return ALL_CHALLENGES.find((c) => c.id === id);
-}
-
-export function getTotalChallengesInLevel(level: number): number {
-  return getChallengesByLevel(level).length;
-}
-
-export function getNextLevel(currentLevel: number): number | null {
-  return currentLevel < 7 ? currentLevel + 1 : null;
-}

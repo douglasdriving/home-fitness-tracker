@@ -12,5 +12,9 @@ direnv allow
 # Install npm dependencies using the flake environment
 direnv exec . npm install
 
+# Install git hooks (dead code scanner pre-commit hook)
+echo "Installing git hooks..."
+direnv exec . npm run hooks:install
+
 echo ""
 echo "Setup complete! Run 'npm run dev' to start the dev server."

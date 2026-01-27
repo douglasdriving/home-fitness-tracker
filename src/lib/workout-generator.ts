@@ -307,25 +307,6 @@ function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
 }
 
 /**
- * Get recently used exercise IDs from workout history
- * Returns IDs from last 2 workouts to ensure variety
- */
-export function getRecentExerciseIds(recentWorkouts: Workout[]): string[] {
-  const exerciseIds = new Set<string>();
-
-  // Get last 2 workouts
-  const lastTwo = recentWorkouts.slice(-2);
-
-  lastTwo.forEach((workout) => {
-    workout.exercises.forEach((exercise) => {
-      exerciseIds.add(exercise.exerciseId);
-    });
-  });
-
-  return Array.from(exerciseIds);
-}
-
-/**
  * Get a map of exercise IDs to their last used workout number
  * Used to prioritize exercises that haven't been used recently
  *

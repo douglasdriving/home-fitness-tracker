@@ -129,7 +129,3 @@ export const totalStretchingDuration = stretchingRoutine.reduce(
   (sum, stretch) => sum + stretch.duration,
   0
 );
-
-export function getStretchById(id: string): StretchExercise | undefined {
-  return stretchingRoutine.find((stretch) => stretch.id === id);
-}

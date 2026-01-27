@@ -20,10 +20,3 @@ export const isStandalone = (): boolean => {
   );
 };
 
-/**
- * Detects if the device is iOS Safari (not in-app browser)
- */
-export const isIOSSafari = (): boolean => {
-  const userAgent = window.navigator.userAgent.toLowerCase();
-  return isIOS() && /safari/.test(userAgent) && !/crios|fxios/.test(userAgent);
-};
