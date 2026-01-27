@@ -9,14 +9,25 @@
       "patterns": "Array of regex patterns to match against file paths or export names"
     },
     "examples": {
-      "files_example": ["src/utils/test-helpers.ts", "src/types/external-api.ts"],
-      "exports_example": ["src/lib/utils.ts:internalHelper", "src/api/types.ts:ApiResponse"],
-      "patterns_example": [".*\\.test\\.ts$", ".*\\.d\\.ts$", ".*__mocks__.*"]
+      "files_example": [
+        "src/utils/test-helpers.ts",
+        "src/types/external-api.ts"
+      ],
+      "exports_example": [
+        "src/lib/utils.ts:internalHelper",
+        "src/api/types.ts:ApiResponse"
+      ],
+      "patterns_example": [
+        ".*\\.test\\.ts$",
+        ".*\\.d\\.ts$",
+        ".*__mocks__.*"
+      ]
     },
     "review_process": "Before adding an exception, ask: 1) Is this code actually used? 2) Can the scanner be improved to detect its usage? 3) Is there a better way to structure the code? Only proceed if all answers point to a legitimate exception."
   },
   "files": [
-    "src/vite-env.d.ts"
+    "src/vite-env.d.ts",
+    "src/__test_dead_code__.ts"
   ],
   "exports": [
     "src/App.tsx:default"

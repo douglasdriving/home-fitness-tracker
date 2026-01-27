@@ -13,7 +13,7 @@ import IOSInstallPrompt from '../components/common/IOSInstallPrompt';
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise, updateWorkoutFrequencyDays } = useUserStore();
+  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
@@ -316,34 +316,6 @@ export default function Settings() {
                 </div>
               </div>
             </label>
-          </div>
-        </div>
-
-        {/* Workout Frequency */}
-        <div className="border-b border-background-lighter pb-6">
-          <h2 className="text-lg font-semibold text-text mb-4">Workout Frequency</h2>
-          <p className="text-sm text-text-muted mb-4">
-            Set how often you want to work out. Your streak tracks consecutive workouts within this frequency.
-          </p>
-          <div className="space-y-3">
-            <label className="block">
-              <span className="text-sm font-medium text-text">Work out every...</span>
-              <select
-                value={profile?.workoutFrequencyDays || 2}
-                onChange={(e) => updateWorkoutFrequencyDays(Number(e.target.value))}
-                className="mt-2 block w-full p-3 bg-background-light rounded-lg text-text border border-background-lighter focus:ring-2 focus:ring-primary focus:border-transparent"
-              >
-                <option value={1}>Every day (no rest days)</option>
-                <option value={2}>Every 2 days (1 day rest max)</option>
-                <option value={3}>Every 3 days (2 days rest max)</option>
-                <option value={4}>Every 4 days (3 days rest max)</option>
-                <option value={5}>Every 5 days (4 days rest max)</option>
-                <option value={7}>Once a week</option>
-              </select>
-            </label>
-            <p className="text-xs text-text-muted">
-              Your streak counts consecutive workouts. If you skip too many days, your streak resets.
-            </p>
           </div>
         </div>
 

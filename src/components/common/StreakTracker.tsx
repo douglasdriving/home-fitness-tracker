@@ -10,44 +10,26 @@ export default function StreakTracker() {
     return null;
   }
 
-  const frequencyDays = profile.workoutFrequencyDays || 2; // Default: work out every 2 days
-  const streakInfo = calculateStreak(workoutHistory, frequencyDays);
-
-  // Get friendly time message
-  const getLastWorkoutText = () => {
-    if (streakInfo.daysSinceLastWorkout === null) {
-      return 'No workouts yet';
-    }
-    if (streakInfo.daysSinceLastWorkout === 0) {
-      return 'Today';
-    }
-    if (streakInfo.daysSinceLastWorkout === 1) {
-      return '1 day ago';
-    }
-    return `${streakInfo.daysSinceLastWorkout} days ago`;
-  };
+  const streakInfo = calculateStreak(workoutHistory);
 
   return (
     <div className="mb-6">
-      {/* Last Workout */}
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs text-text-muted">Last workout</span>
-        <span className={`text-sm font-medium ${
-          streakInfo.streakAtRisk ? 'text-yellow-400' : 'text-text'
-        }`}>
-          {getLastWorkoutText()}
-        </span>
-      </div>
-
       {/* Streak Display */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2">
         <div className="flex items-baseline gap-2">
           <span className={`text-3xl font-bold ${
             streakInfo.currentStreak > 0 ? 'text-primary' : 'text-text-muted'
           }`}>
             {streakInfo.currentStreak}
           </span>
-          <span className="text-sm text-text-muted">workout streak</span>
+          <span className="text-sm text-text-muted">
+            week{streakInfo.currentStreak !== 1 ? 's' : ''} streak
+          </span>
+          {streakInfo.workedOutThisWeek && (
+            <span className="text-green-400 text-sm" title="Worked out this week">
+              ✓
+            </span>
+          )}
         </div>
 
         {streakInfo.longestStreak > streakInfo.currentStreak && (
@@ -60,15 +42,12 @@ export default function StreakTracker() {
         )}
       </div>
 
-      {/* Next Workout Message */}
-      {streakInfo.currentStreak > 0 && (
-        <div className={`text-xs ${
-          streakInfo.streakAtRisk ? 'text-yellow-400' : 'text-text-muted'
-        }`}>
-          {getNextWorkoutMessage(streakInfo, frequencyDays)}
-          {streakInfo.streakAtRisk && ' 🔥'}
-        </div>
-      )}
+      {/* Status Message */}
+      <div className={`text-xs ${
+        streakInfo.streakAtRisk ? 'text-yellow-400' : 'text-text-muted'
+      }`}>
+        {getNextWorkoutMessage(streakInfo)}
+      </div>
     </div>
   );
 }

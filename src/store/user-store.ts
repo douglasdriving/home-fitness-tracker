@@ -22,7 +22,6 @@ interface UserStore {
   excludeExercise: (exerciseId: string) => void;
   includeExercise: (exerciseId: string) => void;
   setBackfillCompleted: () => void;
-  updateWorkoutFrequencyDays: (days: number) => void;
   initializeChallengeState: (startingLevel: number) => void;
   completeChallenge: (challengeId: string, value: number) => void;
   updateChallengeLevel: (newLevel: number) => void;
@@ -143,19 +142,6 @@ export const useUserStore = create<UserStore>((set, get) => ({
     const updatedProfile: UserProfile = {
       ...profile,
       hasBackfilledStrengthData: true,
-    };
-
-    saveUserProfile(updatedProfile);
-    set({ profile: updatedProfile });
-  },
-
-  updateWorkoutFrequencyDays: (days: number) => {
-    const profile = get().profile;
-    if (!profile) return;
-
-    const updatedProfile: UserProfile = {
-      ...profile,
-      workoutFrequencyDays: days,
     };
 
     saveUserProfile(updatedProfile);
