@@ -1,0 +1,23 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/eslint-autofix-hook.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/enforce-testing-hook.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/hooks/verify-pr-hook.sh"
+          }
+        ]
+      }
+    ]
+  }
+}

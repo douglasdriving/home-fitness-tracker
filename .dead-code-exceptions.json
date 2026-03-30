@@ -27,7 +27,8 @@
   },
   "files": [
     "src/vite-env.d.ts",
-    "src/__test_dead_code__.ts"
+    "src/__test_dead_code__.ts",
+    "src/test/setup.ts"
   ],
   "exports": [
     "src/App.tsx:default"

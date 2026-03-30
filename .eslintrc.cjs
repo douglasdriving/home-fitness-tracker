@@ -26,4 +26,12 @@ module.exports = {
       },
     ],
   },
+  overrides: [
+    {
+      files: ['e2e/**/*.ts', 'e2e/**/*.spec.ts'],
+      rules: {
+        'no-constant-condition': 'off',
+      },
+    },
+  ],
 }

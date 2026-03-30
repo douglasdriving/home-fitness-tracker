@@ -383,19 +383,3 @@ export function getAvailableExercises(
     }));
 }
 
-/**
- * Get exercise counts by status
- */
-export function getExerciseStatusCounts(
-  workoutHistory: WorkoutHistoryEntry[],
-  achievements: ExerciseAchievements,
-  hasElasticBands: boolean
-): { active: number; locked: number; retired: number } {
-  const statuses = getExerciseStatuses(workoutHistory, achievements, hasElasticBands);
-
-  return {
-    active: statuses.filter(ex => ex.status === 'active').length,
-    locked: statuses.filter(ex => ex.status === 'locked').length,
-    retired: statuses.filter(ex => ex.status === 'retired').length,
-  };
-}

@@ -20,12 +20,12 @@ export default function ChallengeAttempt() {
 
   useEffect(() => {
     // Request wake lock when challenge starts
-    let wakeLock: any = null;
+    let wakeLock: WakeLockSentinel | null = null;
 
     const requestWakeLock = async () => {
       if ('wakeLock' in navigator) {
         try {
-          wakeLock = await (navigator as any).wakeLock.request('screen');
+          wakeLock = await navigator.wakeLock.request('screen');
         } catch (err) {
           console.log('Wake lock failed:', err);
         }
@@ -73,7 +73,7 @@ export default function ChallengeAttempt() {
 
       // Update strength levels based on challenge completion
       const strengthBoost = challenge.strengthMultiplier * 2; // Small boost per challenge
-      const updates: any = {};
+      const updates: Partial<{ abs: number; glutes: number; lowerBack: number }> = {};
 
       challenge.muscleGroups.forEach((muscle) => {
         if (muscle === 'abs') {

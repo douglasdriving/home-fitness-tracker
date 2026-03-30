@@ -11,6 +11,9 @@
     "test": "vitest",
     "test:e2e": "playwright test",
     "scan:dead-code": "node scripts/dead-code-scanner.js",
+    "scan:dead-components": "bash scripts/hooks/check-dead-components.sh",
+    "verify": "bash scripts/hooks/verify-pr.sh",
+    "test:hooks": "bash scripts/hooks/__tests__/check-dead-components.test.sh && bash scripts/hooks/__tests__/verify-pr.test.sh",
     "hooks:install": "node scripts/install-hooks.js",
     "prepare": "node scripts/install-hooks.js"
   },

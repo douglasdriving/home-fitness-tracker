@@ -7,7 +7,7 @@
  */
 export const isIOSStandalone = (): boolean => {
   return (
-    ('standalone' in window.navigator && (window.navigator as any).standalone === true) ||
+    ('standalone' in window.navigator && (window.navigator as Navigator & { standalone?: boolean }).standalone === true) ||
     window.matchMedia('(display-mode: standalone)').matches
   );
 };
@@ -23,7 +23,7 @@ export const initPWAMode = () => {
     isStandalone,
     isIOS,
     displayMode: window.matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser',
-    navigatorStandalone: (window.navigator as any).standalone,
+    navigatorStandalone: (window.navigator as Navigator & { standalone?: boolean }).standalone,
   });
 
   // Prevent external links from breaking out of standalone mode

@@ -16,7 +16,7 @@ export default function Settings() {
   const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [deferredPrompt, setDeferredPrompt] = useState<(Event & { prompt(): void; userChoice: Promise<{ outcome: string }> }) | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
     const [isSeeding, setIsSeeding] = useState(false);
 
@@ -25,7 +25,7 @@ export default function Settings() {
       // Prevent the default browser install prompt
       e.preventDefault();
       // Store the event for later use
-      setDeferredPrompt(e);
+      setDeferredPrompt(e as Event & { prompt(): void; userChoice: Promise<{ outcome: string }> });
       setIsInstallable(true);
     };
 
