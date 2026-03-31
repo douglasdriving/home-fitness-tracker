@@ -31,13 +31,30 @@ assert_exit_code() {
   fi
 }
 
+assert_output_contains() {
+  local description="$1"
+  local expected_text="$2"
+  local actual_output="$3"
+
+  if echo "$actual_output" | grep -q "$expected_text"; then
+    echo -e "${GREEN}PASS${NC}: $description"
+    PASS=$((PASS + 1))
+  else
+    echo -e "${RED}FAIL${NC}: $description (output did not contain '$expected_text')"
+    echo "  Actual output: $actual_output"
+    FAIL=$((FAIL + 1))
+  fi
+}
+
 echo "=== check-dead-components.sh tests ==="
 echo ""
 
-# Test 1: No dead components in clean codebase
-echo "Test 1: Clean codebase has no dead components"
-bash "$SCRIPT" > /dev/null 2>&1
-assert_exit_code "Clean codebase passes" 0 $?
+# Test 1: Script produces output and exits cleanly (pipefail regression test)
+echo "Test 1: Script completes and produces output (pipefail regression)"
+OUTPUT=$(bash "$SCRIPT" 2>&1)
+EXIT_CODE=$?
+assert_exit_code "Clean codebase passes" 0 $EXIT_CODE
+assert_output_contains "Script produces success message" "No dead components found" "$OUTPUT"
 
 # Test 2: Detect a dead component
 echo ""
@@ -49,9 +66,10 @@ export default function DeadTestComponent() {
 }
 EOF
 
-bash "$SCRIPT" > /dev/null 2>&1
+OUTPUT=$(bash "$SCRIPT" 2>&1)
 EXIT_CODE=$?
 assert_exit_code "Detects dead component (exit 1)" 1 $EXIT_CODE
+assert_output_contains "Reports dead component in output" "DeadTestComponent" "$OUTPUT"
 
 # Clean up
 rm -f "$DEAD_FILE"

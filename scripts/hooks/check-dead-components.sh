@@ -40,14 +40,14 @@ while IFS= read -r file; do
     | grep -v "$file" \
     | grep -v '\.test\.' \
     | grep -v '\.spec\.' \
-    | wc -l)
+    | wc -l || true)
 
   if [ "$import_count" -eq 0 ]; then
     # Double-check with dynamic imports
     dynamic_count=$(grep -r --include='*.ts' --include='*.tsx' \
       "import(.*${basename})" "$SRC_DIR" 2>/dev/null \
       | grep -v "$file" \
-      | wc -l)
+      | wc -l || true)
 
     if [ "$dynamic_count" -eq 0 ]; then
       DEAD_COMPONENTS+=("$file")
