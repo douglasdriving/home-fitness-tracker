@@ -108,6 +108,9 @@ test.describe('Workout Completion Flow', () => {
     // Should show "Exercise Performance" section
     await expect(page.getByText(/exercise performance/i)).toBeVisible();
 
+    // First workout ever - should show "first time completing this exercise" for exercises
+    await expect(page.getByText(/first time completing this exercise/i).first()).toBeVisible();
+
     // Should NOT show old aggregate stats
     await expect(page.getByText('total reps')).not.toBeVisible();
     await expect(page.getByText('time under tension')).not.toBeVisible();

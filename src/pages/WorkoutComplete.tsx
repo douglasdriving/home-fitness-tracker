@@ -194,14 +194,17 @@ export default function WorkoutComplete() {
                   </div>
 
                   {/* Personal best comparison */}
-                  {bestValue !== undefined && (
+                  {bestValue === undefined ? (
+                    <div className="text-xs text-secondary">
+                      First time completing this exercise!
+                    </div>
+                  ) : isNewPB ? (
+                    <div className="text-xs text-primary">
+                      Improved from previous best: {bestValue}{isRepsExercise ? ' reps' : 's'}
+                    </div>
+                  ) : (
                     <div className="text-xs text-text-muted">
                       Personal best: {bestValue}{isRepsExercise ? ' reps' : 's'}
-                      {isNewPB && (
-                        <span className="text-primary ml-1">
-                          → {currentBest}{isRepsExercise ? ' reps' : 's'}
-                        </span>
-                      )}
                     </div>
                   )}
                 </div>

@@ -112,25 +112,89 @@ describe('WorkoutComplete', () => {
       expect(screen.getByText(/28/)).toBeInTheDocument();
     });
 
-    it('shows personal best comparison for exercises', async () => {
+    it('shows "first time" message when no previous history exists', async () => {
       const { getBestPerformance } = await import('../lib/achievement-tracker');
-      (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue({ reps: 32 });
+      (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue(null);
 
       renderWithRouter(mockWorkout);
 
-      // Should show personal best indicator - the best set (35) beat the PB (32)
-      expect(screen.getByText(/personal best/i)).toBeInTheDocument();
+      expect(screen.getByText(/first time completing this exercise/i)).toBeInTheDocument();
     });
 
-    it('shows improvement indicator when performance beats PB', async () => {
+    it('shows improvement amount when performance beats previous PB', async () => {
       const { getBestPerformance } = await import('../lib/achievement-tracker');
-      // PB was 32 reps, this workout achieved 35
+      // Previous PB was 32 reps, this workout achieved 35 (best set)
       (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue({ reps: 32 });
 
       renderWithRouter(mockWorkout);
 
-      // Should show "New PB!" or similar indicator
+      // Should show New PB badge
       expect(screen.getByText(/new pb/i)).toBeInTheDocument();
+      // Should clearly show the improvement from old PB to new
+      expect(screen.getByText(/improved from previous best: 32 reps/i)).toBeInTheDocument();
+    });
+
+    it('shows previous personal best when no improvement made', async () => {
+      const { getBestPerformance } = await import('../lib/achievement-tracker');
+      // PB is 40 reps, best set this workout is 35 - no improvement
+      (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue({ reps: 40 });
+
+      renderWithRouter(mockWorkout);
+
+      expect(screen.getByText(/personal best: 40 reps/i)).toBeInTheDocument();
+      // Should NOT show improvement or first-time messages
+      expect(screen.queryByText(/improved/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/first time/i)).not.toBeInTheDocument();
+    });
+
+    it('shows "first time" for timed exercises with no history', async () => {
+      const { getBestPerformance } = await import('../lib/achievement-tracker');
+      (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue(null);
+
+      const timedWorkout: WorkoutHistoryEntry = {
+        ...mockWorkout,
+        exercises: [
+          {
+            exerciseId: 'plank-001',
+            exerciseName: 'Plank',
+            muscleGroups: ['abs'],
+            completedSets: [
+              { setNumber: 1, actualDuration: 45 },
+              { setNumber: 2, actualDuration: 40 },
+            ],
+          },
+        ],
+      };
+
+      renderWithRouter(timedWorkout);
+
+      expect(screen.getByText(/first time completing this exercise/i)).toBeInTheDocument();
+    });
+
+    it('shows improvement for timed exercises when beating PB', async () => {
+      const { getBestPerformance } = await import('../lib/achievement-tracker');
+      // Previous PB was 40s, this workout achieved 45s
+      (getBestPerformance as ReturnType<typeof vi.fn>).mockReturnValue({ duration: 40 });
+
+      const timedWorkout: WorkoutHistoryEntry = {
+        ...mockWorkout,
+        exercises: [
+          {
+            exerciseId: 'plank-001',
+            exerciseName: 'Plank',
+            muscleGroups: ['abs'],
+            completedSets: [
+              { setNumber: 1, actualDuration: 45 },
+              { setNumber: 2, actualDuration: 40 },
+            ],
+          },
+        ],
+      };
+
+      renderWithRouter(timedWorkout);
+
+      expect(screen.getByText(/new pb/i)).toBeInTheDocument();
+      expect(screen.getByText(/improved from previous best: 40s/i)).toBeInTheDocument();
     });
   });
 
