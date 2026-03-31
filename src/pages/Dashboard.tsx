@@ -4,7 +4,6 @@ import { useUserStore } from '../store/user-store';
 import { useWorkoutStore } from '../store/workout-store';
 import { db } from '../db/db';
 import Button from '../components/common/Button';
-import DietTipsModal from '../components/common/DietTipsModal';
 import StreakTracker from '../components/common/StreakTracker';
 import StorageWarning from '../components/common/StorageWarning';
 
@@ -20,11 +19,9 @@ interface StretchState {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const { currentWorkout, loadWorkouts, generateNewWorkout, startWorkout, loadHistory, workoutHistory } =
+  const { currentWorkout, loadWorkouts, generateNewWorkout, startWorkout, loadHistory } =
     useWorkoutStore();
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
-  const [showDietTips, setShowDietTips] = useState(false);
-  const [hasCompletedWorkoutToday, setHasCompletedWorkoutToday] = useState(false);
   const [timeConstraint, setTimeConstraint] = useState<string>('');
   const [activeStretchSession, setActiveStretchSession] = useState<StretchState | null>(null);
 
@@ -49,24 +46,6 @@ export default function Dashboard() {
       setActiveStretchSession(null);
     }
   }, []);
-
-  // Check if user has completed a workout today
-  useEffect(() => {
-    const checkTodayWorkout = async () => {
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const todayTimestamp = today.getTime();
-
-      const history = await db.history.toArray();
-      const hasWorkoutToday = history.some(
-        (workout) => workout.completedDate >= todayTimestamp
-      );
-
-      setHasCompletedWorkoutToday(hasWorkoutToday);
-    };
-
-    checkTodayWorkout();
-  }, [workoutHistory]);
 
   // Check which exercises in current workout are new
   useEffect(() => {
@@ -309,28 +288,7 @@ export default function Dashboard() {
           </div>
         )} */}
 
-        {/* Diet Tips Button - Show after completing workout today */}
-        {hasCompletedWorkoutToday && !currentWorkout && (
-          <div className="mt-4 bg-green-50 border border-green-200 rounded-lg p-4">
-            <div className="flex items-center mb-2">
-              <span className="text-2xl mr-2">🥗</span>
-              <h3 className="font-semibold text-green-900">Post-Workout Nutrition</h3>
-            </div>
-            <p className="text-sm text-green-800 mb-3">
-              You've completed your workout! Check out nutrition tips to optimize your recovery.
-            </p>
-            <button
-              onClick={() => setShowDietTips(true)}
-              className="w-full bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium"
-            >
-              View Diet Tips
-            </button>
-          </div>
-        )}
       </div>
-
-      {/* Diet Tips Modal */}
-      {showDietTips && <DietTipsModal onClose={() => setShowDietTips(false)} />}
     </div>
   );
 }
