@@ -124,11 +124,33 @@ assert_no_block_decision() {
   fi
 }
 
+# Helper: create a transcript JSONL file with optional Bash test commands
+TRANSCRIPT_DIR=$(mktemp -d)
+TRANSCRIPT_WITH_TESTS="$TRANSCRIPT_DIR/with-tests.jsonl"
+TRANSCRIPT_WITHOUT_TESTS="$TRANSCRIPT_DIR/without-tests.jsonl"
+
+cat > "$TRANSCRIPT_WITH_TESTS" << 'TEOF'
+{"type":"user","message":{"role":"user","content":"Run tests"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"toolu_123","name":"Bash","input":{"command":"npm run test"}}]}}
+{"type":"user","message":{"role":"user","content":[{"type":"tool_result","tool_use_id":"toolu_123","content":"All tests passed"}]}}
+TEOF
+
+cat > "$TRANSCRIPT_WITHOUT_TESTS" << 'TEOF'
+{"type":"user","message":{"role":"user","content":"Fix the bug"}}
+{"type":"assistant","message":{"role":"assistant","content":[{"type":"tool_use","id":"toolu_123","name":"Bash","input":{"command":"npm run build"}}]}}
+TEOF
+
+cleanup_transcripts() {
+  rm -rf "$TRANSCRIPT_DIR"
+}
+trap 'cleanup_retry_files; cleanup_transcripts' EXIT
+
 # Helper: create stdin JSON for stop hooks
 make_stop_input() {
   local stop_hook_active="${1:-false}"
+  local transcript_path="${2:-$TRANSCRIPT_WITHOUT_TESTS}"
   cat <<EOF
-{"hook_event_name":"Stop","stop_hook_active":$stop_hook_active,"transcript_summary":"User asked for a random change","last_assistant_message":"Done."}
+{"hook_event_name":"Stop","stop_hook_active":$stop_hook_active,"transcript_path":"$transcript_path","last_assistant_message":"Done."}
 EOF
 }
 
@@ -201,8 +223,8 @@ TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_retry.ts"
 echo "export const testRetry = 42;" > "$TEMP_SRC"
 git add "$TEMP_SRC" > /dev/null 2>&1
 
-TRANSCRIPT_INPUT=$(cat <<'INPUTEOF'
-{"hook_event_name":"Stop","stop_hook_active":true,"transcript_summary":"User asked for a random change. Claude edited a file.","last_assistant_message":"Done with the change."}
+TRANSCRIPT_INPUT=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":true,"transcript_path":"$TRANSCRIPT_WITHOUT_TESTS","last_assistant_message":"Done with the change."}
 INPUTEOF
 )
 
@@ -250,8 +272,8 @@ TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_exhaust.ts"
 echo "export const testExhaust = 42;" > "$TEMP_SRC"
 git add "$TEMP_SRC" > /dev/null 2>&1
 
-TRANSCRIPT_NO_TESTS=$(cat <<'INPUTEOF'
-{"hook_event_name":"Stop","stop_hook_active":true,"transcript_summary":"User asked for a random change.","last_assistant_message":"Done."}
+TRANSCRIPT_NO_TESTS=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":true,"transcript_path":"$TRANSCRIPT_WITHOUT_TESTS","last_assistant_message":"Done."}
 INPUTEOF
 )
 
@@ -285,8 +307,8 @@ TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_reset.ts"
 echo "export const testReset = 42;" > "$TEMP_SRC"
 git add "$TEMP_SRC" > /dev/null 2>&1
 
-TRANSCRIPT_NO_TESTS=$(cat <<'INPUTEOF'
-{"hook_event_name":"Stop","stop_hook_active":false,"transcript_summary":"User asked for a random change.","last_assistant_message":"Done."}
+TRANSCRIPT_NO_TESTS=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":false,"transcript_path":"$TRANSCRIPT_WITHOUT_TESTS","last_assistant_message":"Done."}
 INPUTEOF
 )
 
@@ -322,9 +344,9 @@ TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp.ts"
 echo "export const testTemp = 42;" > "$TEMP_SRC"
 git add "$TEMP_SRC" > /dev/null 2>&1
 
-# Provide a transcript that does NOT mention test execution
-TRANSCRIPT_INPUT=$(cat <<'INPUTEOF'
-{"hook_event_name":"Stop","stop_hook_active":false,"transcript_summary":"User asked for a random change. Claude edited a file.","last_assistant_message":"Done with the change."}
+# Provide a transcript that does NOT contain test execution
+TRANSCRIPT_INPUT=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":false,"transcript_path":"$TRANSCRIPT_WITHOUT_TESTS","last_assistant_message":"Done with the change."}
 INPUTEOF
 )
 
@@ -356,6 +378,81 @@ assert_json_has_block_decision "verify-pr-hook outputs block decision for untrac
 
 # Clean up
 rm -f "$DEAD_FILE"
+
+# ============================================================
+# Test Group 6: Transcript-based test detection
+# ============================================================
+echo ""
+echo "--- Test Group 6: Transcript-based test detection ---"
+echo ""
+
+# Test 6.1: enforce-testing-hook allows when transcript contains test commands
+echo "Test 6.1: enforce-testing-hook allows when transcript has test execution"
+cleanup_retry_files
+
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_transcript.ts"
+echo "export const testTranscript = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_INPUT=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":false,"transcript_path":"$TRANSCRIPT_WITH_TESTS","last_assistant_message":"Done."}
+INPUTEOF
+)
+
+OUTPUT=$(echo "$TRANSCRIPT_INPUT" | bash "$TESTING_HOOK" 2>/dev/null)
+EXIT_CODE=$?
+assert_exit_code "enforce-testing-hook exits 0 with transcript tests" 0 $EXIT_CODE
+assert_no_block_decision "enforce-testing-hook allows when transcript has test commands" "$OUTPUT"
+
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
+
+# Test 6.2: enforce-testing-hook blocks when transcript exists but has no test commands
+echo ""
+echo "Test 6.2: enforce-testing-hook blocks when transcript has no test commands"
+cleanup_retry_files
+
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_no_transcript.ts"
+echo "export const testNoTranscript = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_INPUT=$(cat <<INPUTEOF
+{"hook_event_name":"Stop","stop_hook_active":false,"transcript_path":"$TRANSCRIPT_WITHOUT_TESTS","last_assistant_message":"Done."}
+INPUTEOF
+)
+
+OUTPUT=$(echo "$TRANSCRIPT_INPUT" | bash "$TESTING_HOOK" 2>/dev/null)
+EXIT_CODE=$?
+assert_exit_code "enforce-testing-hook exits 0 without transcript tests" 0 $EXIT_CODE
+assert_json_has_block_decision "enforce-testing-hook blocks when transcript lacks test commands" "$OUTPUT"
+
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
+
+# Test 6.3: enforce-testing-hook blocks when transcript_path is missing
+echo ""
+echo "Test 6.3: enforce-testing-hook blocks when no transcript_path provided"
+cleanup_retry_files
+
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_no_path.ts"
+echo "export const testNoPath = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_INPUT=$(cat <<'INPUTEOF'
+{"hook_event_name":"Stop","stop_hook_active":false,"last_assistant_message":"Done."}
+INPUTEOF
+)
+
+OUTPUT=$(echo "$TRANSCRIPT_INPUT" | bash "$TESTING_HOOK" 2>/dev/null)
+EXIT_CODE=$?
+assert_exit_code "enforce-testing-hook exits 0 without transcript path" 0 $EXIT_CODE
+assert_json_has_block_decision "enforce-testing-hook blocks when no transcript_path" "$OUTPUT"
+
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
 
 # ============================================================
 # Summary

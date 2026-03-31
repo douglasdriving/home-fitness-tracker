@@ -3,8 +3,8 @@
 # enforce-testing-hook.sh - Claude Stop hook
 #
 # Blocks Claude from stopping if code was changed but no tests were
-# written or run during the session. Checks the conversation context
-# from the stop hook input for evidence of test execution.
+# written or run during the session. Parses the transcript JSONL file
+# for Bash tool_use entries containing test commands (npm run test, etc).
 #
 # Usage: Configured as a Claude "Stop" hook in .claude/settings.json
 #
@@ -54,12 +54,21 @@ if [ -z "$NON_TEST_CHANGES" ]; then
   exit 0
 fi
 
-# Check transcript/summary from hook input for evidence of test execution
-TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_summary // ""' 2>/dev/null)
-LAST_MSG=$(echo "$INPUT" | jq -r '.last_assistant_message // ""' 2>/dev/null)
-COMBINED="${TRANSCRIPT} ${LAST_MSG}"
+# Check transcript file for evidence of test execution via Bash tool calls
+TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null)
 
-if echo "$COMBINED" | grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
+if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
+  # Search for Bash tool_use entries containing test commands in the transcript JSONL
+  if grep -E '"tool_use"' "$TRANSCRIPT_PATH" 2>/dev/null | \
+     grep -E '"name"\s*:\s*"Bash"' | \
+     grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
+    exit 0
+  fi
+fi
+
+# Fallback: check last_assistant_message for test evidence
+LAST_MSG=$(echo "$INPUT" | jq -r '.last_assistant_message // ""' 2>/dev/null)
+if echo "$LAST_MSG" | grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
   exit 0
 fi
 
