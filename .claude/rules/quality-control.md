@@ -8,6 +8,8 @@ Claude Code hooks run automatically during sessions. Configured in `.claude/sett
 2. **enforce-testing-hook.sh** - Blocks if source code changed but no tests were run
 3. **verify-pr-hook.sh** - Runs full verification suite on changed code
 
+Hooks use **retry-based re-verification**: when a hook blocks Claude and Claude tries to stop again (`stop_hook_active=true`), hooks re-run their checks up to 2 additional times. This ensures Claude's fixes are verified. After max retries, hooks bail out to prevent infinite loops.
+
 ### Hook Scripts Location
 - `.claude/hooks/` - Claude Code hook scripts
 - `scripts/hooks/` - Reusable quality control scripts

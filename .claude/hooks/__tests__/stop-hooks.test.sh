@@ -7,7 +7,8 @@
 #   - Exit code 0 with JSON {"decision":"block","reason":"..."} to block
 #   - Exit code 0 with no output (or empty) to allow
 #   - Hooks must read JSON input from stdin (including stop_hook_active flag)
-#   - Hooks must NOT exit with code 1/2 (non-blocking/blocking error)
+#   - Hooks re-verify on retries (stop_hook_active=true) up to MAX_RETRIES
+#   - Hooks bail out after MAX_RETRIES to prevent infinite loops
 #
 # Run with: bash .claude/hooks/__tests__/stop-hooks.test.sh
 
@@ -26,6 +27,20 @@ NC='\033[0m'
 
 PASS=0
 FAIL=0
+
+# Retry files use md5sum of pwd — compute once for cleanup
+PWD_HASH=$(pwd | md5sum | cut -d' ' -f1)
+ESLINT_RETRY_FILE="/tmp/claude-eslint-hook-retries-${PWD_HASH}"
+TESTING_RETRY_FILE="/tmp/claude-testing-hook-retries-${PWD_HASH}"
+VERIFY_RETRY_FILE="/tmp/claude-verify-hook-retries-${PWD_HASH}"
+
+cleanup_retry_files() {
+  rm -f "$ESLINT_RETRY_FILE" "$TESTING_RETRY_FILE" "$VERIFY_RETRY_FILE"
+}
+
+# Clean up at start and on exit
+cleanup_retry_files
+trap cleanup_retry_files EXIT
 
 assert_exit_code() {
   local description="$1"
@@ -171,53 +186,146 @@ OUTPUT=$(make_stop_input | bash "$VERIFY_HOOK" 2>/dev/null)
 assert_valid_json_or_empty "verify-pr-hook output format" "$OUTPUT"
 
 # ============================================================
-# Test Group 3: stop_hook_active bypass
+# Test Group 3: Retry behavior (hooks re-verify on stop_hook_active)
 # ============================================================
 echo ""
-echo "--- Test Group 3: stop_hook_active bypass ---"
+echo "--- Test Group 3: Retry behavior (re-verify on stop_hook_active) ---"
 echo ""
 
-# Test 3.1: eslint-autofix-hook allows stop when stop_hook_active=true
-echo "Test 3.1: eslint-autofix-hook respects stop_hook_active"
-OUTPUT=$(make_stop_input true | bash "$ESLINT_HOOK" 2>/dev/null)
+# Test 3.1: enforce-testing-hook still blocks on retry when issue persists
+echo "Test 3.1: enforce-testing-hook blocks on retry (stop_hook_active=true) when issue persists"
+cleanup_retry_files
+
+# Create a temporary source change
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_retry.ts"
+echo "export const testRetry = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_INPUT=$(cat <<'INPUTEOF'
+{"hook_event_name":"Stop","stop_hook_active":true,"transcript_summary":"User asked for a random change. Claude edited a file.","last_assistant_message":"Done with the change."}
+INPUTEOF
+)
+
+OUTPUT=$(echo "$TRANSCRIPT_INPUT" | bash "$TESTING_HOOK" 2>/dev/null)
 EXIT_CODE=$?
-assert_exit_code "eslint-autofix-hook exits 0 when stop_hook_active" 0 $EXIT_CODE
-assert_no_block_decision "eslint-autofix-hook does not block when stop_hook_active" "$OUTPUT"
+assert_exit_code "enforce-testing-hook exits 0 on retry" 0 $EXIT_CODE
+assert_json_has_block_decision "enforce-testing-hook blocks on first retry" "$OUTPUT"
 
-# Test 3.2: enforce-testing-hook allows stop when stop_hook_active=true
-echo ""
-echo "Test 3.2: enforce-testing-hook respects stop_hook_active"
-OUTPUT=$(make_stop_input true | bash "$TESTING_HOOK" 2>/dev/null)
-EXIT_CODE=$?
-assert_exit_code "enforce-testing-hook exits 0 when stop_hook_active" 0 $EXIT_CODE
-assert_no_block_decision "enforce-testing-hook does not block when stop_hook_active" "$OUTPUT"
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
 
-# Test 3.3: verify-pr-hook allows stop when stop_hook_active=true
+# Test 3.2: verify-pr-hook still checks on retry when stop_hook_active=true
 echo ""
-echo "Test 3.3: verify-pr-hook respects stop_hook_active"
+echo "Test 3.2: verify-pr-hook still runs verification on retry"
+cleanup_retry_files
+
+DEAD_FILE="$PROJECT_ROOT/src/components/common/StopHookTestDeadRetry.tsx"
+cat > "$DEAD_FILE" << 'COMPEOF'
+export default function StopHookTestDeadRetry() {
+  return <div>dead</div>;
+}
+COMPEOF
+
 OUTPUT=$(make_stop_input true | bash "$VERIFY_HOOK" 2>/dev/null)
 EXIT_CODE=$?
-assert_exit_code "verify-pr-hook exits 0 when stop_hook_active" 0 $EXIT_CODE
-assert_no_block_decision "verify-pr-hook does not block when stop_hook_active" "$OUTPUT"
+assert_exit_code "verify-pr-hook exits 0 on retry" 0 $EXIT_CODE
+assert_json_has_block_decision "verify-pr-hook blocks on retry with dead component" "$OUTPUT"
+
+# Clean up
+rm -f "$DEAD_FILE"
 
 # ============================================================
-# Test Group 4: Blocking behavior with actual issues
+# Test Group 4: Retry exhaustion (bail out after MAX_RETRIES)
 # ============================================================
 echo ""
-echo "--- Test Group 4: Blocking on real issues ---"
+echo "--- Test Group 4: Retry exhaustion (bail out after MAX_RETRIES) ---"
 echo ""
 
-# Test 4.1: enforce-testing-hook blocks when source changed but no tests run
-echo "Test 4.1: enforce-testing-hook blocks when code changed without tests"
-# Create a temporary source change
+# Test 4.1: enforce-testing-hook bails out after MAX_RETRIES
+echo "Test 4.1: enforce-testing-hook allows stop after max retries"
+cleanup_retry_files
+
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_exhaust.ts"
+echo "export const testExhaust = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_NO_TESTS=$(cat <<'INPUTEOF'
+{"hook_event_name":"Stop","stop_hook_active":true,"transcript_summary":"User asked for a random change.","last_assistant_message":"Done."}
+INPUTEOF
+)
+
+# Retry 1 — should block
+OUTPUT=$(echo "$TRANSCRIPT_NO_TESTS" | bash "$TESTING_HOOK" 2>/dev/null)
+assert_json_has_block_decision "enforce-testing-hook blocks on retry 1" "$OUTPUT"
+
+# Retry 2 — should block
+OUTPUT=$(echo "$TRANSCRIPT_NO_TESTS" | bash "$TESTING_HOOK" 2>/dev/null)
+assert_json_has_block_decision "enforce-testing-hook blocks on retry 2" "$OUTPUT"
+
+# Retry 3 — should give up (MAX_RETRIES=2 exhausted)
+OUTPUT=$(echo "$TRANSCRIPT_NO_TESTS" | bash "$TESTING_HOOK" 2>/dev/null)
+EXIT_CODE=$?
+assert_exit_code "enforce-testing-hook exits 0 after exhaustion" 0 $EXIT_CODE
+assert_no_block_decision "enforce-testing-hook allows stop after max retries" "$OUTPUT"
+
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
+
+# Test 4.2: Fresh stop resets retry counter
+echo ""
+echo "Test 4.2: Fresh stop (stop_hook_active=false) resets retry counter"
+cleanup_retry_files
+
+# Simulate: first a retry that creates a counter
+echo "1" > "$TESTING_RETRY_FILE"
+
+TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp_reset.ts"
+echo "export const testReset = 42;" > "$TEMP_SRC"
+git add "$TEMP_SRC" > /dev/null 2>&1
+
+TRANSCRIPT_NO_TESTS=$(cat <<'INPUTEOF'
+{"hook_event_name":"Stop","stop_hook_active":false,"transcript_summary":"User asked for a random change.","last_assistant_message":"Done."}
+INPUTEOF
+)
+
+# Fresh stop should block (counter reset, runs checks normally)
+OUTPUT=$(echo "$TRANSCRIPT_NO_TESTS" | bash "$TESTING_HOOK" 2>/dev/null)
+assert_json_has_block_decision "enforce-testing-hook blocks on fresh stop after counter reset" "$OUTPUT"
+
+# Retry file should have been cleaned up by the fresh stop
+if [ ! -f "$TESTING_RETRY_FILE" ]; then
+  echo -e "${GREEN}PASS${NC}: Retry file cleaned up on fresh stop"
+  PASS=$((PASS + 1))
+else
+  echo -e "${RED}FAIL${NC}: Retry file still exists after fresh stop"
+  FAIL=$((FAIL + 1))
+fi
+
+# Clean up
+git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
+rm -f "$TEMP_SRC"
+
+# ============================================================
+# Test Group 5: Blocking behavior with actual issues (first attempt)
+# ============================================================
+echo ""
+echo "--- Test Group 5: Blocking on real issues (first attempt) ---"
+echo ""
+
+# Test 5.1: enforce-testing-hook blocks when source changed but no tests run
+echo "Test 5.1: enforce-testing-hook blocks when code changed without tests"
+cleanup_retry_files
+
 TEMP_SRC="$PROJECT_ROOT/src/lib/__stop_hook_test_temp.ts"
 echo "export const testTemp = 42;" > "$TEMP_SRC"
 git add "$TEMP_SRC" > /dev/null 2>&1
 
 # Provide a transcript that does NOT mention test execution
-TRANSCRIPT_INPUT=$(cat <<'EOF'
+TRANSCRIPT_INPUT=$(cat <<'INPUTEOF'
 {"hook_event_name":"Stop","stop_hook_active":false,"transcript_summary":"User asked for a random change. Claude edited a file.","last_assistant_message":"Done with the change."}
-EOF
+INPUTEOF
 )
 
 OUTPUT=$(echo "$TRANSCRIPT_INPUT" | bash "$TESTING_HOOK" 2>/dev/null)
@@ -229,11 +337,11 @@ assert_json_has_block_decision "enforce-testing-hook outputs block decision" "$O
 git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
 rm -f "$TEMP_SRC"
 
-# Test 4.2: verify-pr-hook blocks when dead component exists (untracked file)
-# This creates an untracked .tsx file — the hook must detect untracked files
-# as potential changes, not just git-tracked modifications.
+# Test 5.2: verify-pr-hook blocks when dead component exists (untracked file)
 echo ""
-echo "Test 4.2: verify-pr-hook blocks on dead component (untracked file)"
+echo "Test 5.2: verify-pr-hook blocks on dead component (untracked file)"
+cleanup_retry_files
+
 DEAD_FILE="$PROJECT_ROOT/src/components/common/StopHookTestDead.tsx"
 cat > "$DEAD_FILE" << 'COMPEOF'
 export default function StopHookTestDead() {
