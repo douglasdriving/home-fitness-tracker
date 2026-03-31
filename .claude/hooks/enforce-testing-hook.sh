@@ -3,17 +3,25 @@
 # enforce-testing-hook.sh - Claude Stop hook
 #
 # Blocks Claude from stopping if code was changed but no tests were
-# written or run during the session. Checks the conversation transcript
-# for evidence of test execution.
+# written or run during the session. Checks the conversation context
+# from the stop hook input for evidence of test execution.
 #
 # Usage: Configured as a Claude "Stop" hook in .claude/settings.json
 #
-# This hook reads the transcript from stdin (piped by Claude Code).
-# It checks for:
-#   1. Vitest test runs (npm run test, npx vitest, vitest run)
-#   2. New or modified test files (.test.ts, .test.tsx)
+# Protocol: Stop hooks must exit 0. To block, output JSON:
+#   {"decision":"block","reason":"..."}
+# To allow, output nothing or non-block JSON.
 
 set -uo pipefail
+
+# Read stdin (Stop hook input JSON)
+INPUT=$(cat)
+
+# Check stop_hook_active to prevent infinite loops
+STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null)
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  exit 0
+fi
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$PROJECT_ROOT"
@@ -34,11 +42,12 @@ if [ -z "$NON_TEST_CHANGES" ]; then
   exit 0
 fi
 
-# Read the transcript from stdin to check for test execution
-TRANSCRIPT=$(cat)
+# Check transcript/summary from hook input for evidence of test execution
+TRANSCRIPT=$(echo "$INPUT" | jq -r '.transcript_summary // ""' 2>/dev/null)
+LAST_MSG=$(echo "$INPUT" | jq -r '.last_assistant_message // ""' 2>/dev/null)
+COMBINED="${TRANSCRIPT} ${LAST_MSG}"
 
-# Check if tests were run
-if echo "$TRANSCRIPT" | grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
+if echo "$COMBINED" | grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
   exit 0
 fi
 
@@ -48,14 +57,10 @@ if [ -n "$TEST_FILES_CHANGED" ]; then
   exit 0
 fi
 
-# If we get here, code was changed but no tests were run
-echo ""
-echo "WARNING: Source code was modified but no tests were run."
-echo ""
-echo "Changed source files:"
-echo "$NON_TEST_CHANGES" | while read -r f; do echo "  - $f"; done
-echo ""
-echo "Please run tests before finishing:"
-echo "  npm run test"
-echo ""
-exit 1
+# Build list of changed files for the reason message
+FILE_LIST=$(echo "$NON_TEST_CHANGES" | head -5 | tr '\n' ', ' | sed 's/,$//')
+
+cat <<EOF
+{"decision":"block","reason":"Source code was modified but no tests were run. Changed files: ${FILE_LIST}. Please run tests before finishing: npm run test"}
+EOF
+exit 0

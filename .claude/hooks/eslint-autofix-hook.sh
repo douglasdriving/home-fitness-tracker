@@ -6,8 +6,21 @@
 # Catches and fixes formatting/import issues before they get committed.
 #
 # Usage: Configured as a Claude "Stop" hook in .claude/settings.json
+#
+# Protocol: Stop hooks must exit 0. To block, output JSON:
+#   {"decision":"block","reason":"..."}
+# To allow, output nothing or non-block JSON.
 
 set -uo pipefail
+
+# Read stdin (Stop hook input JSON)
+INPUT=$(cat)
+
+# Check stop_hook_active to prevent infinite loops
+STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null)
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  exit 0
+fi
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$PROJECT_ROOT"
@@ -24,20 +37,22 @@ if [ -z "$ALL_FILES" ]; then
 fi
 
 # Run eslint --fix on changed files
-FAILED=false
+FIXED_FILES=()
 while IFS= read -r file; do
   if [ -f "$file" ]; then
     if ! npx eslint --fix "$file" 2>/dev/null; then
-      echo "ESLint autofix found issues in: $file"
-      FAILED=true
+      FIXED_FILES+=("$file")
     fi
   fi
 done <<< "$ALL_FILES"
 
-if [ "$FAILED" = true ]; then
-  echo ""
-  echo "ESLint autofix applied fixes. Review the changes before proceeding."
-  exit 1
+if [ ${#FIXED_FILES[@]} -gt 0 ]; then
+  FILES_LIST=$(printf '%s, ' "${FIXED_FILES[@]}")
+  FILES_LIST=${FILES_LIST%, }
+  cat <<EOF
+{"decision":"block","reason":"ESLint autofix applied fixes to: ${FILES_LIST}. Review the changes before proceeding."}
+EOF
+  exit 0
 fi
 
 exit 0

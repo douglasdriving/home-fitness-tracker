@@ -7,8 +7,21 @@
 # been introduced during the session.
 #
 # Usage: Configured as a Claude "Stop" hook in .claude/settings.json
+#
+# Protocol: Stop hooks must exit 0. To block, output JSON:
+#   {"decision":"block","reason":"..."}
+# To allow, output nothing or non-block JSON.
 
 set -uo pipefail
+
+# Read stdin (Stop hook input JSON)
+INPUT=$(cat)
+
+# Check stop_hook_active to prevent infinite loops
+STOP_HOOK_ACTIVE=$(echo "$INPUT" | jq -r '.stop_hook_active // false' 2>/dev/null)
+if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
+  exit 0
+fi
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 cd "$PROJECT_ROOT"
@@ -27,19 +40,15 @@ fi
 CODE_CHANGES=$(echo "$ALL_CHANGES" | grep -E '\.(ts|tsx|js|jsx|css)$' || true)
 
 if [ -z "$CODE_CHANGES" ]; then
-  # Only docs/config changed, just do a quick lint
-  echo "Only non-code files changed, running quick lint..."
   exit 0
 fi
 
-# Run the full verification suite
-echo "Running PR verification on changed code..."
-echo ""
-
-if bash scripts/hooks/verify-pr.sh 2>&1; then
+# Run the full verification suite, capture output to stderr for logging
+if bash scripts/hooks/verify-pr.sh >&2 2>&1; then
   exit 0
 else
-  echo ""
-  echo "PR verification failed. Please fix the issues above before stopping."
-  exit 1
+  cat <<'EOF'
+{"decision":"block","reason":"PR verification failed. Check the output above for details and fix the issues before stopping."}
+EOF
+  exit 0
 fi
