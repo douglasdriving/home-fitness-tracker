@@ -56,12 +56,17 @@ fi
 
 # Check transcript file for evidence of test execution via Bash tool calls
 TRANSCRIPT_PATH=$(echo "$INPUT" | jq -r '.transcript_path // ""' 2>/dev/null)
+# Expand tilde in case transcript_path uses ~/... (not expanded in variables)
+TRANSCRIPT_PATH="${TRANSCRIPT_PATH/#\~/$HOME}"
 
 if [ -n "$TRANSCRIPT_PATH" ] && [ -f "$TRANSCRIPT_PATH" ]; then
   # Search for Bash tool_use entries containing test commands in the transcript JSONL
-  if grep -E '"tool_use"' "$TRANSCRIPT_PATH" 2>/dev/null | \
+  # Note: avoid grep -q at end of pipeline — with pipefail, SIGPIPE from early exit
+  # causes exit code 141, making the pipeline appear to fail despite finding matches.
+  TEST_MATCH_COUNT=$(grep -E '"tool_use"' "$TRANSCRIPT_PATH" 2>/dev/null | \
      grep -E '"name"\s*:\s*"Bash"' | \
-     grep -qE '(npm run test|npx vitest|vitest run|npm test)'; then
+     grep -cE '(npm run test|npx vitest|vitest run|npm test)' || true)
+  if [ "$TEST_MATCH_COUNT" -gt 0 ] 2>/dev/null; then
     exit 0
   fi
 fi
