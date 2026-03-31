@@ -234,19 +234,24 @@ export default function WorkoutExecution() {
         addRetiredExercises(newRetirements);
       }
 
-      // Navigate to milestones if there are any, otherwise to workout complete
-      if (newUnlocks.length > 0 || newRetirements.length > 0) {
-        navigate('/milestones', {
+      // Build state to pass through the completion flow
+      const completionState = {
+        workout: historyEntry,
+        unlockReasons: unlockReasons.length > 0 ? unlockReasons : undefined,
+        retirementReasons: retirementReasons.length > 0 ? retirementReasons : undefined,
+      };
+
+      // New flow: stretching first (if enabled), then workout complete
+      const autoShowStretching = profile?.preferences?.autoShowStretching ?? true;
+      if (autoShowStretching) {
+        navigate('/stretching', {
           state: {
-            unlockedExerciseIds: newUnlocks,
-            retiredExerciseIds: newRetirements,
-            unlockReasons,
-            retirementReasons,
-            workoutId: historyEntry.id,
+            workoutId: historyEntry.workoutId,
+            completionState,
           },
         });
       } else {
-        navigate('/workout-complete', { state: { workout: historyEntry } });
+        navigate('/workout-complete', { state: completionState });
       }
     } catch (error) {
       console.error('Error completing workout:', error);

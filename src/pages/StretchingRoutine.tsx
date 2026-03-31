@@ -25,6 +25,7 @@ export default function StretchingRoutine() {
   const navigate = useNavigate();
   const location = useLocation();
   const workoutId = location.state?.workoutId;
+  const completionState = location.state?.completionState;
 
   // Keep screen awake during stretching routine
   useWakeLock();
@@ -129,7 +130,12 @@ export default function StretchingRoutine() {
       console.error('Failed to clear stretch state:', error);
     }
 
-    navigate('/', { state: { stretchingCompleted: true } });
+    // Navigate to workout complete page with the completion state
+    if (completionState) {
+      navigate('/workout-complete', { state: completionState });
+    } else {
+      navigate('/');
+    }
   };
 
   const handleSkip = () => {
@@ -140,7 +146,12 @@ export default function StretchingRoutine() {
       } catch (error) {
         console.error('Failed to clear stretch state:', error);
       }
-      navigate('/');
+      // Navigate to workout complete page with the completion state
+      if (completionState) {
+        navigate('/workout-complete', { state: completionState });
+      } else {
+        navigate('/');
+      }
     }
   };
 

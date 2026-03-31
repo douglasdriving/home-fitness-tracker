@@ -5,7 +5,7 @@ import ScrollToTop from './components/common/ScrollToTop';
 import Dashboard from './pages/Dashboard';
 import WorkoutExecution from './pages/WorkoutExecution';
 import WorkoutComplete from './pages/WorkoutComplete';
-import Milestones from './pages/Milestones';
+
 import StretchingRoutine from './pages/StretchingRoutine';
 import History from './pages/History';
 import ExerciseStatus from './pages/ExerciseStatus';
@@ -69,7 +69,7 @@ function App() {
             <Route path="/" element={<Dashboard />} />
             <Route path="/workout" element={<WorkoutExecution />} />
             <Route path="/workout-complete" element={<WorkoutComplete />} />
-            <Route path="/milestones" element={<Milestones />} />
+
             <Route path="/stretching" element={<StretchingRoutine />} />
             <Route path="/history" element={<History />} />
             <Route path="/exercises" element={<ExerciseStatus />} />
