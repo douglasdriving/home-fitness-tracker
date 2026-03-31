@@ -229,9 +229,11 @@ assert_json_has_block_decision "enforce-testing-hook outputs block decision" "$O
 git reset HEAD "$TEMP_SRC" > /dev/null 2>&1
 rm -f "$TEMP_SRC"
 
-# Test 4.2: verify-pr-hook blocks when dead component exists
+# Test 4.2: verify-pr-hook blocks when dead component exists (untracked file)
+# This creates an untracked .tsx file — the hook must detect untracked files
+# as potential changes, not just git-tracked modifications.
 echo ""
-echo "Test 4.2: verify-pr-hook blocks on dead component"
+echo "Test 4.2: verify-pr-hook blocks on dead component (untracked file)"
 DEAD_FILE="$PROJECT_ROOT/src/components/common/StopHookTestDead.tsx"
 cat > "$DEAD_FILE" << 'COMPEOF'
 export default function StopHookTestDead() {
@@ -242,7 +244,7 @@ COMPEOF
 OUTPUT=$(make_stop_input | bash "$VERIFY_HOOK" 2>/dev/null)
 EXIT_CODE=$?
 assert_exit_code "verify-pr-hook exits 0 (not 1)" 0 $EXIT_CODE
-assert_json_has_block_decision "verify-pr-hook outputs block decision" "$OUTPUT"
+assert_json_has_block_decision "verify-pr-hook outputs block decision for untracked dead component" "$OUTPUT"
 
 # Clean up
 rm -f "$DEAD_FILE"
