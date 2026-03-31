@@ -17,7 +17,6 @@ const STRETCH_STATE_KEY = 'stretchRoutineState';
 interface StretchState {
   workoutId: string;
   currentStretchIndex: number;
-  isResting: boolean;
   completedStretches: number[];
 }
 
@@ -31,7 +30,6 @@ export default function StretchingRoutine() {
   useWakeLock();
 
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
-  const [isResting, setIsResting] = useState(false);
   const [showStretchModal, setShowStretchModal] = useState(false);
   const [completedStretches, setCompletedStretches] = useState<Set<number>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
@@ -48,7 +46,6 @@ export default function StretchingRoutine() {
         // Only restore if it's for the same workout
         if (state.workoutId === workoutId) {
           setCurrentStretchIndex(state.currentStretchIndex);
-          setIsResting(state.isResting);
           setCompletedStretches(new Set(state.completedStretches));
         }
       }
@@ -66,7 +63,6 @@ export default function StretchingRoutine() {
     const state: StretchState = {
       workoutId,
       currentStretchIndex,
-      isResting,
       completedStretches: Array.from(completedStretches)
     };
 
@@ -75,11 +71,11 @@ export default function StretchingRoutine() {
     } catch (error) {
       console.error('Failed to save stretch state:', error);
     }
-  }, [workoutId, currentStretchIndex, isResting, completedStretches, isInitialized]);
+  }, [workoutId, currentStretchIndex, completedStretches, isInitialized]);
 
   const currentStretch = stretchingRoutine[currentStretchIndex];
   const isLastStretch = currentStretchIndex === stretchingRoutine.length - 1;
-  const progress = ((currentStretchIndex + (isResting ? 0.5 : 0)) / stretchingRoutine.length) * 100;
+  const progress = (currentStretchIndex / stretchingRoutine.length) * 100;
 
 
   const handleStretchComplete = () => {
@@ -88,14 +84,8 @@ export default function StretchingRoutine() {
     if (isLastStretch) {
       handleRoutineComplete();
     } else {
-      // Brief rest between stretches
-      setIsResting(true);
+      setCurrentStretchIndex(currentStretchIndex + 1);
     }
-  };
-
-  const handleRestComplete = () => {
-    setIsResting(false);
-    setCurrentStretchIndex(currentStretchIndex + 1);
   };
 
   const handleRoutineComplete = async () => {
@@ -107,10 +97,9 @@ export default function StretchingRoutine() {
         const historyEntry = allHistory.find(entry => entry.workoutId === workoutId);
 
         if (historyEntry) {
-          // Calculate total stretching time including rests
+          // Calculate total stretching time
           const stretchDuration = stretchingRoutine.reduce((sum, s) => sum + s.duration, 0);
-          const restDuration = (stretchingRoutine.length - 1) * 10; // 10 second rests between stretches
-          const totalStretchMinutes = Math.round((stretchDuration + restDuration) / 60);
+          const totalStretchMinutes = Math.round(stretchDuration / 60);
 
           await db.history.put({
             ...historyEntry,
@@ -162,55 +151,6 @@ export default function StretchingRoutine() {
       setCurrentStretchIndex(currentStretchIndex + 1);
     }
   };
-
-  if (isResting) {
-    const nextStretch = stretchingRoutine[currentStretchIndex + 1];
-
-    return (
-      <div className="bg-background min-h-screen">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-purple-600 to-purple-700 text-white p-4 shadow-lg">
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="text-2xl font-bold">🧘 Stretching</h1>
-            <button onClick={handleSkip} className="text-sm underline opacity-80 hover:opacity-100">
-              Skip All
-            </button>
-          </div>
-          <div className="w-full bg-white/30 rounded-full h-2">
-            <div
-              className="bg-white h-2 rounded-full transition-all"
-              style={{ width: `${progress}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Rest Content */}
-        <div className="p-4">
-          <div className="bg-background-light rounded-lg shadow-lg p-6 text-center mb-6 border border-background-lighter">
-            <div className="text-6xl mb-4">😌</div>
-            <h2 className="text-2xl font-bold text-text mb-2">Quick Break</h2>
-            <p className="text-text-muted mb-4">
-              Relax for a moment before the next stretch
-            </p>
-          </div>
-
-          <Timer
-            key={`rest-${currentStretchIndex}`}
-            duration={10}
-            onComplete={handleRestComplete}
-            autoStart={true}
-          />
-
-          {/* Next Stretch Preview */}
-          <div className="mt-6 bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-            <h3 className="text-sm font-medium text-text-muted mb-2">Up Next:</h3>
-            <div className="font-medium text-text text-lg">{nextStretch?.name}</div>
-            <div className="text-sm text-text-muted">{nextStretch?.duration}s</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="bg-background min-h-screen">
