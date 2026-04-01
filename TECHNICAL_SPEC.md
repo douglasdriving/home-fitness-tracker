@@ -332,11 +332,26 @@ function validateBackupData(data: unknown): boolean;
 - Exercise timer (for timed exercises)
 - Rest timer between sets
 - Navigation between exercises
+- On completion, routes to StretchingRoutine (or WorkoutComplete if stretching disabled)
+
+**StretchingRoutine** (`pages/StretchingRoutine.tsx`)
+- Post-workout stretching exercises
+- Stretches flow directly between exercises (no rest timer)
+- Bilateral side-transition timers preserved
+- Skip all option
+- On completion, navigates to WorkoutComplete
+
+**WorkoutComplete** (`pages/WorkoutComplete.tsx`)
+- Per-exercise set-by-set results with PB comparison
+- First-time, improvement, and no-improvement messaging
+- Integrated milestone display (unlocks/retirements)
+- Unlock progress bars
+- Done button navigates to Dashboard
 
 **History** (`pages/History.tsx`)
 - Chronological list of completed workouts
 - Expandable workout details
-- Workout summary cards
+- Workout summary cards (duration, exercise count, set count, exercise names)
 
 **ExerciseLibrary** (`pages/ExerciseLibrary.tsx`)
 - Search bar

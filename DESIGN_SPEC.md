@@ -101,8 +101,8 @@ A progressive, open-source, local-first web application designed for fitness beg
 
 5. **Completion**
    - Set complete → check exercise
-   - All exercises complete → workout complete
-   - Confirmation screen and congratulations message
+   - All exercises complete → stretching routine (if enabled) → workout complete
+   - Workout complete screen shows per-exercise progression (set-by-set results vs personal best), milestone unlocks/retirements
 
 ---
 
@@ -274,7 +274,14 @@ Move to Next Exercise
     ↓
 [Repeat for all exercises]
     ↓
-Workout Complete! 🎉
+All Exercises Complete
+    ↓
+Stretching Routine (if enabled)
+    ↓
+Workout Complete Screen
+    - Per-exercise progression data
+    - Personal best comparison
+    - Milestone unlocks/retirements
     ↓
 Save to History
     ↓

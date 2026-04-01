@@ -36,6 +36,8 @@ Routes defined in `src/App.tsx`. Main pages in `src/pages/`:
 - `Dashboard.tsx` - Home screen, workout start
 - `Calibration.tsx` - Initial 3-exercise assessment
 - `WorkoutExecution.tsx` - Active workout interface
+- `StretchingRoutine.tsx` - Post-workout stretching (shown before completion)
+- `WorkoutComplete.tsx` - Per-exercise progression data, PB tracking, integrated milestones
 - `History.tsx` - Past workout records
 - `ExerciseLibrary.tsx` - Browse exercises
 - `Settings.tsx` - User settings, reset options

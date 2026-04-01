@@ -84,7 +84,7 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 After each workout completion, the system:
 1. Checks if any exercise performance meets an unlock threshold
 2. Checks if any exercise performance meets a retirement threshold
-3. If achievements occurred, shows the Milestones screen
+3. Displays achievements (unlocks/retirements) on the WorkoutComplete page
 
 ### Exercise Filtering
 
@@ -96,7 +96,7 @@ When generating workouts:
 ### User Interface
 
 - **Exercise Status page** (replaces Progress): Shows active, locked (with progress), and retired exercises
-- **Milestones screen**: Shown after workout completion if unlocks/retirements occurred
+- **WorkoutComplete page**: Shows per-exercise progression data, PB tracking, and any unlocks/retirements that occurred
 - **Restore option**: Users can manually restore retired exercises if desired
 
 ## Data Model
@@ -132,4 +132,4 @@ interface ExerciseAchievements {
 - `src/data/exercises.json` - All exercise data with unlock/retirement thresholds
 - `src/lib/achievement-tracker.ts` - Core logic for checking achievements
 - `src/pages/ExerciseStatus.tsx` - Exercise status UI
-- `src/pages/Milestones.tsx` - Post-workout achievements screen
+- `src/pages/WorkoutComplete.tsx` - Post-workout progression data and integrated achievements
