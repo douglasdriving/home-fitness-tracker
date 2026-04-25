@@ -143,6 +143,19 @@ export default function WorkoutDetailModal({
                     ))}
                   </div>
 
+                  {/* Intensity Feedback */}
+                  {exercise.intensityFeedback && (
+                    <div className="mt-2 text-xs text-text-muted">
+                      Feedback: {
+                        exercise.intensityFeedback === 1 ? 'Way too easy' :
+                        exercise.intensityFeedback === 2 ? 'A bit too easy' :
+                        exercise.intensityFeedback === 3 ? 'Just right' :
+                        exercise.intensityFeedback === 4 ? 'A bit too hard' :
+                        'Way too hard'
+                      }
+                    </div>
+                  )}
+
                   {/* Exercise Note */}
                   {note && (
                     <div className="mt-3 pt-3 border-t border-background-lighter">

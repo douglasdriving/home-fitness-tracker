@@ -35,8 +35,8 @@ export default function WorkoutExecution() {
   const [isInitialized, setIsInitialized] = useState(false);
   const [nextSetPreview, setNextSetPreview] = useState<{reps?: number, duration?: number} | null>(null);
 
-  // Store intensity feedback for each exercise (keyed by exercise index)
-  const [intensityFeedbackMap, setIntensityFeedbackMap] = useState<Record<number, IntensityRating>>({});
+  // Store intensity feedback for each exercise (keyed by exercise ID)
+  const [intensityFeedbackMap, setIntensityFeedbackMap] = useState<Record<string, IntensityRating>>({});
 
   // Initialize position from saved state on mount
   useEffect(() => {
@@ -169,10 +169,12 @@ export default function WorkoutExecution() {
   };
 
   const handleIntensityFeedback = (rating: IntensityRating) => {
-    // Store the feedback for this exercise
+    const exerciseId = currentExercise.exerciseId;
+
+    // Store the feedback for this exercise (keyed by exercise ID for robustness)
     setIntensityFeedbackMap(prev => ({
       ...prev,
-      [currentExerciseIndex]: rating,
+      [exerciseId]: rating,
     }));
 
     const isLastExercise = currentExerciseIndex === currentWorkout.exercises.length - 1;
@@ -181,7 +183,7 @@ export default function WorkoutExecution() {
       // Complete the workout with all feedback
       handleCompleteWorkout({
         ...intensityFeedbackMap,
-        [currentExerciseIndex]: rating,
+        [exerciseId]: rating,
       });
     } else {
       // Move to rest between exercises
@@ -203,7 +205,7 @@ export default function WorkoutExecution() {
     setPhase('exercise');
   };
 
-  const handleCompleteWorkout = async (feedbackMap: Record<number, IntensityRating>) => {
+  const handleCompleteWorkout = async (feedbackMap: Record<string, IntensityRating>) => {
     try {
       const historyEntry = await completeWorkout(feedbackMap);
 

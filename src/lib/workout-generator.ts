@@ -169,8 +169,10 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     let targetValue: number;
     if (lastPerformanceData !== null) {
       // Use feedback-based progression
-      // Default to rating 3 (just right) if no feedback recorded
       const feedback = lastPerformanceData.feedback ?? 3;
+      if (lastPerformanceData.feedback === undefined) {
+        console.warn(`[WORKOUT GEN] - WARNING: No intensity feedback found for ${exercise.name}, defaulting to rating 3 (just right)`);
+      }
       targetValue = calculateProgressionWithFeedback(
         lastPerformanceData.performance,
         exercise.type,
@@ -337,7 +339,7 @@ export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<
  * Find the last performance AND intensity feedback for a specific exercise
  * Returns both the performance value and the feedback rating from the most recent workout
  */
-function findLastPerformanceWithFeedback(
+export function findLastPerformanceWithFeedback(
   exerciseId: string,
   workoutHistory: WorkoutHistoryEntry[]
 ): { performance: number; feedback: IntensityRating | undefined } | null {

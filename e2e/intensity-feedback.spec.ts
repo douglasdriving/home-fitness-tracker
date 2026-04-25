@@ -392,4 +392,82 @@ test.describe('Intensity Feedback System', () => {
 
     expect(hasIntensityFeedback).toBe(true);
   });
+
+  test('intensity feedback is displayed in workout history detail', async ({ page }) => {
+    await page.goto('/');
+
+    // Set up calibrated user
+    await page.evaluate(() => {
+      localStorage.setItem('fitness-user-profile', JSON.stringify({
+        id: 'test-user',
+        createdAt: Date.now(),
+        calibrationCompleted: true,
+        strengthLevels: {
+          abs: 30,
+          glutes: 30,
+          lowerBack: 30,
+          lastUpdated: Date.now(),
+        },
+      }));
+    });
+    await page.reload();
+
+    // Generate and complete a workout
+    await page.getByRole('button', { name: /generate|new workout/i }).click();
+    await page.waitForTimeout(500);
+    await page.getByRole('button', { name: /start workout/i }).click();
+
+    // Complete first exercise with "Way too hard" feedback
+    for (let i = 0; i < 3; i++) {
+      await page.getByRole('button', { name: /complete set/i }).click();
+      const skipRest = page.getByRole('button', { name: /skip/i });
+      if (await skipRest.isVisible({ timeout: 1500 }).catch(() => false)) {
+        await skipRest.click();
+      }
+    }
+
+    await expect(page.getByText(/how did that feel/i)).toBeVisible({ timeout: 5000 });
+    await page.getByText(/way too hard/i).click();
+    await page.getByRole('button', { name: /continue/i }).click();
+
+    // Complete remaining exercises
+    while (true) {
+      const isComplete = await page.getByText(/workout complete/i).isVisible({ timeout: 1000 }).catch(() => false);
+      if (isComplete) break;
+
+      const completeButton = page.getByRole('button', { name: /complete set/i });
+      if (await completeButton.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await completeButton.click();
+
+        const feedbackVisible = await page.getByText(/how did that feel/i).isVisible({ timeout: 1000 }).catch(() => false);
+        if (feedbackVisible) {
+          await page.getByText(/just right/i).click();
+          await page.getByRole('button', { name: /continue/i }).click();
+        }
+        continue;
+      }
+
+      const skipRest = page.getByRole('button', { name: /skip/i });
+      if (await skipRest.isVisible({ timeout: 1000 }).catch(() => false)) {
+        await skipRest.click();
+        continue;
+      }
+
+      break;
+    }
+
+    await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
+
+    // Navigate to History
+    await page.getByRole('button', { name: /done|skip/i }).click();
+    await page.waitForTimeout(500);
+    await page.click('text=History');
+    await page.waitForURL('/history');
+
+    // Click on the workout card to open detail modal
+    await page.locator('text=Workout #1').click();
+
+    // The detail modal should show "Way too hard" feedback for the first exercise
+    await expect(page.getByText(/Way too hard/)).toBeVisible({ timeout: 5000 });
+  });
 });
