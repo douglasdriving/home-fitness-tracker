@@ -6,6 +6,7 @@ import { db } from '../db/db';
 import Button from '../components/common/Button';
 import StreakTracker from '../components/common/StreakTracker';
 import StorageWarning from '../components/common/StorageWarning';
+import { getExerciseEmoji } from '../data/exerciseData';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -192,7 +193,7 @@ export default function Dashboard() {
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <div className="font-semibold text-text">{exercise.exerciseName}</div>
+                        <div className="font-semibold text-text">{getExerciseEmoji(exercise.exerciseId)} {exercise.exerciseName}</div>
                         {isNew && (
                           <span className="text-xs bg-primary text-background px-2 py-0.5 rounded-full font-bold">
                             NEW

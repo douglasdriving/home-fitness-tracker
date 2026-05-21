@@ -88,7 +88,7 @@ export default function RestPhase({
           <div className="flex justify-between items-center">
             <div>
               <div className="font-medium text-text">
-                {isExerciseRest ? nextExercise?.exerciseName : currentExercise.exerciseName}
+                {isExerciseRest ? (nextExerciseInfo?.emoji ?? '') : (exerciseData?.emoji ?? '')} {isExerciseRest ? nextExercise?.exerciseName : currentExercise.exerciseName}
               </div>
               <div className="text-sm text-text-muted">
                 {isExerciseRest

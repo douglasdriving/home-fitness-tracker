@@ -336,7 +336,7 @@ export default function Settings() {
                     className="flex items-center justify-between p-3 bg-background-light rounded-lg"
                   >
                     <div>
-                      <div className="font-medium text-text">{exercise.name}</div>
+                      <div className="font-medium text-text">{exercise.emoji} {exercise.name}</div>
                       <div className="text-xs text-text-muted capitalize">
                         {exercise.muscleGroups.join(', ')}
                       </div>

@@ -101,7 +101,7 @@ export default function WorkoutDetailModal({
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex-1">
                       <div className="font-medium text-text">
-                        {exercise.exerciseName}
+                        {exerciseData?.emoji} {exercise.exerciseName}
                       </div>
                       <div className="flex gap-1 mt-1 flex-wrap">
                         {exercise.muscleGroups.map((mg, mgIdx) => (

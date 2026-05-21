@@ -9,6 +9,7 @@ import { IntensityRating } from '../../types/workout';
 
 interface IntensityFeedbackProps {
   exerciseName: string;
+  emoji?: string;
   onSubmit: (rating: IntensityRating) => void;
 }
 
@@ -54,6 +55,7 @@ const ratingOptions: RatingOption[] = [
 
 export default function IntensityFeedback({
   exerciseName,
+  emoji,
   onSubmit,
 }: IntensityFeedbackProps) {
   const [selectedRating, setSelectedRating] = useState<IntensityRating | null>(null);
@@ -78,7 +80,7 @@ export default function IntensityFeedback({
             How did that feel?
           </h2>
           <p className="text-text-muted">
-            Rate the intensity of <span className="font-semibold text-primary">{exerciseName}</span>
+            Rate the intensity of <span className="font-semibold text-primary">{emoji} {exerciseName}</span>
           </p>
         </div>
 

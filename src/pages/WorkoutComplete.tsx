@@ -9,7 +9,7 @@ import {
   UnlockReason,
   RetirementReason,
 } from '../lib/achievement-tracker';
-import { allExercises } from '../data/exerciseData';
+import { allExercises, getExerciseEmoji } from '../data/exerciseData';
 
 interface WorkoutCompleteState {
   workout: WorkoutHistoryEntry;
@@ -112,7 +112,7 @@ export default function WorkoutComplete() {
                   key={reason.unlockedExerciseId}
                   className="bg-background rounded px-3 py-2"
                 >
-                  <div className="text-text font-medium">{reason.unlockedExerciseName}</div>
+                  <div className="text-text font-medium">{getExerciseEmoji(reason.unlockedExerciseId)} {reason.unlockedExerciseName}</div>
                   <div className="text-text-muted text-sm">
                     {reason.performanceType === 'reps'
                       ? `${reason.performanceValue} reps`
@@ -137,7 +137,7 @@ export default function WorkoutComplete() {
                   key={reason.exerciseId}
                   className="bg-background rounded px-3 py-2"
                 >
-                  <div className="text-text font-medium">{reason.exerciseName}</div>
+                  <div className="text-text font-medium">{getExerciseEmoji(reason.exerciseId)} {reason.exerciseName}</div>
                   <div className="text-text-muted text-sm">
                     Reached {reason.performanceType === 'reps'
                       ? `${reason.performanceValue} reps`
@@ -165,7 +165,7 @@ export default function WorkoutComplete() {
               return (
                 <div key={exercise.exerciseId} className="bg-background rounded-lg p-3">
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-text font-medium">{exercise.exerciseName}</span>
+                    <span className="text-text font-medium">{getExerciseEmoji(exercise.exerciseId)} {exercise.exerciseName}</span>
                     {isNewPB && (
                       <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold">
                         New PB!
@@ -221,7 +221,7 @@ export default function WorkoutComplete() {
               {nearUnlocks.map(ex => (
                 <div key={ex.id} className="bg-background rounded-lg p-3">
                   <div className="flex justify-between items-center mb-1">
-                    <span className="text-text font-medium text-sm">{ex.name}</span>
+                    <span className="text-text font-medium text-sm">{ex.emoji} {ex.name}</span>
                     <span className="text-xs text-text-muted">
                       {ex.unlockProgress!.currentValue}/{ex.unlockProgress!.requiredValue}
                     </span>

@@ -153,7 +153,7 @@ export default function Calibration() {
           </div>
 
           <h2 className="text-2xl font-bold text-gray-800 mb-4">
-            {currentExercise?.name}
+            {currentExercise?.emoji} {currentExercise?.name}
           </h2>
 
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 mb-6">

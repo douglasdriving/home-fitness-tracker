@@ -367,6 +367,7 @@ export function getAvailableExercises(
     .map((ex): Exercise => ({
       id: ex.id,
       name: ex.name,
+      emoji: ex.emoji,
       muscleGroups: ex.muscleGroups,
       description: ex.description,
       videoUrl: ex.videoUrl,

@@ -159,11 +159,13 @@ export default function EditWorkoutModal({ workout, onSave, onClose }: EditWorko
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-text">Exercises</h3>
 
-            {editedWorkout.exercises.map((exercise, exerciseIndex) => (
+            {editedWorkout.exercises.map((exercise, exerciseIndex) => {
+              const exerciseData = getExerciseById(exercise.exerciseId);
+              return (
               <div key={exerciseIndex} className="bg-background rounded-lg p-4 space-y-3">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-medium text-text">{exercise.exerciseName}</h4>
+                    <h4 className="font-medium text-text">{exerciseData?.emoji} {exercise.exerciseName}</h4>
                     <div className="flex gap-1 mt-1">
                       {exercise.muscleGroups.map((mg, mgIdx) => (
                         <span
@@ -231,7 +233,8 @@ export default function EditWorkoutModal({ workout, onSave, onClose }: EditWorko
                   })}
                 </div>
               </div>
-            ))}
+            );
+            })}
           </div>
         </div>
 

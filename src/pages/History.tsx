@@ -5,6 +5,7 @@ import { WorkoutHistoryEntry } from '../types/workout';
 import EditWorkoutModal from '../components/history/EditWorkoutModal';
 import AddManualWorkoutModal from '../components/history/AddManualWorkoutModal';
 import WorkoutDetailModal from '../components/history/WorkoutDetailModal';
+import { getExerciseEmoji } from '../data/exerciseData';
 
 export default function History() {
   const { workoutHistory, loadHistory, deleteHistoryEntry, updateHistoryEntry, addManualWorkout } = useWorkoutStore();
@@ -171,7 +172,7 @@ export default function History() {
                   <div className="text-sm text-text-muted">
                     {entry.exercises.map((ex, idx) => (
                       <span key={idx}>
-                        {ex.exerciseName}
+                        {getExerciseEmoji(ex.exerciseId)} {ex.exerciseName}
                         {idx < entry.exercises.length - 1 ? ', ' : ''}
                       </span>
                     ))}

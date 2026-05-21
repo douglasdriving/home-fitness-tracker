@@ -38,6 +38,7 @@ vi.mock('../data/exerciseData', () => ({
     {
       id: 'crunches-001',
       name: 'Crunches',
+      emoji: '🫁',
       muscleGroups: ['abs'],
       type: 'reps',
       retirementThreshold: { type: 'reps', value: 50 },
@@ -45,6 +46,7 @@ vi.mock('../data/exerciseData', () => ({
     {
       id: 'flutter-kicks-001',
       name: 'Flutter Kicks',
+      emoji: '🦵',
       muscleGroups: ['abs'],
       type: 'timed',
       unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 40 },
@@ -52,10 +54,17 @@ vi.mock('../data/exerciseData', () => ({
   ],
   getExerciseById: (id: string) => {
     const exercises: Record<string, unknown> = {
-      'crunches-001': { id: 'crunches-001', name: 'Crunches', type: 'reps' },
-      'flutter-kicks-001': { id: 'flutter-kicks-001', name: 'Flutter Kicks', type: 'timed', unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 40 } },
+      'crunches-001': { id: 'crunches-001', name: 'Crunches', emoji: '🫁', type: 'reps' },
+      'flutter-kicks-001': { id: 'flutter-kicks-001', name: 'Flutter Kicks', emoji: '🦵', type: 'timed', unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 40 } },
     };
     return exercises[id];
+  },
+  getExerciseEmoji: (id: string) => {
+    const emojis: Record<string, string> = {
+      'crunches-001': '🫁',
+      'flutter-kicks-001': '🦵',
+    };
+    return emojis[id] ?? '';
   },
 }));
 
@@ -103,8 +112,8 @@ describe('WorkoutComplete', () => {
     it('shows per-exercise progression with set-by-set details', () => {
       renderWithRouter(mockWorkout);
 
-      // Should show exercise name
-      expect(screen.getByText('Crunches')).toBeInTheDocument();
+      // Should show exercise name with emoji
+      expect(screen.getByText(/🫁 Crunches/)).toBeInTheDocument();
 
       // Should show individual set results
       expect(screen.getByText(/35/)).toBeInTheDocument();

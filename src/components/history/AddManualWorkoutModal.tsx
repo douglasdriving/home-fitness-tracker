@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { WorkoutHistoryEntry, CompletedExercise, CompletedSet } from '../../types/workout';
-import { allExercises } from '../../data/exerciseData';
+import { allExercises, getExerciseEmoji } from '../../data/exerciseData';
 import { Exercise } from '../../types/exercise';
 import { format } from 'date-fns';
 import Button from '../common/Button';
@@ -203,7 +203,7 @@ export default function AddManualWorkoutModal({ onSave, onClose }: AddManualWork
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-text">{exercise.exerciseName}</h4>
+                      <h4 className="font-medium text-text">{getExerciseEmoji(exercise.exerciseId)} {exercise.exerciseName}</h4>
                       <button
                         onClick={() => handleRemoveExercise(exerciseIndex)}
                         className="text-red-400 hover:text-red-300 p-1"
@@ -314,7 +314,7 @@ export default function AddManualWorkoutModal({ onSave, onClose }: AddManualWork
                   onClick={() => handleAddExercise(exercise)}
                   className="w-full text-left bg-background hover:bg-background-lighter rounded-lg p-3 transition-colors"
                 >
-                  <div className="font-medium text-text">{exercise.name}</div>
+                  <div className="font-medium text-text">{exercise.emoji} {exercise.name}</div>
                   <div className="flex gap-1 mt-1">
                     {exercise.muscleGroups.map((mg, mgIdx) => (
                       <span

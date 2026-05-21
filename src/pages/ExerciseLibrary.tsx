@@ -87,7 +87,7 @@ export default function ExerciseLibrary() {
               <div key={exercise.id} className="bg-background-light rounded-lg p-4 border border-background-lighter">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-text mb-1">{exercise.name}</h3>
+                    <h3 className="text-lg font-bold text-text mb-1">{exercise.emoji} {exercise.name}</h3>
                     <div className="flex gap-2 mb-2">
                       {exercise.muscleGroups.map((mg: MuscleGroup, idx: number) => (
                         <span

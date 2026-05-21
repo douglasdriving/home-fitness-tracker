@@ -93,7 +93,7 @@ export default function ExercisePhase({
         <div className="flex justify-between items-start mb-4">
           <div>
             <h2 className="text-2xl font-bold text-text mb-1">
-              {currentExercise.exerciseName}
+              {exercise.emoji} {currentExercise.exerciseName}
             </h2>
             <div className="flex gap-2">
               {currentExercise.muscleGroups.map((mg, idx) => (

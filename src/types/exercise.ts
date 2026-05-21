@@ -18,6 +18,7 @@ export interface RetirementThreshold {
 export interface Exercise {
   id: string;
   name: string;
+  emoji: string;
   muscleGroups: MuscleGroup[];
   description: string;
   videoUrl?: string;

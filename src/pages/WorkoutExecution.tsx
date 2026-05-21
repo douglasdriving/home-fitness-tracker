@@ -272,6 +272,7 @@ export default function WorkoutExecution() {
     return (
       <IntensityFeedback
         exerciseName={currentExercise.exerciseName}
+        emoji={exercise?.emoji}
         onSubmit={handleIntensityFeedback}
       />
     );

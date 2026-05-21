@@ -98,7 +98,7 @@ export default function ExerciseStatus() {
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <div className="font-medium text-text">{exercise.name}</div>
+                    <div className="font-medium text-text">{exercise.emoji} {exercise.name}</div>
                     <div className="text-xs text-text-muted mt-1">
                       {formatMuscleGroups(exercise.muscleGroups)}
                     </div>

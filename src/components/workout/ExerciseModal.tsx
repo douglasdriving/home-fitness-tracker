@@ -32,7 +32,7 @@ export default function ExerciseModal({ exercise, onClose }: ExerciseModalProps)
       >
         {/* Header */}
         <div className="sticky top-0 bg-background-light border-b border-background-lighter p-4 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-text">{exercise.name}</h2>
+          <h2 className="text-xl font-bold text-text">{exercise.emoji} {exercise.name}</h2>
           <button
             onClick={onClose}
             className="text-text-muted hover:text-text transition-colors text-2xl leading-none"
