@@ -96,15 +96,6 @@ describe('History', () => {
       expect(screen.getByText('15')).toBeInTheDocument();
     });
 
-    it('still displays exercise count and set count', () => {
-      renderHistory();
-
-      expect(screen.getByText('2 exercises')).toBeInTheDocument();
-      expect(screen.getByText('3 sets')).toBeInTheDocument();
-      expect(screen.getByText('1 exercises')).toBeInTheDocument();
-      expect(screen.getByText('1 sets')).toBeInTheDocument();
-    });
-
     it('still displays exercise names', () => {
       renderHistory();
 

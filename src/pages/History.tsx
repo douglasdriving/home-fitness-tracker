@@ -144,11 +144,6 @@ export default function History() {
         ) : (
           <div className="space-y-3">
             {workoutHistory.map((entry) => {
-              const totalSets = entry.exercises.reduce(
-                (sum, ex) => sum + ex.completedSets.length,
-                0
-              );
-
               return (
                 <div
                   key={entry.id}
@@ -172,11 +167,6 @@ export default function History() {
                         <div className="text-xs text-text-muted">minutes</div>
                       </div>
                     </div>
-                  </div>
-                  <div className="flex gap-3 text-sm text-text-muted mb-2">
-                    <span>{entry.exercises.length} exercises</span>
-                    <span>•</span>
-                    <span>{totalSets} sets</span>
                   </div>
                   <div className="text-sm text-text-muted">
                     {entry.exercises.map((ex, idx) => (
