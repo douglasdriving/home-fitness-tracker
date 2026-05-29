@@ -36,7 +36,7 @@
     "heavinessScore": { "abs": 5, "glutes": 0, "lowerBack": 4 },
     "type": "reps",
     "defaultReps": 10,
-    "retirementThreshold": { "type": "reps", "value": 35 }
+    "retirementThreshold": { "type": "reps", "value": 20 }
   },
   {
     "id": "plank-001",

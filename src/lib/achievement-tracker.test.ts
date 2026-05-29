@@ -558,6 +558,34 @@ describe('Achievement Tracker', () => {
     });
   });
 
+  describe('Dead Bug retirement threshold', () => {
+    it('retires Dead Bug when user achieves 20 reps', () => {
+      const completedWorkout = createHistoryEntry('dead-bug-001', 20);
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const result = checkWorkoutAchievements(completedWorkout, [], achievements);
+
+      // Dead Bug should be retired (threshold is 20 reps, we did 20)
+      expect(result.newRetirements).toContain('dead-bug-001');
+    });
+
+    it('does NOT retire Dead Bug when user achieves 19 reps', () => {
+      const completedWorkout = createHistoryEntry('dead-bug-001', 19);
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const result = checkWorkoutAchievements(completedWorkout, [], achievements);
+
+      // Dead Bug should NOT be retired (threshold is 20 reps, we only did 19)
+      expect(result.newRetirements).not.toContain('dead-bug-001');
+    });
+  });
+
   describe('combined unlock and retirement', () => {
     it('can unlock one exercise and retire a different exercise in the same workout', () => {
       const completedWorkout: WorkoutHistoryEntry = {

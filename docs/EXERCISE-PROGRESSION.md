@@ -17,7 +17,7 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 |----------|-----------|-------------------|------------|
 | Crunches | 3 | — | 50 reps |
 | Toe Touches | 4 | — | 50 reps |
-| Dead Bug | 5 | — | 35 reps |
+| Dead Bug | 5 | — | 20 reps |
 | Plank | 5 | — | 120s |
 | Reverse Crunches | 5 | — | 45 reps |
 | Flutter Kicks | 6 | 20 Crunches | 90s |
