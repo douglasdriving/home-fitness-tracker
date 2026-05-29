@@ -3,6 +3,8 @@
  * 5-minute post-workout stretching routine targeting abs, glutes, and lower back
  */
 
+import { MuscleGroup } from '../types/exercise';
+
 export interface StretchExercise {
   id: string;
   name: string;
@@ -129,3 +131,16 @@ export const totalStretchingDuration = stretchingRoutine.reduce(
   (sum, stretch) => sum + stretch.duration,
   0
 );
+
+// Muscle-group-specific stretching for daily rotation mode
+export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
+  abs: ['stretch-cat-cow', 'stretch-cobra', 'stretch-lying-twist'],
+  glutes: ['stretch-figure-four', 'stretch-hip-flexor', 'stretch-lying-twist'],
+  lowerBack: ['stretch-child-pose', 'stretch-cat-cow', 'stretch-cobra'],
+};
+
+// Helper function to get stretches for a specific muscle group
+export function getStretchesForMuscleGroup(muscleGroup: MuscleGroup): StretchExercise[] {
+  const stretchIds = muscleGroupStretches[muscleGroup];
+  return stretchingRoutine.filter(stretch => stretchIds.includes(stretch.id));
+}

@@ -1,16 +1,18 @@
 /**
  * StretchingRoutine Page
  * Guides users through a 5-minute post-workout stretching routine
+ * Or muscle-group-specific stretching for daily rotation mode
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { stretchingRoutine, totalStretchingDuration } from '../data/stretchingData';
+import { stretchingRoutine, getStretchesForMuscleGroup } from '../data/stretchingData';
 import Timer from '../components/workout/Timer';
 import Button from '../components/common/Button';
 import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
+import { MuscleGroup } from '../types/exercise';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -18,6 +20,7 @@ interface StretchState {
   workoutId: string;
   currentStretchIndex: number;
   completedStretches: number[];
+  targetMuscleGroup?: MuscleGroup;
 }
 
 export default function StretchingRoutine() {
@@ -25,9 +28,22 @@ export default function StretchingRoutine() {
   const location = useLocation();
   const workoutId = location.state?.workoutId;
   const completionState = location.state?.completionState;
+  const targetMuscleGroup: MuscleGroup | undefined = location.state?.targetMuscleGroup;
 
   // Keep screen awake during stretching routine
   useWakeLock();
+
+  // Get the appropriate stretching routine (filtered or full)
+  const activeRoutine = useMemo(() => {
+    if (targetMuscleGroup) {
+      return getStretchesForMuscleGroup(targetMuscleGroup);
+    }
+    return stretchingRoutine;
+  }, [targetMuscleGroup]);
+
+  const activeRoutineDuration = useMemo(() => {
+    return activeRoutine.reduce((sum, stretch) => sum + stretch.duration, 0);
+  }, [activeRoutine]);
 
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
   const [showStretchModal, setShowStretchModal] = useState(false);
@@ -43,8 +59,8 @@ export default function StretchingRoutine() {
       if (savedState) {
         const state: StretchState = JSON.parse(savedState);
 
-        // Only restore if it's for the same workout
-        if (state.workoutId === workoutId) {
+        // Only restore if it's for the same workout and same muscle group target
+        if (state.workoutId === workoutId && state.targetMuscleGroup === targetMuscleGroup) {
           setCurrentStretchIndex(state.currentStretchIndex);
           setCompletedStretches(new Set(state.completedStretches));
         }
@@ -54,7 +70,7 @@ export default function StretchingRoutine() {
     } finally {
       setIsInitialized(true);
     }
-  }, [workoutId]);
+  }, [workoutId, targetMuscleGroup]);
 
   // Save state to localStorage whenever it changes
   useEffect(() => {
@@ -63,7 +79,8 @@ export default function StretchingRoutine() {
     const state: StretchState = {
       workoutId,
       currentStretchIndex,
-      completedStretches: Array.from(completedStretches)
+      completedStretches: Array.from(completedStretches),
+      targetMuscleGroup
     };
 
     try {
@@ -71,11 +88,11 @@ export default function StretchingRoutine() {
     } catch (error) {
       console.error('Failed to save stretch state:', error);
     }
-  }, [workoutId, currentStretchIndex, completedStretches, isInitialized]);
+  }, [workoutId, currentStretchIndex, completedStretches, isInitialized, targetMuscleGroup]);
 
-  const currentStretch = stretchingRoutine[currentStretchIndex];
-  const isLastStretch = currentStretchIndex === stretchingRoutine.length - 1;
-  const progress = (currentStretchIndex / stretchingRoutine.length) * 100;
+  const currentStretch = activeRoutine[currentStretchIndex];
+  const isLastStretch = currentStretchIndex === activeRoutine.length - 1;
+  const progress = (currentStretchIndex / activeRoutine.length) * 100;
 
 
   const handleStretchComplete = () => {
@@ -97,8 +114,8 @@ export default function StretchingRoutine() {
         const historyEntry = allHistory.find(entry => entry.workoutId === workoutId);
 
         if (historyEntry) {
-          // Calculate total stretching time
-          const stretchDuration = stretchingRoutine.reduce((sum, s) => sum + s.duration, 0);
+          // Calculate total stretching time using the active routine (filtered or full)
+          const stretchDuration = activeRoutine.reduce((sum, s) => sum + s.duration, 0);
           const totalStretchMinutes = Math.round(stretchDuration / 60);
 
           await db.history.put({
@@ -169,7 +186,7 @@ export default function StretchingRoutine() {
           />
         </div>
         <p className="text-sm opacity-90 mt-2">
-          Stretch {currentStretchIndex + 1} of {stretchingRoutine.length}
+          Stretch {currentStretchIndex + 1} of {activeRoutine.length}
         </p>
       </div>
 
@@ -215,7 +232,7 @@ export default function StretchingRoutine() {
         <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
           <h3 className="text-sm font-medium text-text-muted mb-3">Stretch Progress</h3>
           <div className="flex gap-2 flex-wrap">
-            {stretchingRoutine.map((_, index) => (
+            {activeRoutine.map((_, index) => (
               <div
                 key={index}
                 className={`flex-1 min-w-[40px] h-2 rounded-full transition-colors ${
@@ -229,7 +246,7 @@ export default function StretchingRoutine() {
             ))}
           </div>
           <div className="mt-2 text-xs text-text-muted text-center">
-            {completedStretches.size} of {stretchingRoutine.length} completed
+            {completedStretches.size} of {activeRoutine.length} completed
           </div>
         </div>
 
@@ -253,7 +270,7 @@ export default function StretchingRoutine() {
 
         {/* Total Time Remaining */}
         <div className="text-center text-sm text-text-muted">
-          Total routine: ~{Math.ceil(totalStretchingDuration / 60)} minutes
+          Total routine: ~{Math.ceil(activeRoutineDuration / 60)} minutes
         </div>
       </div>
 

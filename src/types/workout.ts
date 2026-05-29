@@ -13,6 +13,8 @@ export interface Workout {
   currentExerciseIndex?: number; // Track position for persistence
   currentSetIndex?: number; // Track position for persistence
   currentPhase?: 'exercise' | 'rest' | 'exercise-rest'; // Track phase for persistence
+  workoutMode?: 'full-body' | 'daily-rotation';
+  targetMuscleGroup?: MuscleGroup;
 }
 
 export interface WorkoutExercise {
@@ -42,6 +44,8 @@ export interface WorkoutHistoryEntry {
   exercises: CompletedExercise[];
   stretchingCompleted?: boolean; // Optional: tracks if post-workout stretching was done
   intensityScore?: number; // Score representing workout difficulty/intensity (0-100)
+  workoutMode?: 'full-body' | 'daily-rotation';
+  targetMuscleGroup?: MuscleGroup;
 }
 
 // Intensity feedback scale: 1-5
