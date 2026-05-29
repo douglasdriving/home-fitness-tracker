@@ -20,13 +20,13 @@ describe('exerciseData', () => {
       expect(exercisesUnlockedByProneYTW).toHaveLength(0);
     });
 
-    it('should have Back Extension Hold unlocked by good-morning-001 at 30 reps', () => {
+    it('should have Back Extension Hold unlocked by good-morning-001 at 16 reps', () => {
       const backExtensionHold = getExerciseById('back-extension-hold-001');
       expect(backExtensionHold).toBeDefined();
       expect(backExtensionHold?.unlockRequirement).toEqual({
         exerciseId: 'good-morning-001',
         type: 'reps',
-        value: 30,
+        value: 16,
       });
     });
 
@@ -46,12 +46,12 @@ describe('exerciseData', () => {
       expect(exerciseIds).toContain('superman-001');
       expect(exerciseIds).toContain('back-extension-hold-001');
 
-      // Both should unlock at 30 reps
+      // Both should unlock at 16 reps
       const superman = exercisesUnlockedByGoodMorning.find(ex => ex.id === 'superman-001');
       const backExtensionHold = exercisesUnlockedByGoodMorning.find(ex => ex.id === 'back-extension-hold-001');
 
-      expect(superman?.unlockRequirement?.value).toBe(30);
-      expect(backExtensionHold?.unlockRequirement?.value).toBe(30);
+      expect(superman?.unlockRequirement?.value).toBe(16);
+      expect(backExtensionHold?.unlockRequirement?.value).toBe(16);
     });
 
     it('should still have all other lower back base exercises', () => {

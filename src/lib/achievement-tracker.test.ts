@@ -26,7 +26,7 @@ const mockExercises: Partial<Exercise>[] = [
     muscleGroups: ['abs'],
     type: 'timed',
     heavinessScore: { abs: 6, glutes: 0, lowerBack: 0 },
-    unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 40 },
+    unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 20 },
     retirementThreshold: { type: 'timed', value: 90 },
   },
   {
@@ -138,22 +138,22 @@ describe('Achievement Tracker', () => {
     });
 
     it('returns false if unlock requirement not met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
-      const history = [createHistoryEntry('crunches-001', 30)];
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
+      const history = [createHistoryEntry('crunches-001', 15)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(false);
     });
 
     it('returns true if unlock requirement is met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
       const history = [createHistoryEntry('crunches-001', 45)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(true);
     });
 
     it('returns true if unlock requirement is exactly met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
-      const history = [createHistoryEntry('crunches-001', 40)];
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
+      const history = [createHistoryEntry('crunches-001', 20)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(true);
     });
@@ -211,7 +211,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(completedWorkout, [], achievements);
 
-      // Flutter Kicks should be unlocked (needs 40 crunches, we did 45 in THIS workout)
+      // Flutter Kicks should be unlocked (needs 20 crunches, we did 45 in THIS workout)
       expect(result.newUnlocks).toContain('flutter-kicks-001');
     });
 
@@ -232,7 +232,7 @@ describe('Achievement Tracker', () => {
       expect(flutterKicksReason?.prereqExerciseName).toBe('Crunches');
       expect(flutterKicksReason?.performanceValue).toBe(45);
       expect(flutterKicksReason?.performanceType).toBe('reps');
-      expect(flutterKicksReason?.thresholdValue).toBe(40);
+      expect(flutterKicksReason?.thresholdValue).toBe(20);
     });
 
     it('detects new retirements when exercise is in current workout', () => {
@@ -414,11 +414,11 @@ describe('Achievement Tracker', () => {
     });
 
     it('uses current workout performance only, not combined history', () => {
-      // Prior history: 25 crunches
-      const priorHistory = [createHistoryEntry('crunches-001', 25, undefined, 1)];
+      // Prior history: 15 crunches
+      const priorHistory = [createHistoryEntry('crunches-001', 15, undefined, 1)];
 
-      // Current workout: 20 crunches (combined would be 25+20=45, but individual is only 20)
-      const currentWorkout = createHistoryEntry('crunches-001', 20);
+      // Current workout: 10 crunches (combined would be 15+10=25, but individual is only 10)
+      const currentWorkout = createHistoryEntry('crunches-001', 10);
 
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
@@ -427,7 +427,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(currentWorkout, priorHistory, achievements);
 
-      // Flutter Kicks should NOT be unlocked (needs 40 in single workout, we only did 20)
+      // Flutter Kicks should NOT be unlocked (needs 20 in single workout, we only did 10)
       expect(result.newUnlocks).not.toContain('flutter-kicks-001');
     });
   });

@@ -75,7 +75,7 @@
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 0 },
     "type": "timed",
     "defaultDuration": 30,
-    "unlockRequirement": { "exerciseId": "crunches-001", "type": "reps", "value": 40 },
+    "unlockRequirement": { "exerciseId": "crunches-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {
@@ -89,7 +89,7 @@
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 0 },
     "type": "reps",
     "defaultReps": 20,
-    "unlockRequirement": { "exerciseId": "toe-touches-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "toe-touches-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "reps", "value": 45 }
   },
   {
@@ -103,7 +103,7 @@
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 3 },
     "type": "timed",
     "defaultDuration": 30,
-    "unlockRequirement": { "exerciseId": "plank-001", "type": "timed", "value": 60 },
+    "unlockRequirement": { "exerciseId": "plank-001", "type": "timed", "value": 45 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {
@@ -117,7 +117,7 @@
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 4 },
     "type": "timed",
     "defaultDuration": 20,
-    "unlockRequirement": { "exerciseId": "dead-bug-001", "type": "reps", "value": 25 },
+    "unlockRequirement": { "exerciseId": "dead-bug-001", "type": "reps", "value": 15 },
     "countingMethod": "per-side"
   },
   {
@@ -131,7 +131,7 @@
     "heavinessScore": { "abs": 7, "glutes": 0, "lowerBack": 0 },
     "type": "timed",
     "defaultDuration": 30,
-    "unlockRequirement": { "exerciseId": "reverse-crunches-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "reverse-crunches-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {
@@ -145,7 +145,7 @@
     "heavinessScore": { "abs": 7, "glutes": 0, "lowerBack": 0 },
     "type": "reps",
     "defaultReps": 12,
-    "unlockRequirement": { "exerciseId": "flutter-kicks-001", "type": "timed", "value": 45 },
+    "unlockRequirement": { "exerciseId": "flutter-kicks-001", "type": "timed", "value": 35 },
     "retirementThreshold": { "type": "reps", "value": 40 }
   },
   {
@@ -159,7 +159,7 @@
     "heavinessScore": { "abs": 8, "glutes": 0, "lowerBack": 0 },
     "type": "reps",
     "defaultReps": 10,
-    "unlockRequirement": { "exerciseId": "leg-raises-001", "type": "reps", "value": 25 },
+    "unlockRequirement": { "exerciseId": "leg-raises-001", "type": "reps", "value": 16 },
     "retirementThreshold": { "type": "reps", "value": 35 }
   },
   {
@@ -173,7 +173,7 @@
     "heavinessScore": { "abs": 9, "glutes": 0, "lowerBack": 0 },
     "type": "timed",
     "defaultDuration": 20,
-    "unlockRequirement": { "exerciseId": "side-plank-001", "type": "timed", "value": 60 },
+    "unlockRequirement": { "exerciseId": "side-plank-001", "type": "timed", "value": 30 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {
@@ -187,7 +187,7 @@
     "heavinessScore": { "abs": 10, "glutes": 0, "lowerBack": 5 },
     "type": "reps",
     "defaultReps": 5,
-    "unlockRequirement": { "exerciseId": "v-ups-001", "type": "reps", "value": 20 }
+    "unlockRequirement": { "exerciseId": "v-ups-001", "type": "reps", "value": 14 }
   },
   {
     "id": "glute-bridge-001",
@@ -271,7 +271,7 @@
     "heavinessScore": { "abs": 0, "glutes": 5, "lowerBack": 2 },
     "type": "reps",
     "defaultReps": 15,
-    "unlockRequirement": { "exerciseId": "glute-bridge-001", "type": "reps", "value": 35 },
+    "unlockRequirement": { "exerciseId": "glute-bridge-001", "type": "reps", "value": 18 },
     "retirementThreshold": { "type": "reps", "value": 50 }
   },
   {
@@ -286,7 +286,7 @@
     "type": "reps",
     "defaultReps": 12,
     "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "band-clamshells-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "band-clamshells-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "reps", "value": 40 }
   },
   {
@@ -301,7 +301,7 @@
     "type": "reps",
     "defaultReps": 10,
     "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "donkey-kicks-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "donkey-kicks-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "reps", "value": 30 }
   },
   {
@@ -316,7 +316,7 @@
     "type": "reps",
     "defaultReps": 12,
     "equipment": "elastic-band",
-    "unlockRequirement": { "exerciseId": "fire-hydrants-001", "type": "reps", "value": 30 }
+    "unlockRequirement": { "exerciseId": "fire-hydrants-001", "type": "reps", "value": 20 }
   },
   {
     "id": "single-leg-rdl-001",
@@ -330,7 +330,7 @@
     "type": "reps",
     "defaultReps": 10,
     "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "band-lateral-walk-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "band-lateral-walk-001", "type": "reps", "value": 25 },
     "retirementThreshold": { "type": "reps", "value": 35 }
   },
   {
@@ -344,7 +344,7 @@
     "heavinessScore": { "abs": 0, "glutes": 7, "lowerBack": 3 },
     "type": "reps",
     "defaultReps": 12,
-    "unlockRequirement": { "exerciseId": "frog-pumps-001", "type": "reps", "value": 35 },
+    "unlockRequirement": { "exerciseId": "frog-pumps-001", "type": "reps", "value": 20 },
     "retirementThreshold": { "type": "reps", "value": 40 }
   },
   {
@@ -359,7 +359,7 @@
     "type": "reps",
     "defaultReps": 10,
     "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "single-leg-glute-bridge-001", "type": "reps", "value": 20 },
+    "unlockRequirement": { "exerciseId": "single-leg-glute-bridge-001", "type": "reps", "value": 14 },
     "retirementThreshold": { "type": "reps", "value": 30 }
   },
   {
@@ -373,7 +373,7 @@
     "heavinessScore": { "abs": 0, "glutes": 9, "lowerBack": 4 },
     "type": "reps",
     "defaultReps": 5,
-    "unlockRequirement": { "exerciseId": "bulgarian-split-squat-001", "type": "reps", "value": 20 }
+    "unlockRequirement": { "exerciseId": "bulgarian-split-squat-001", "type": "reps", "value": 14 }
   },
   {
     "id": "bird-dog-001",
@@ -400,7 +400,7 @@
     "heavinessScore": { "abs": 0, "glutes": 4, "lowerBack": 6 },
     "type": "reps",
     "defaultReps": 12,
-    "unlockRequirement": { "exerciseId": "bird-dog-001", "type": "reps", "value": 25 },
+    "unlockRequirement": { "exerciseId": "bird-dog-001", "type": "reps", "value": 15 },
     "retirementThreshold": { "type": "reps", "value": 40 }
   },
   {
@@ -414,7 +414,7 @@
     "heavinessScore": { "abs": 0, "glutes": 5, "lowerBack": 7 },
     "type": "timed",
     "defaultDuration": 20,
-    "unlockRequirement": { "exerciseId": "good-morning-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "good-morning-001", "type": "reps", "value": 16 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {
@@ -428,7 +428,7 @@
     "heavinessScore": { "abs": 0, "glutes": 8, "lowerBack": 8 },
     "type": "reps",
     "defaultReps": 12,
-    "unlockRequirement": { "exerciseId": "good-morning-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "good-morning-001", "type": "reps", "value": 16 },
     "retirementThreshold": { "type": "reps", "value": 35 }
   },
   {
@@ -442,7 +442,7 @@
     "heavinessScore": { "abs": 0, "glutes": 6, "lowerBack": 8 },
     "type": "reps",
     "defaultReps": 12,
-    "unlockRequirement": { "exerciseId": "back-extension-hold-001", "type": "timed", "value": 60 },
+    "unlockRequirement": { "exerciseId": "back-extension-hold-001", "type": "timed", "value": 30 },
     "retirementThreshold": { "type": "reps", "value": 35 }
   }
 ]

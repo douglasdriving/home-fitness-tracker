@@ -20,15 +20,15 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Dead Bug | 5 | — | 35 reps |
 | Plank | 5 | — | 120s |
 | Reverse Crunches | 5 | — | 45 reps |
-| Flutter Kicks | 6 | 40 Crunches | 90s |
-| Bicycle Crunches | 6 | 30 Toe Touches | 45 reps |
-| Plank Shoulder Taps | 6 | 60s Plank | 90s |
-| Side Plank | 6 | 25 Dead Bug | — |
-| Mountain Climbers | 7 | 30 Reverse Crunches | 90s |
-| Leg Raises | 7 | 45s Flutter Kicks | 40 reps |
-| V-Ups | 8 | 25 Leg Raises | 35 reps |
-| Hollow Body Hold | 9 | 60s Side Plank | 90s |
-| Dragon Flag (Tuck) | 10 | 20 V-Ups | — |
+| Flutter Kicks | 6 | 20 Crunches | 90s |
+| Bicycle Crunches | 6 | 20 Toe Touches | 45 reps |
+| Plank Shoulder Taps | 6 | 45s Plank | 90s |
+| Side Plank | 6 | 15 Dead Bug | — |
+| Mountain Climbers | 7 | 20 Reverse Crunches | 90s |
+| Leg Raises | 7 | 35s Flutter Kicks | 40 reps |
+| V-Ups | 8 | 16 Leg Raises | 35 reps |
+| Hollow Body Hold | 9 | 30s Side Plank | 90s |
+| Dragon Flag (Tuck) | 10 | 14 V-Ups | — |
 
 **Unlock Chains:**
 - Crunches → Flutter Kicks → Leg Raises → V-Ups → Dragon Flag
@@ -46,14 +46,14 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Donkey Kicks | 5 | — | 40 reps |
 | Fire Hydrants (band) | 5 | — | 40 reps |
 | Band Lateral Walk | 5 | — | 40 reps |
-| Frog Pumps | 5 | 35 Glute Bridges | 50 reps |
-| Curtsy Lunge | 6 | 30 Band Clamshells | 40 reps |
-| Single-Leg Glute Bridge | 6 | 30 Donkey Kicks | 30 reps |
-| Band Glute Bridge | 6 | 30 Fire Hydrants | — |
-| Single-Leg Romanian DL | 7 | 30 Band Lateral Walk | 35 reps |
-| Hip Thrust | 7 | 35 Frog Pumps | 40 reps |
-| Bulgarian Split Squat | 8 | 20 Single-Leg Glute Bridge | 30 reps |
-| Nordic Curl (Assisted) | 9 | 20 Bulgarian Split Squat | — |
+| Frog Pumps | 5 | 18 Glute Bridges | 50 reps |
+| Curtsy Lunge | 6 | 20 Band Clamshells | 40 reps |
+| Single-Leg Glute Bridge | 6 | 20 Donkey Kicks | 30 reps |
+| Band Glute Bridge | 6 | 20 Fire Hydrants | — |
+| Single-Leg Romanian DL | 7 | 25 Band Lateral Walk | 35 reps |
+| Hip Thrust | 7 | 20 Frog Pumps | 40 reps |
+| Bulgarian Split Squat | 8 | 14 Single-Leg Glute Bridge | 30 reps |
+| Nordic Curl (Assisted) | 9 | 14 Bulgarian Split Squat | — |
 
 **Unlock Chains:**
 - Glute Bridge → Frog Pumps → Hip Thrust
@@ -67,10 +67,10 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Exercise | Heaviness | Unlock Requirement | Retires At |
 |----------|-----------|-------------------|------------|
 | Bird Dog | 4 | — | 35 reps |
-| Good Morning | 6 | 25 Bird Dog | 40 reps |
-| Back Extension Hold | 7 | 30 Good Morning | 90s |
-| Superman | 8 | 30 Good Morning | 35 reps |
-| Reverse Hyperextension | 8 | 60s Back Extension Hold | 35 reps |
+| Good Morning | 6 | 15 Bird Dog | 40 reps |
+| Back Extension Hold | 7 | 16 Good Morning | 90s |
+| Superman | 8 | 16 Good Morning | 35 reps |
+| Reverse Hyperextension | 8 | 30s Back Extension Hold | 35 reps |
 
 **Unlock Chains:**
 - Bird Dog → Good Morning → Superman
