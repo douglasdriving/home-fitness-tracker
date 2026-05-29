@@ -6,11 +6,11 @@
 |---|---|---|
 | Dashboard | `/` | Daily Rotation Mode, Exercise Emoji Icons |
 | Calibration | `/calibration` | Exercise Emoji Icons |
-| Workout Execution | `/workout` | Coaching Tips, Intensity Feedback, Exercise Emoji Icons |
-| Workout Complete | `/workout-complete` | Exercise Emoji Icons |
+| Workout Execution | `/workout` | Coaching Tips, Intensity Feedback, Exercise Emoji Icons, McGill Protocol |
+| Workout Complete | `/workout-complete` | Exercise Emoji Icons, McGill Protocol |
 | Stretching Routine | `/stretching` | Daily Rotation Mode |
-| History | `/history` | Exercise Emoji Icons |
-| Exercise Library | `/exercises` | Exercise Progression, Exercise Emoji Icons |
+| History | `/history` | Exercise Emoji Icons, McGill Protocol |
+| Exercise Library | `/exercises` | Exercise Progression, Exercise Emoji Icons, McGill Protocol |
 | Settings | `/settings` | Exercise Emoji Icons |
 
 ## Features
@@ -22,3 +22,4 @@
 | Exercise Emoji Icons | Visually representative emoji icons displayed before exercise names across all views | [exercise-emoji-icons.md](exercise-emoji-icons.md) |
 | Exercise Progression | Unlock chains and retirement thresholds that advance users through harder exercises | [exercise-progression.md](exercise-progression.md) |
 | Intensity Feedback | Post-exercise difficulty ratings that adjust next workout targets | [intensity-feedback.md](intensity-feedback.md) |
+| McGill Protocol | Multiple short holds per side in descending sets for side plank with hybrid progressive overload | [mcgill-protocol.md](mcgill-protocol.md) |
