@@ -11,6 +11,7 @@ import Input from '../common/Input';
 import ExerciseModal from './ExerciseModal';
 import { WorkoutExercise, Set as WorkoutSet } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
+import { formatMcgillSet } from '../../utils/mcgill-formatter';
 
 interface ExercisePhaseProps {
   currentExercise: WorkoutExercise;
@@ -65,6 +66,15 @@ export default function ExercisePhase({
 
   // Format the target display
   const formatTarget = () => {
+    // Check for McGill protocol
+    if (currentSet.mcgillRounds && currentSet.mcgillHoldDuration) {
+      return formatMcgillSet(
+        currentSet.mcgillRounds,
+        currentSet.mcgillHoldDuration,
+        exercise.countingMethod === 'per-side'
+      );
+    }
+
     if (exercise.type === 'reps') {
       const suffix = exercise.countingMethod === 'per-side' ? ' per side' : '';
       return `${currentSet.targetReps}${suffix}`;
@@ -158,8 +168,10 @@ export default function ExercisePhase({
           <div className="mb-6">
             <Timer
               key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
-              duration={currentSet.targetDuration || 30}
+              duration={currentSet.mcgillHoldDuration || currentSet.targetDuration || 30}
               bilateral={exercise.countingMethod === 'per-side'}
+              mcgillRounds={currentSet.mcgillRounds}
+              mcgillRestBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
             />
           </div>
         )}

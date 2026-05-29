@@ -6,6 +6,7 @@
 import Timer from './Timer';
 import { WorkoutExercise } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
+import { formatMcgillSet } from '../../utils/mcgill-formatter';
 
 interface RestPhaseProps {
   workoutNumber: number;
@@ -98,12 +99,32 @@ export default function RestPhase({
             </div>
             <div className="text-lg font-bold text-primary">
               {isExerciseRest
-                ? (nextExerciseInfo?.type === 'reps'
-                    ? `${nextExercise?.sets[0]?.targetReps} reps`
-                    : `${nextExercise?.sets[0]?.targetDuration}s`)
-                : (exerciseData?.type === 'reps'
-                    ? `${nextSetPreview?.reps || currentExercise.sets[currentSetIndex + 1]?.targetReps} reps`
-                    : `${nextSetPreview?.duration || currentExercise.sets[currentSetIndex + 1]?.targetDuration}s`)}
+                ? (() => {
+                    const firstSet = nextExercise?.sets[0];
+                    if (firstSet?.mcgillRounds && firstSet?.mcgillHoldDuration) {
+                      return formatMcgillSet(
+                        firstSet.mcgillRounds,
+                        firstSet.mcgillHoldDuration,
+                        nextExerciseInfo?.countingMethod === 'per-side'
+                      );
+                    }
+                    return nextExerciseInfo?.type === 'reps'
+                      ? `${firstSet?.targetReps} reps`
+                      : `${firstSet?.targetDuration}s`;
+                  })()
+                : (() => {
+                    const nextSet = currentExercise.sets[currentSetIndex + 1];
+                    if (nextSet?.mcgillRounds && nextSet?.mcgillHoldDuration) {
+                      return formatMcgillSet(
+                        nextSet.mcgillRounds,
+                        nextSet.mcgillHoldDuration,
+                        exerciseData?.countingMethod === 'per-side'
+                      );
+                    }
+                    return exerciseData?.type === 'reps'
+                      ? `${nextSetPreview?.reps || nextSet?.targetReps} reps`
+                      : `${nextSetPreview?.duration || nextSet?.targetDuration}s`;
+                  })()}
             </div>
           </div>
         </div>

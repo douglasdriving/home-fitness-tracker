@@ -33,6 +33,8 @@ export interface Set {
   actualReps?: number;
   actualDuration?: number; // seconds
   equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
+  mcgillRounds?: number; // Number of short holds for McGill protocol exercises
+  mcgillHoldDuration?: number; // Duration in seconds per hold for McGill protocol
 }
 
 export interface WorkoutHistoryEntry {
@@ -65,4 +67,6 @@ export interface CompletedSet {
   actualReps?: number;
   actualDuration?: number;
   equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
+  mcgillRounds?: number; // Number of short holds for McGill protocol exercises
+  mcgillHoldDuration?: number; // Duration in seconds per hold for McGill protocol
 }

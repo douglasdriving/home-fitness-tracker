@@ -273,6 +273,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
           actualReps: set.actualReps,
           actualDuration: set.actualDuration,
           equipmentUsed: set.equipmentUsed,
+          mcgillRounds: set.mcgillRounds,
+          mcgillHoldDuration: set.mcgillHoldDuration,
         })),
       // Attach intensity feedback if provided (lookup by exercise ID)
       ...(intensityFeedbackMap && intensityFeedbackMap[ex.exerciseId] !== undefined

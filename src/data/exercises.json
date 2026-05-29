@@ -112,14 +112,16 @@
     "name": "Side Plank",
     "emoji": "📏➡️",
     "muscleGroups": ["abs", "lowerBack"],
-    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides.",
+    "description": "Lie on your side with your elbow directly under your shoulder and legs stacked. Lift your hips off the ground, forming a straight line from head to feet. Hold this position, keeping your core engaged. Perform on both sides. This exercise uses the McGill protocol: multiple short holds per side in descending sets (3 rounds, 2 rounds, 1 round) with brief rest between rounds.",
     "videoUrl": "https://www.youtube.com/watch?v=K2VljzCC16g",
     "source": "American Council on Exercise",
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 4 },
     "type": "timed",
     "defaultDuration": 20,
     "unlockRequirement": { "exerciseId": "dead-bug-001", "type": "reps", "value": 15 },
-    "countingMethod": "per-side"
+    "countingMethod": "per-side",
+    "structure": "mcgill",
+    "mcgillDefaults": { "rounds": [3, 2, 1], "holdDuration": 10, "restBetweenRounds": 5 }
   },
   {
     "id": "mountain-climbers-001",

@@ -10,6 +10,7 @@ import {
   RetirementReason,
 } from '../lib/achievement-tracker';
 import { allExercises, getExerciseEmoji } from '../data/exerciseData';
+import { formatMcgillSet } from '../utils/mcgill-formatter';
 
 interface WorkoutCompleteState {
   workout: WorkoutHistoryEntry;
@@ -176,6 +177,13 @@ export default function WorkoutComplete() {
                   {/* Set-by-set results */}
                   <div className="flex gap-2 mb-2">
                     {exercise.completedSets.map((set) => {
+                      let displayValue: string;
+                      if (set.mcgillRounds && set.mcgillHoldDuration) {
+                        displayValue = formatMcgillSet(set.mcgillRounds, set.mcgillHoldDuration);
+                      } else {
+                        const value = isRepsExercise ? set.actualReps : set.actualDuration;
+                        displayValue = `${value}${isRepsExercise ? '' : 's'}`;
+                      }
                       const value = isRepsExercise ? set.actualReps : set.actualDuration;
                       const isBestSet = value === currentBest && isNewPB;
                       return (
@@ -187,7 +195,7 @@ export default function WorkoutComplete() {
                               : 'bg-background-lighter text-text-muted'
                           }`}
                         >
-                          {value}{isRepsExercise ? '' : 's'}
+                          {displayValue}
                         </div>
                       );
                     })}

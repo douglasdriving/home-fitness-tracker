@@ -51,7 +51,12 @@ export function getBestPerformance(
       if (set.actualReps !== undefined) {
         bestReps = Math.max(bestReps ?? 0, set.actualReps);
       }
-      if (set.actualDuration !== undefined) {
+      // For McGill protocol exercises, use mcgillHoldDuration (per-hold duration)
+      // rather than actualDuration (total work time), because unlock thresholds
+      // are based on single-hold capacity (e.g., 30s hold to unlock hollow body)
+      if (set.mcgillHoldDuration !== undefined) {
+        bestDuration = Math.max(bestDuration ?? 0, set.mcgillHoldDuration);
+      } else if (set.actualDuration !== undefined) {
         bestDuration = Math.max(bestDuration ?? 0, set.actualDuration);
       }
     }
@@ -82,7 +87,10 @@ export function getWorkoutPerformance(
     if (set.actualReps !== undefined) {
       bestReps = Math.max(bestReps ?? 0, set.actualReps);
     }
-    if (set.actualDuration !== undefined) {
+    // For McGill protocol exercises, use mcgillHoldDuration (per-hold duration)
+    if (set.mcgillHoldDuration !== undefined) {
+      bestDuration = Math.max(bestDuration ?? 0, set.mcgillHoldDuration);
+    } else if (set.actualDuration !== undefined) {
       bestDuration = Math.max(bestDuration ?? 0, set.actualDuration);
     }
   }
@@ -381,6 +389,9 @@ export function getAvailableExercises(
       countingMethod: ex.countingMethod,
       unlockRequirement: ex.unlockRequirement,
       retirementThreshold: ex.retirementThreshold,
+      coachingTip: ex.coachingTip,
+      structure: ex.structure,
+      mcgillDefaults: ex.mcgillDefaults,
     }));
 }
 

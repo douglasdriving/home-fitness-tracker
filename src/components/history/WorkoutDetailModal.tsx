@@ -3,6 +3,7 @@ import { WorkoutHistoryEntry } from '../../types/workout';
 import { getExerciseById } from '../../data/exerciseData';
 import { useEffect, useState } from 'react';
 import { db } from '../../db/db';
+import { formatMcgillSet } from '../../utils/mcgill-formatter';
 
 interface WorkoutDetailModalProps {
   workout: WorkoutHistoryEntry;
@@ -126,21 +127,32 @@ export default function WorkoutDetailModal({
 
                   {/* Sets */}
                   <div className="space-y-2 mt-2">
-                    {exercise.completedSets.map((set, setIdx) => (
-                      <div key={setIdx} className="text-xs">
-                        <div className="bg-background-lighter text-text px-2 py-1 rounded inline-block">
-                          Set {set.setNumber}:{' '}
-                          {set.actualReps
-                            ? `${set.actualReps} reps${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`
-                            : `${set.actualDuration}s${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`}
-                        </div>
-                        {set.equipmentUsed && (
-                          <div className="text-text-muted mt-1 ml-2">
-                            Equipment: {set.equipmentUsed}
+                    {exercise.completedSets.map((set, setIdx) => {
+                      let setDisplay: string;
+                      if (set.mcgillRounds && set.mcgillHoldDuration) {
+                        setDisplay = formatMcgillSet(
+                          set.mcgillRounds,
+                          set.mcgillHoldDuration,
+                          exerciseData?.countingMethod === 'per-side'
+                        );
+                      } else if (set.actualReps) {
+                        setDisplay = `${set.actualReps} reps${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`;
+                      } else {
+                        setDisplay = `${set.actualDuration}s${exerciseData?.countingMethod === 'per-side' ? ' per side' : ''}`;
+                      }
+                      return (
+                        <div key={setIdx} className="text-xs">
+                          <div className="bg-background-lighter text-text px-2 py-1 rounded inline-block">
+                            Set {set.setNumber}: {setDisplay}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                          {set.equipmentUsed && (
+                            <div className="text-text-muted mt-1 ml-2">
+                              Equipment: {set.equipmentUsed}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
 
                   {/* Intensity Feedback */}
