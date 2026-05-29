@@ -27,7 +27,8 @@ Unlocked and retired exercise IDs are persisted in the user profile's `exerciseA
 
 ## Gotchas
 
-- Unlock/retirement checks only consider the **current workout's** performance, not cumulative history. A user who did 45 crunches last week but only 10 this week won't trigger the 40-rep unlock threshold.
+- Unlock/retirement checks only consider the **current workout's** performance, not cumulative history. A user who did 25 crunches last week but only 10 this week won't trigger the 20-rep unlock threshold.
 - An exercise cannot be both unlocked and retired in the same workout — unlock takes precedence for newly unlocked exercises.
 - Removing an exercise requires updating any other exercise that references it in `unlockRequirement`, plus seed data and documentation. Historical workout data stores `exerciseName` as a string so removed exercises still display correctly in History and WorkoutComplete.
-- Some exercises share an unlock prerequisite (fork points). For example, Good Morning at 30 reps unlocks both Superman and Back Extension Hold simultaneously.
+- Some exercises share an unlock prerequisite (fork points). For example, Good Morning at 16 reps unlocks both Superman and Back Extension Hold simultaneously.
+- Unlock thresholds are set to ≤1.5x the prerequisite exercise's default value, ensuring smooth progression pacing when transitioning to newly unlocked exercises.
