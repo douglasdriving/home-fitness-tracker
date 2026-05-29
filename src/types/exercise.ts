@@ -25,7 +25,8 @@ export interface Exercise {
   id: string;
   name: string;
   emoji: string;
-  muscleGroups: MuscleGroup[];
+  primaryMuscleGroup: MuscleGroup; // Main muscle group used for daily rotation selection
+  muscleGroups: MuscleGroup[]; // All targeted muscle groups (primary + secondary)
   description: string;
   videoUrl?: string;
   imageUrl?: string;

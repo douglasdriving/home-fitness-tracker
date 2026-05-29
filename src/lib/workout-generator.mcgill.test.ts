@@ -19,7 +19,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 1,
         strengthLevels: mockStrengthLevels,
         workoutHistory: [],
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'], // dead-bug needed for side-plank unlock
           retiredExercises: [],
@@ -94,7 +94,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 2,
         strengthLevels: mockStrengthLevels,
         workoutHistory: history,
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'],
           retiredExercises: [],
@@ -164,7 +164,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 2,
         strengthLevels: mockStrengthLevels,
         workoutHistory: history,
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'],
           retiredExercises: [],
@@ -233,7 +233,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 2,
         strengthLevels: mockStrengthLevels,
         workoutHistory: history,
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'],
           retiredExercises: [],
@@ -292,7 +292,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 2,
         strengthLevels: mockStrengthLevels,
         workoutHistory: history,
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'],
           retiredExercises: [],
@@ -345,7 +345,7 @@ describe('McGill protocol workout generation', () => {
         workoutNumber: 2,
         strengthLevels: mockStrengthLevels,
         workoutHistory: history,
-        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001'],
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
         exerciseAchievements: {
           unlockedExercises: ['dead-bug-001', 'side-plank-001'],
           retiredExercises: [],

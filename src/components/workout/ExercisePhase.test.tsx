@@ -19,6 +19,7 @@ describe('ExercisePhase - Coaching Tips', () => {
     id: 'test-exercise-001',
     name: 'Test Exercise',
     emoji: '🧪',
+    primaryMuscleGroup: 'abs',
     muscleGroups: ['abs'],
     description: 'Test description',
     source: 'Test Source',

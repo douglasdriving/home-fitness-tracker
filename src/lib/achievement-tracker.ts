@@ -376,6 +376,7 @@ export function getAvailableExercises(
       id: ex.id,
       name: ex.name,
       emoji: ex.emoji,
+      primaryMuscleGroup: ex.primaryMuscleGroup,
       muscleGroups: ex.muscleGroups,
       description: ex.description,
       videoUrl: ex.videoUrl,

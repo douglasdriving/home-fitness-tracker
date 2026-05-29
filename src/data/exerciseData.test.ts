@@ -20,17 +20,13 @@ describe('exerciseData', () => {
       expect(exercisesUnlockedByProneYTW).toHaveLength(0);
     });
 
-    it('should have Back Extension Hold unlocked by good-morning-001 at 16 reps', () => {
+    it('should have Back Extension Hold as a starter exercise (no unlock requirement)', () => {
       const backExtensionHold = getExerciseById('back-extension-hold-001');
       expect(backExtensionHold).toBeDefined();
-      expect(backExtensionHold?.unlockRequirement).toEqual({
-        exerciseId: 'good-morning-001',
-        type: 'reps',
-        value: 16,
-      });
+      expect(backExtensionHold?.unlockRequirement).toBeUndefined();
     });
 
-    it('should have Good Morning exercise with both Superman and Back Extension Hold unlocking at 30 reps', () => {
+    it('should have Superman unlocked by good-morning-001 at 16 reps', () => {
       const goodMorning = getExerciseById('good-morning-001');
       expect(goodMorning).toBeDefined();
 
@@ -39,35 +35,55 @@ describe('exerciseData', () => {
         ex => ex.unlockRequirement?.exerciseId === 'good-morning-001'
       );
 
-      // Should have at least 2: Superman and Back Extension Hold
-      expect(exercisesUnlockedByGoodMorning.length).toBeGreaterThanOrEqual(2);
+      // Should have Superman
+      expect(exercisesUnlockedByGoodMorning.length).toBeGreaterThanOrEqual(1);
 
       const exerciseIds = exercisesUnlockedByGoodMorning.map(ex => ex.id);
       expect(exerciseIds).toContain('superman-001');
-      expect(exerciseIds).toContain('back-extension-hold-001');
 
-      // Both should unlock at 16 reps
       const superman = exercisesUnlockedByGoodMorning.find(ex => ex.id === 'superman-001');
-      const backExtensionHold = exercisesUnlockedByGoodMorning.find(ex => ex.id === 'back-extension-hold-001');
-
       expect(superman?.unlockRequirement?.value).toBe(16);
-      expect(backExtensionHold?.unlockRequirement?.value).toBe(16);
     });
 
     it('should still have all other lower back base exercises', () => {
       const lowerBackBaseExercises = allExercises.filter(
-        ex => ex.muscleGroups.includes('lowerBack') && !ex.unlockRequirement
+        ex => ex.primaryMuscleGroup === 'lowerBack' && !ex.unlockRequirement
       );
 
-      // Bird Dog should be the primary lower back base exercise
+      // Bird Dog, Good Morning, and Back Extension Hold should be lower back starters
       const birdDog = lowerBackBaseExercises.find(ex => ex.id === 'bird-dog-001');
+      const goodMorning = lowerBackBaseExercises.find(ex => ex.id === 'good-morning-001');
+      const backExtensionHold = lowerBackBaseExercises.find(ex => ex.id === 'back-extension-hold-001');
       expect(birdDog).toBeDefined();
-      expect(lowerBackBaseExercises.length).toBeGreaterThanOrEqual(1);
+      expect(goodMorning).toBeDefined();
+      expect(backExtensionHold).toBeDefined();
+      expect(lowerBackBaseExercises.length).toBeGreaterThanOrEqual(3);
+    });
+  });
+
+  describe('primaryMuscleGroup field', () => {
+    it('should have primaryMuscleGroup set on every exercise', () => {
+      allExercises.forEach(exercise => {
+        expect(exercise.primaryMuscleGroup).toBeDefined();
+        expect(['abs', 'glutes', 'lowerBack']).toContain(exercise.primaryMuscleGroup);
+      });
+    });
+
+    it('primaryMuscleGroup should always be included in muscleGroups array', () => {
+      allExercises.forEach(exercise => {
+        expect(exercise.muscleGroups).toContain(exercise.primaryMuscleGroup);
+      });
+    });
+
+    it('primaryMuscleGroup should match the first entry in muscleGroups', () => {
+      allExercises.forEach(exercise => {
+        expect(exercise.primaryMuscleGroup).toBe(exercise.muscleGroups[0]);
+      });
     });
   });
 
   describe('Lower back progression chain', () => {
-    it('should have a complete lower back progression chain after removal', () => {
+    it('should have a complete lower back progression chain', () => {
       const birdDog = getExerciseById('bird-dog-001');
       const goodMorning = getExerciseById('good-morning-001');
       const superman = getExerciseById('superman-001');
@@ -81,15 +97,31 @@ describe('exerciseData', () => {
       expect(backExtensionHold).toBeDefined();
       expect(reverseHyper).toBeDefined();
 
-      // Verify progression: Bird Dog → Good Morning
-      expect(goodMorning?.unlockRequirement?.exerciseId).toBe('bird-dog-001');
+      // Bird Dog, Good Morning, and Back Extension Hold are starters (no unlock requirement)
+      expect(birdDog?.unlockRequirement).toBeUndefined();
+      expect(goodMorning?.unlockRequirement).toBeUndefined();
+      expect(backExtensionHold?.unlockRequirement).toBeUndefined();
 
-      // Verify fork: Good Morning → Superman AND Good Morning → Back Extension Hold
+      // Verify locked exercises: Good Morning → Superman
       expect(superman?.unlockRequirement?.exerciseId).toBe('good-morning-001');
-      expect(backExtensionHold?.unlockRequirement?.exerciseId).toBe('good-morning-001');
 
       // Verify continuation: Back Extension Hold → Reverse Hyperextension
       expect(reverseHyper?.unlockRequirement?.exerciseId).toBe('back-extension-hold-001');
+    });
+  });
+
+  describe('Starter exercises per muscle group', () => {
+    it('should have at least 3 starter exercises per primary muscle group (without bands)', () => {
+      const muscleGroups = ['abs', 'glutes', 'lowerBack'] as const;
+
+      muscleGroups.forEach(group => {
+        const starters = allExercises.filter(
+          ex => ex.primaryMuscleGroup === group
+            && !ex.unlockRequirement
+            && ex.equipment !== 'elastic-band'
+        );
+        expect(starters.length).toBeGreaterThanOrEqual(3);
+      });
     });
   });
 });

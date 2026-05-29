@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { generateWorkout, generateDailyRotationWorkout, findLastPerformanceWithFeedback, getNextDailyRotationGroup } from './workout-generator';
 import { getExerciseById } from '../data/exerciseData';
+import { getAvailableExercises } from './achievement-tracker';
 import { StrengthLevels } from '../types/user';
 import { WorkoutHistoryEntry } from '../types/workout';
 import { MuscleGroup } from '../types/exercise';
@@ -359,11 +360,11 @@ describe('generateDailyRotationWorkout', () => {
 
         expect(workout.exercises.length).toBe(3);
 
-        // All exercises should target the specified muscle group
+        // All exercises should have the specified muscle group as their PRIMARY group
         workout.exercises.forEach((workoutExercise) => {
           const exercise = getExerciseById(workoutExercise.exerciseId);
           expect(exercise).toBeDefined();
-          expect(exercise!.muscleGroups).toContain(targetMuscleGroup);
+          expect(exercise!.primaryMuscleGroup).toBe(targetMuscleGroup);
         });
       });
     });
@@ -408,6 +409,60 @@ describe('generateDailyRotationWorkout', () => {
       // Should generate workout with fewer than 3 exercises without crashing
       expect(workout.exercises.length).toBeGreaterThan(0);
       expect(workout.exercises.length).toBeLessThanOrEqual(3);
+    });
+
+    it('should only select exercises by primaryMuscleGroup, not secondary groups', () => {
+      // Generate workouts for each muscle group and verify no overlap
+      const muscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
+      const exercisesByGroup: Record<string, Set<string>> = {};
+
+      muscleGroups.forEach(targetMuscleGroup => {
+        exercisesByGroup[targetMuscleGroup] = new Set();
+
+        // Generate multiple workouts to see different exercise selections
+        for (let i = 0; i < 10; i++) {
+          const workout = generateDailyRotationWorkout({
+            workoutNumber: i + 1,
+            strengthLevels: defaultStrengthLevels,
+            targetMuscleGroup,
+            hasElasticBands: true,
+          });
+
+          workout.exercises.forEach(ex => {
+            exercisesByGroup[targetMuscleGroup].add(ex.exerciseId);
+          });
+        }
+      });
+
+      // Verify no exercise appears in multiple muscle group rotations
+      const absExercises = exercisesByGroup['abs'];
+      const glutesExercises = exercisesByGroup['glutes'];
+      const lowerBackExercises = exercisesByGroup['lowerBack'];
+
+      absExercises.forEach(id => {
+        expect(glutesExercises.has(id)).toBe(false);
+        expect(lowerBackExercises.has(id)).toBe(false);
+      });
+      glutesExercises.forEach(id => {
+        expect(absExercises.has(id)).toBe(false);
+        expect(lowerBackExercises.has(id)).toBe(false);
+      });
+      lowerBackExercises.forEach(id => {
+        expect(absExercises.has(id)).toBe(false);
+        expect(glutesExercises.has(id)).toBe(false);
+      });
+    });
+
+    it('should have at least 3 glutes exercises available for new users without bands', () => {
+      // Simulate a new user with no workout history and no elastic bands
+      const available = getAvailableExercises(
+        [], // no workout history
+        { unlockedExercises: [], retiredExercises: [] },
+        false, // no elastic bands
+      );
+
+      const glutesExercises = available.filter(ex => ex.primaryMuscleGroup === 'glutes');
+      expect(glutesExercises.length).toBeGreaterThanOrEqual(3);
     });
   });
 

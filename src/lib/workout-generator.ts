@@ -163,8 +163,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
   // Build workout exercises with sets
   let workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => {
-    // Determine primary muscle group for this exercise (first one in the array)
-    const primaryMuscleGroup = exercise.muscleGroups[0];
+    // Use the exercise's designated primary muscle group
+    const primaryMuscleGroup = exercise.primaryMuscleGroup;
     const strengthLevel = strengthLevels[primaryMuscleGroup];
 
     // Check if user has done this exercise before (progressive overload)
@@ -365,9 +365,10 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
     excludedExerciseIds
   );
 
-  // Filter to exercises that target the specific muscle group
+  // Filter to exercises whose PRIMARY muscle group matches the target
+  // This prevents exercises from appearing in multiple rotation days
   const availableExercises = allAvailableExercises.filter(ex =>
-    ex.muscleGroups.includes(targetMuscleGroup)
+    ex.primaryMuscleGroup === targetMuscleGroup
   );
 
   console.log(`[DAILY ROTATION] ${availableExercises.length} available exercises for ${targetMuscleGroup}`);
