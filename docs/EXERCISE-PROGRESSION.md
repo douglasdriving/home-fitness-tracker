@@ -52,13 +52,12 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Band Glute Bridge | 6 | 20 Fire Hydrants | — |
 | Single-Leg Romanian DL | 7 | 25 Band Lateral Walk | 35 reps |
 | Hip Thrust | 7 | 20 Frog Pumps | 40 reps |
-| Bulgarian Split Squat | 8 | 14 Single-Leg Glute Bridge | 30 reps |
-| Nordic Curl (Assisted) | 9 | 14 Bulgarian Split Squat | — |
+| Nordic Curl (Assisted) | 9 | 18 Hip Thrusts | — |
 
 **Unlock Chains:**
-- Glute Bridge → Frog Pumps → Hip Thrust
+- Glute Bridge → Frog Pumps → Hip Thrust → Nordic Curl
 - Band Clamshells → Curtsy Lunge
-- Donkey Kicks → Single-Leg Glute Bridge → Bulgarian Split Squat → Nordic Curl
+- Donkey Kicks → Single-Leg Glute Bridge
 - Fire Hydrants → Band Glute Bridge
 - Band Lateral Walk → Single-Leg Romanian DL
 

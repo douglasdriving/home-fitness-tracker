@@ -24,11 +24,11 @@ Every workout targets all three groups.
 - *Intermediate*: Plank, Dead Bug, Bicycle Crunches, Plank Shoulder Taps
 - *Advanced*: Mountain Climbers, Leg Raises, V-Ups, Hollow Body Hold, Dragon Flag
 
-### Glutes (15 exercises)
+### Glutes (14 exercises)
 - *Basic*: Glute Bridge, Frog Pumps
 - *Band exercises*: Clamshells, Fire Hydrants, Band Lateral Walk, Band Glute Bridge
 - *Unilateral*: Donkey Kicks, Curtsy Lunges, Single-Leg Glute Bridge
-- *Advanced*: Hip Thrust, Bulgarian Split Squat, Single-Leg RDL, Nordic Curl
+- *Advanced*: Hip Thrust, Single-Leg RDL, Nordic Curl
 
 ### Lower Back (7 exercises)
 - *Basic*: Bird Dog

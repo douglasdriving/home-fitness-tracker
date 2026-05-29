@@ -348,21 +348,6 @@
     "retirementThreshold": { "type": "reps", "value": 40 }
   },
   {
-    "id": "bulgarian-split-squat-001",
-    "name": "Bulgarian Split Squat",
-    "emoji": "🇧🇬",
-    "muscleGroups": ["glutes"],
-    "description": "Stand a couple feet in front of a couch or chair. Place one foot behind you on the elevated surface. Lower your body by bending your front knee, keeping your torso upright. Go down until your front thigh is parallel to the ground, then push back up through your front heel.",
-    "videoUrl": "https://www.youtube.com/watch?v=2C-uNgKwPLE",
-    "source": "Strength Training",
-    "heavinessScore": { "abs": 0, "glutes": 8, "lowerBack": 2 },
-    "type": "reps",
-    "defaultReps": 10,
-    "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "single-leg-glute-bridge-001", "type": "reps", "value": 14 },
-    "retirementThreshold": { "type": "reps", "value": 30 }
-  },
-  {
     "id": "nordic-curl-assisted-001",
     "name": "Nordic Curl (Assisted)",
     "emoji": "🧊",
@@ -373,7 +358,7 @@
     "heavinessScore": { "abs": 0, "glutes": 9, "lowerBack": 4 },
     "type": "reps",
     "defaultReps": 5,
-    "unlockRequirement": { "exerciseId": "bulgarian-split-squat-001", "type": "reps", "value": 14 }
+    "unlockRequirement": { "exerciseId": "hip-thrust-001", "type": "reps", "value": 18 }
   },
   {
     "id": "bird-dog-001",

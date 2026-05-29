@@ -25,7 +25,7 @@ Items to implement in the app or routine, arising from coaching sessions.
 
 ### Retire / Remove
 - [ ] **Dead Bug**: Retire from current rotation. At 30 reps, it has become a hip flexor endurance exercise, not a core exercise. Could return later as a harder variation (slow tempo, full leg extension, added weight) at 8-12 reps per side.
-- [ ] **Bulgarian Split Squat**: Remove from program. Primarily a quad exercise, doesn't fit core-focused training. Could return if program expands to leg training.
+- [x] **Bulgarian Split Squat**: Remove from program. Primarily a quad exercise, doesn't fit core-focused training. Could return if program expands to leg training.
 
 ### Form & Instruction Updates
 - [ ] **Reverse Crunches**: Update exercise instructions to emphasize "pelvic curl, not a leg lift." Key cues: curl tailbone toward ceiling, 3-second lowering count, maintain lower back contact with floor. Give 2-3 sessions with corrected form before deciding if it stays.
