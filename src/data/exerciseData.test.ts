@@ -124,4 +124,35 @@ describe('exerciseData', () => {
       });
     });
   });
+
+  describe('Single-Leg RDL resistance band update', () => {
+    it('should have elastic-band equipment', () => {
+      const singleLegRDL = getExerciseById('single-leg-rdl-001');
+      expect(singleLegRDL).toBeDefined();
+      expect(singleLegRDL?.equipment).toBe('elastic-band');
+    });
+
+    it('should have description mentioning band setup', () => {
+      const singleLegRDL = getExerciseById('single-leg-rdl-001');
+      expect(singleLegRDL).toBeDefined();
+      expect(singleLegRDL?.description).toBeDefined();
+
+      const description = singleLegRDL?.description.toLowerCase();
+      expect(description).toContain('band');
+      expect(description).toContain('foot');
+    });
+
+    it('should maintain its existing fields', () => {
+      const singleLegRDL = getExerciseById('single-leg-rdl-001');
+      expect(singleLegRDL).toBeDefined();
+
+      // Should maintain key properties
+      expect(singleLegRDL?.name).toBe('Single-Leg Romanian Deadlift');
+      expect(singleLegRDL?.type).toBe('reps');
+      expect(singleLegRDL?.defaultReps).toBe(10);
+      expect(singleLegRDL?.countingMethod).toBe('per-side');
+      expect(singleLegRDL?.heavinessScore).toEqual({ abs: 0, glutes: 7, lowerBack: 5 });
+      expect(singleLegRDL?.primaryMuscleGroup).toBe('glutes');
+    });
+  });
 });
