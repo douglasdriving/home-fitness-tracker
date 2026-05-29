@@ -37,8 +37,7 @@ const FINAL_WORKOUT_TARGETS: Record<string, number> = {
 
   // Lower back exercises
   'bird-dog-001': 23,          // Single-Leg Romanian Deadlift unlocks at 25 reps
-  'prone-y-t-w-001': 28,       // Reverse Hyperextension unlocks at 30 reps
-  'good-morning-001': 28,      // Back Extension Hold unlocks at 30 reps
+  'good-morning-001': 28,      // Back Extension Hold and Superman unlock at 30 reps
   'superman-001': 55,          // (no unlock, but good to have progression)
 };
 

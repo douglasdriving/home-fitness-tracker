@@ -390,19 +390,6 @@
     "retirementThreshold": { "type": "reps", "value": 35 }
   },
   {
-    "id": "prone-y-t-w-001",
-    "name": "Prone Y-T-W Raises",
-    "emoji": "🙆",
-    "muscleGroups": ["lowerBack"],
-    "description": "Lie face down with arms extended overhead. Lift your chest slightly and raise your arms into a Y position, hold briefly. Lower and raise into a T position (arms out to sides). Lower and raise into a W position (elbows bent, hands by shoulders). That's one rep.",
-    "videoUrl": "https://www.youtube.com/watch?v=lB8FaGfcf1Q",
-    "source": "Physical Therapy",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 5 },
-    "type": "reps",
-    "defaultReps": 10,
-    "retirementThreshold": { "type": "reps", "value": 40 }
-  },
-  {
     "id": "good-morning-001",
     "name": "Good Morning",
     "emoji": "🌅",
@@ -427,7 +414,7 @@
     "heavinessScore": { "abs": 0, "glutes": 5, "lowerBack": 7 },
     "type": "timed",
     "defaultDuration": 20,
-    "unlockRequirement": { "exerciseId": "prone-y-t-w-001", "type": "reps", "value": 30 },
+    "unlockRequirement": { "exerciseId": "good-morning-001", "type": "reps", "value": 30 },
     "retirementThreshold": { "type": "timed", "value": 90 }
   },
   {

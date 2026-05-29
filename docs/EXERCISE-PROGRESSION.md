@@ -67,15 +67,14 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Exercise | Heaviness | Unlock Requirement | Retires At |
 |----------|-----------|-------------------|------------|
 | Bird Dog | 4 | — | 35 reps |
-| Prone Y-T-W Raises | 5 | — | 40 reps |
 | Good Morning | 6 | 25 Bird Dog | 40 reps |
-| Back Extension Hold | 7 | 30 Prone Y-T-W | 90s |
+| Back Extension Hold | 7 | 30 Good Morning | 90s |
 | Superman | 8 | 30 Good Morning | 35 reps |
 | Reverse Hyperextension | 8 | 60s Back Extension Hold | 35 reps |
 
 **Unlock Chains:**
 - Bird Dog → Good Morning → Superman
-- Prone Y-T-W → Back Extension Hold → Reverse Hyperextension
+- Bird Dog → Good Morning → Back Extension Hold → Reverse Hyperextension
 
 ## How It Works
 

@@ -634,6 +634,31 @@ describe('Achievement Tracker', () => {
   });
 
   describe('edge cases', () => {
+    it('handles removed exercises in historical data gracefully', () => {
+      // Scenario: User has workout history with a removed exercise (prone-y-t-w-001)
+      const historyWithRemovedExercise: WorkoutHistoryEntry = {
+        id: 'h1',
+        workoutId: 'w1',
+        workoutNumber: 1,
+        completedDate: Date.now(),
+        totalDuration: 30,
+        exercises: [
+          {
+            exerciseId: 'prone-y-t-w-001', // This exercise has been removed
+            exerciseName: 'Prone Y-T-W Raises', // Name is stored in history
+            muscleGroups: ['lowerBack'],
+            completedSets: [
+              { setNumber: 1, actualReps: 25 },
+            ],
+          },
+        ],
+      };
+
+      // getBestPerformance should return the stored performance even if exercise is removed
+      const result = getBestPerformance('prone-y-t-w-001', [historyWithRemovedExercise]);
+      expect(result?.reps).toBe(25);
+    });
+
     it('handles empty workout history', () => {
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
