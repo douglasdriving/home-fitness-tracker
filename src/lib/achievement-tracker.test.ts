@@ -367,7 +367,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does NOT allow unlock and retire of same exercise in same workout', () => {
-      // Plank shoulder taps: unlocks at 60s plank, retires at 90s plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
       // If user just unlocked it, they shouldn't immediately retire it
       const currentWorkout: WorkoutHistoryEntry = {
         id: 'h1',
@@ -381,7 +381,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 60s)
+              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 45s)
             ],
           },
           {
@@ -389,7 +389,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank Shoulder Taps',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 95 }, // Exceeds 90s retirement threshold
+              { setNumber: 1, actualReps: 35 }, // Exceeds 30 reps retirement threshold
             ],
           },
         ],
@@ -620,7 +620,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does not unlock and retire same exercise simultaneously', () => {
-      // Plank shoulder taps: unlocks at 60s plank, retires at 90s plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
       const completedWorkout: WorkoutHistoryEntry = {
         id: 'h1',
         workoutId: 'w1',
@@ -633,7 +633,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (60s)
+              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (45s)
             ],
           },
           {
@@ -641,7 +641,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank Shoulder Taps',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 95 }, // Enough to retire (90s)
+              { setNumber: 1, actualReps: 35 }, // Enough to retire (30 reps)
             ],
           },
         ],
@@ -654,7 +654,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(completedWorkout, [], achievements);
 
-      // Plank shoulder taps should be unlocked (60s plank, we did 65s)
+      // Plank shoulder taps should be unlocked (45s plank, we did 65s)
       expect(result.newUnlocks).toContain('plank-shoulder-taps-001');
       // Should NOT also be retired in the same workout
       expect(result.newRetirements).not.toContain('plank-shoulder-taps-001');

@@ -110,10 +110,10 @@
     "videoUrl": "https://www.youtube.com/watch?v=LEFtlHCkdz8",
     "source": "ACE Fitness",
     "heavinessScore": { "abs": 6, "glutes": 0, "lowerBack": 3 },
-    "type": "timed",
-    "defaultDuration": 30,
+    "type": "reps",
+    "defaultReps": 12,
     "unlockRequirement": { "exerciseId": "plank-001", "type": "timed", "value": 45 },
-    "retirementThreshold": { "type": "timed", "value": 90 }
+    "retirementThreshold": { "type": "reps", "value": 30 }
   },
   {
     "id": "side-plank-001",

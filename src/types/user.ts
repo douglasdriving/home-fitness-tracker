@@ -21,6 +21,7 @@ export interface UserProfile {
     autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
   };
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
+  hasMigratedShoulderTaps?: boolean; // Flag to track if plank shoulder taps migration has been completed
   weight?: number; // kg
   height?: number; // cm
   workoutFrequencyDays?: number; // Target frequency: work out every X days (default: 2, meaning max 1 day gap)
