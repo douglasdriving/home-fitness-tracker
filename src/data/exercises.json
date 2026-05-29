@@ -62,7 +62,8 @@
     "heavinessScore": { "abs": 5, "glutes": 0, "lowerBack": 0 },
     "type": "reps",
     "defaultReps": 15,
-    "retirementThreshold": { "type": "reps", "value": 45 }
+    "retirementThreshold": { "type": "reps", "value": 45 },
+    "coachingTip": "Pelvic curl, not a leg lift. Curl tailbone toward ceiling, 3-second lowering count, maintain lower back contact with floor."
   },
   {
     "id": "flutter-kicks-001",
@@ -132,7 +133,8 @@
     "type": "timed",
     "defaultDuration": 30,
     "unlockRequirement": { "exerciseId": "reverse-crunches-001", "type": "reps", "value": 20 },
-    "retirementThreshold": { "type": "timed", "value": 90 }
+    "retirementThreshold": { "type": "timed", "value": 90 },
+    "coachingTip": "Do NOT use yoga mat. Use socks on hard floor for sliding variation (harder core variation). Alternative: furniture sliders or paper plates."
   },
   {
     "id": "leg-raises-001",
@@ -174,7 +176,8 @@
     "type": "timed",
     "defaultDuration": 20,
     "unlockRequirement": { "exerciseId": "side-plank-001", "type": "timed", "value": 30 },
-    "retirementThreshold": { "type": "timed", "value": 90 }
+    "retirementThreshold": { "type": "timed", "value": 90 },
+    "coachingTip": "⚠️ SAFETY: Lower back MUST stay on floor at all times. Stop set immediately when back lifts. Regress by: (1) bending knees more, (2) bringing arms to sides, (3) reducing hold time."
   },
   {
     "id": "dragon-flag-tuck-001",
@@ -244,7 +247,8 @@
     "defaultReps": 15,
     "equipment": "elastic-band",
     "countingMethod": "per-side",
-    "retirementThreshold": { "type": "reps", "value": 40 }
+    "retirementThreshold": { "type": "reps", "value": 40 },
+    "coachingTip": "Reposition resistance band above the knee (lower thigh) instead of at knee crease to prevent blisters. Wearing pants also works."
   },
   {
     "id": "band-lateral-walk-001",

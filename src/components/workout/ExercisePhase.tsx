@@ -105,6 +105,28 @@ export default function ExercisePhase({
                 </span>
               ))}
             </div>
+
+            {/* Coaching Tip */}
+            {exercise.coachingTip && (
+              <div
+                className={`mt-3 p-3 rounded-lg ${
+                  exercise.coachingTip.includes('⚠️')
+                    ? 'bg-red-500/10 border border-red-500/30'
+                    : 'bg-secondary/10 border border-secondary/30'
+                }`}
+              >
+                <p className="text-sm text-text">
+                  {exercise.coachingTip.includes('⚠️') ? (
+                    exercise.coachingTip
+                  ) : (
+                    <>
+                      <span className="mr-1">💡</span>
+                      {exercise.coachingTip}
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
           <div className="text-right">
             <div className="text-sm text-text-muted">Exercise</div>

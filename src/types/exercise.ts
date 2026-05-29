@@ -32,4 +32,5 @@ export interface Exercise {
   countingMethod?: CountingMethod; // defaults to 'total' if not specified
   unlockRequirement?: UnlockRequirement; // if set, exercise must be unlocked
   retirementThreshold?: RetirementThreshold; // if set, exercise can be auto-retired
+  coachingTip?: string; // persistent coaching tip displayed during workout execution
 }
