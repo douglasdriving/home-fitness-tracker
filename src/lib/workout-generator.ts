@@ -553,14 +553,16 @@ function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
 
       // Add exercise time
       if (set.mcgillRounds && set.mcgillHoldDuration && isMcgill) {
-        // McGill protocol: multiple rounds per side with rest between rounds
-        // Each round: hold left + transition + hold right + rest (except after last round)
-        const transitionTime = 3; // Seconds between sides
-        const timePerRound = set.mcgillHoldDuration * 2 + transitionTime; // Bilateral
-        const totalRoundTime = timePerRound * set.mcgillRounds;
-        const totalRestTime = restBetweenRounds * (set.mcgillRounds - 1) * 2; // Rest after each round except last, bilateral
+        // McGill protocol: all rounds on left side, then transition, then all rounds on right
+        // Left side: (holdDuration × rounds) + rest × (rounds - 1)
+        // Transition: 10s
+        // Right side: same as left
+        const transitionTime = 10; // Seconds between sides
+        const holdTimePerSide = set.mcgillHoldDuration * set.mcgillRounds;
+        const restTimePerSide = restBetweenRounds * Math.max(0, set.mcgillRounds - 1);
+        const timePerSide = holdTimePerSide + restTimePerSide;
 
-        totalSeconds += totalRoundTime + totalRestTime;
+        totalSeconds += (timePerSide * 2) + transitionTime;
       } else if (set.targetReps) {
         // Assume 3 seconds per rep
         totalSeconds += (set.targetReps * 3);

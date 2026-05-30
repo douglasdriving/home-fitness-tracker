@@ -10,8 +10,6 @@ interface TimerProps {
   showSecondsOnly?: boolean; // Show only seconds, no minutes formatting
   bilateral?: boolean; // Run timer twice (for exercises done on both sides)
   transitionDuration?: number; // Seconds of rest between left and right sides (default 10)
-  mcgillRounds?: number; // Number of rounds for McGill protocol
-  mcgillRestBetweenRounds?: number; // Rest duration between McGill rounds (default 5)
 }
 
 export default function Timer({
@@ -23,13 +21,10 @@ export default function Timer({
   showSecondsOnly = false,
   bilateral = false,
   transitionDuration = 10,
-  mcgillRounds,
-  mcgillRestBetweenRounds = 5
 }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(countUp ? 0 : duration);
   const [isRunning, setIsRunning] = useState(autoStart);
-  const [currentSide, setCurrentSide] = useState<'left' | 'transition' | 'right' | 'rest' | 'complete'>('left');
-  const [currentRound, setCurrentRound] = useState(1);
+  const [currentSide, setCurrentSide] = useState<'left' | 'transition' | 'right' | 'complete'>(bilateral ? 'left' : 'complete');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const onCompleteRef = useRef(onComplete);
 
@@ -42,9 +37,8 @@ export default function Timer({
   useEffect(() => {
     setTimeLeft(countUp ? 0 : duration);
     setIsRunning(autoStart);
-    setCurrentSide((bilateral || mcgillRounds) ? 'left' : 'complete');
-    setCurrentRound(1);
-  }, [duration, autoStart, countUp, bilateral, mcgillRounds]);
+    setCurrentSide(bilateral ? 'left' : 'complete');
+  }, [duration, autoStart, countUp, bilateral]);
 
   // Manage interval based on isRunning state
   useEffect(() => {
@@ -66,59 +60,7 @@ export default function Timer({
             setIsRunning(false);
             playCompletionSound();
 
-            // Handle bilateral transitions and McGill rounds
-            if (mcgillRounds && bilateral) {
-              // McGill protocol with bilateral exercise
-              setCurrentSide((currentSideValue) => {
-                if (currentSideValue === 'left') {
-                  // Move to transition
-                  setTimeout(() => {
-                    setTimeLeft(0);
-                    setCurrentSide('transition');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'left';
-                } else if (currentSideValue === 'transition') {
-                  // Move to right side
-                  setTimeout(() => {
-                    setTimeLeft(0);
-                    setCurrentSide('right');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'transition';
-                } else if (currentSideValue === 'right') {
-                  // After right side, check if more rounds needed
-                  setCurrentRound((currentRoundValue) => {
-                    if (currentRoundValue < mcgillRounds) {
-                      // Move to rest before next round
-                      setTimeout(() => {
-                        setTimeLeft(0);
-                        setCurrentSide('rest');
-                        setIsRunning(true);
-                      }, 100);
-                      return currentRoundValue;
-                    } else {
-                      // All rounds complete
-                      setCurrentSide('complete');
-                      if (onCompleteRef.current) onCompleteRef.current();
-                      return currentRoundValue;
-                    }
-                    return currentRoundValue;
-                  });
-                  return 'right';
-                } else if (currentSideValue === 'rest') {
-                  // After rest, start next round
-                  setCurrentRound((r) => r + 1);
-                  setTimeout(() => {
-                    setTimeLeft(0);
-                    setCurrentSide('left');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'rest';
-                }
-                return currentSideValue;
-              });
-            } else if (bilateral) {
+            if (bilateral) {
               setCurrentSide((currentSideValue) => {
                 if (currentSideValue === 'left') {
                   // Move to transition
@@ -157,59 +99,7 @@ export default function Timer({
             setIsRunning(false);
             playCompletionSound();
 
-            // Handle bilateral transitions and McGill rounds
-            if (mcgillRounds && bilateral) {
-              // McGill protocol with bilateral exercise
-              setCurrentSide((currentSideValue) => {
-                if (currentSideValue === 'left') {
-                  // Move to transition
-                  setTimeout(() => {
-                    setTimeLeft(transitionDuration);
-                    setCurrentSide('transition');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'left';
-                } else if (currentSideValue === 'transition') {
-                  // Move to right side
-                  setTimeout(() => {
-                    setTimeLeft(duration);
-                    setCurrentSide('right');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'transition';
-                } else if (currentSideValue === 'right') {
-                  // After right side, check if more rounds needed
-                  setCurrentRound((currentRoundValue) => {
-                    if (currentRoundValue < mcgillRounds) {
-                      // Move to rest before next round
-                      setTimeout(() => {
-                        setTimeLeft(mcgillRestBetweenRounds);
-                        setCurrentSide('rest');
-                        setIsRunning(true);
-                      }, 100);
-                      return currentRoundValue;
-                    } else {
-                      // All rounds complete
-                      setCurrentSide('complete');
-                      if (onCompleteRef.current) onCompleteRef.current();
-                      return currentRoundValue;
-                    }
-                    return currentRoundValue;
-                  });
-                  return 'right';
-                } else if (currentSideValue === 'rest') {
-                  // After rest, start next round
-                  setCurrentRound((r) => r + 1);
-                  setTimeout(() => {
-                    setTimeLeft(duration);
-                    setCurrentSide('left');
-                    setIsRunning(true);
-                  }, 100);
-                  return 'rest';
-                }
-                return currentSideValue;
-              });
-            } else if (bilateral) {
+            if (bilateral) {
               setCurrentSide((currentSideValue) => {
                 if (currentSideValue === 'left') {
                   // Move to transition
@@ -252,7 +142,7 @@ export default function Timer({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, countUp, duration, bilateral, transitionDuration, mcgillRounds, mcgillRestBetweenRounds]);
+  }, [isRunning, countUp, duration, bilateral, transitionDuration]);
 
   const toggleTimer = () => {
     if (countUp) {
@@ -286,31 +176,7 @@ export default function Timer({
   const seconds = timeLeft % 60;
 
   const progress = (() => {
-    if (mcgillRounds && bilateral) {
-      // For McGill protocol, show progress across all rounds
-      const timePerRound = (duration * 2) + transitionDuration;
-      const totalExerciseTime = timePerRound * mcgillRounds;
-      const totalRestTime = mcgillRestBetweenRounds * (mcgillRounds - 1);
-      const totalDuration = totalExerciseTime + totalRestTime;
-
-      let elapsed = 0;
-      const completedRounds = currentRound - 1;
-      elapsed += completedRounds * (timePerRound + mcgillRestBetweenRounds);
-
-      if (currentSide === 'left') {
-        elapsed += countUp ? timeLeft : (duration - timeLeft);
-      } else if (currentSide === 'transition') {
-        elapsed += duration + (countUp ? timeLeft : (transitionDuration - timeLeft));
-      } else if (currentSide === 'right') {
-        elapsed += duration + transitionDuration + (countUp ? timeLeft : (duration - timeLeft));
-      } else if (currentSide === 'rest') {
-        elapsed += timePerRound + (countUp ? timeLeft : (mcgillRestBetweenRounds - timeLeft));
-      } else {
-        elapsed = totalDuration;
-      }
-
-      return (elapsed / totalDuration) * 100;
-    } else if (bilateral) {
+    if (bilateral) {
       // For bilateral, show progress across both sides + transition
       const totalDuration = (duration * 2) + transitionDuration;
       let elapsed = 0;
@@ -334,20 +200,7 @@ export default function Timer({
   })();
 
   const getStatusText = () => {
-    if (mcgillRounds && bilateral) {
-      const roundText = `Round ${currentRound} of ${mcgillRounds}`;
-      if (currentSide === 'left') {
-        return `${roundText} - Left Side`;
-      } else if (currentSide === 'transition') {
-        return `${roundText} - Switching Sides...`;
-      } else if (currentSide === 'right') {
-        return `${roundText} - Right Side`;
-      } else if (currentSide === 'rest') {
-        return `Rest Between Rounds`;
-      } else {
-        return 'Complete';
-      }
-    } else if (bilateral) {
+    if (bilateral) {
       if (currentSide === 'left') {
         return 'Left Side';
       } else if (currentSide === 'transition') {

@@ -9,6 +9,11 @@ vi.mock('./Timer', () => ({
   default: () => <div data-testid="timer">Mock Timer</div>,
 }));
 
+// Mock the McgillTimer component
+vi.mock('./McgillTimer', () => ({
+  default: () => <div data-testid="mcgill-timer">Mock McgillTimer</div>,
+}));
+
 // Mock the ExerciseModal component
 vi.mock('./ExerciseModal', () => ({
   default: () => <div data-testid="exercise-modal">Mock Exercise Modal</div>,

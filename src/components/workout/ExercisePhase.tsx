@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from 'react';
 import Timer from './Timer';
+import McgillTimer from './McgillTimer';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import ExerciseModal from './ExerciseModal';
@@ -166,13 +167,20 @@ export default function ExercisePhase({
         {/* Timer for timed exercises */}
         {exercise.type === 'timed' && (
           <div className="mb-6">
-            <Timer
-              key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
-              duration={currentSet.mcgillHoldDuration || currentSet.targetDuration || 30}
-              bilateral={exercise.countingMethod === 'per-side'}
-              mcgillRounds={currentSet.mcgillRounds}
-              mcgillRestBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
-            />
+            {currentSet.mcgillRounds && currentSet.mcgillHoldDuration ? (
+              <McgillTimer
+                key={`mcgill-timer-${currentExerciseIndex}-${currentSetIndex}`}
+                rounds={currentSet.mcgillRounds}
+                holdDuration={currentSet.mcgillHoldDuration}
+                restBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
+              />
+            ) : (
+              <Timer
+                key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
+                duration={currentSet.targetDuration || 30}
+                bilateral={exercise.countingMethod === 'per-side'}
+              />
+            )}
           </div>
         )}
 
