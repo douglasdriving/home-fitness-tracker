@@ -20,7 +20,7 @@ Unlocked and retired exercise IDs are persisted in the user profile's `exerciseA
 
 - `src/data/exercises.json` — Exercise definitions with unlock requirements and retirement thresholds
 - `src/data/exerciseData.ts` — Exports `allExercises`, `getExerciseById`, `getExerciseEmoji`
-- `src/lib/achievement-tracker.ts` — `checkWorkoutAchievements`, `isExerciseUnlocked`, `shouldRetireExercise`, `getAvailableExercises`
+- `src/lib/achievement-tracker.ts` — `checkWorkoutAchievements`, `isExerciseUnlocked`, `shouldRetireExercise`, `getExerciseStatuses`, `getAvailableExercises`
 - `src/lib/workout-generator.ts` — Uses available exercises to build workouts
 - `src/store/user-store.ts` — Persists `exerciseAchievements` (unlocked/retired lists)
 - `docs/EXERCISE-PROGRESSION.md` — Full reference of all exercises, heaviness scores, and unlock chains
@@ -32,3 +32,4 @@ Unlocked and retired exercise IDs are persisted in the user profile's `exerciseA
 - Removing an exercise requires updating any other exercise that references it in `unlockRequirement`, plus seed data and documentation. Historical workout data stores `exerciseName` as a string so removed exercises still display correctly in History and WorkoutComplete.
 - Some exercises share an unlock prerequisite (fork points). For example, Good Morning at 16 reps unlocks both Superman and Back Extension Hold simultaneously.
 - Unlock thresholds are set to ≤1.5x the prerequisite exercise's default value, ensuring smooth progression pacing when transitioning to newly unlocked exercises.
+- Equipment-gated exercises (e.g., `equipment: "elastic-band"`) are shown as locked with `needsEquipment: true` in `getExerciseStatuses` when the user lacks the equipment, but are excluded from workout generation via `getAvailableExercises`. This ensures they remain visible in the exercise library while not appearing in workouts.
