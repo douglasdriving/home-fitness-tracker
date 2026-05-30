@@ -15,7 +15,7 @@ The McGill protocol replaces the traditional single long hold for the side plank
 
 3. **Backwards compatibility**: If a user has legacy side plank history (single long holds without McGill fields), `convertLegacyToMcgill()` converts the duration to an equivalent McGill configuration by dividing by 6 (total rounds in [3+2+1]) and clamping to [10, 30] seconds.
 
-4. **Timer execution**: The Timer component runs `mcgillRounds` iterations of the bilateral timer per set. Each round follows: left hold → transition → right hold → rest (except after the final round). The display shows "Round X of Y - Left/Right Side".
+4. **Timer execution**: A dedicated `McgillTimer` component handles the protocol per set. The flow is: all rounds on left side (hold → rest → hold → ...) → transition (10s) → all rounds on right side (hold → rest → hold → ...) → complete. This follows the correct McGill protocol where you exhaust one side before switching. The display shows "Left Side — Hold X of Y" / "Right Side — Hold X of Y" with round dot indicators per side.
 
 5. **Unlock thresholds**: `getBestPerformance()` uses `mcgillHoldDuration` (per-hold duration) rather than `actualDuration` (total work time) for unlock comparisons. This means a user doing 3x10s hasn't reached 30s hold capacity and correctly won't unlock hollow body hold, which requires 30s.
 
@@ -28,13 +28,13 @@ The McGill protocol replaces the traditional single long hold for the side plank
 | `src/types/workout.ts` | `mcgillRounds` and `mcgillHoldDuration` on `Set` and `CompletedSet` |
 | `src/lib/progression-calculator.ts` | `calculateMcgillProgression()` and `convertLegacyToMcgill()` |
 | `src/lib/workout-generator.ts` | McGill-specific set generation branch in both `generateWorkout()` and `generateDailyRotationWorkout()` |
-| `src/components/workout/Timer.tsx` | Multi-round state machine with `mcgillRounds` and `mcgillRestBetweenRounds` props |
-| `src/components/workout/ExercisePhase.tsx` | McGill target display and Timer prop forwarding |
+| `src/components/workout/McgillTimer.tsx` | Dedicated McGill timer with left-hold/left-rest/transition/right-hold/right-rest/complete state machine |
+| `src/components/workout/ExercisePhase.tsx` | McGill target display; routes McGill exercises to `McgillTimer`, others to `Timer` |
 | `src/utils/mcgill-formatter.ts` | `formatMcgillSet()` helper for consistent "3x10s per side" formatting |
 
 ## Gotchas
 
 - **`getAvailableExercises` in achievement-tracker.ts** manually constructs Exercise objects field-by-field. New Exercise fields must be explicitly copied there or they'll be undefined at runtime (this was the root cause of initial test failures).
 - **`targetDuration` compatibility**: McGill sets store `targetDuration = mcgillRounds * mcgillHoldDuration` so existing code that reads `targetDuration` for duration estimates continues to work. UI components override the display to show "3x10s" instead of "30s".
-- **Timer state complexity**: The bilateral timer already has 4 states (left, transition, right, complete). McGill adds a round loop and rest state. The `currentRound` state tracks position within the round sequence.
+- **Stale closure risk**: `McgillTimer` uses refs (`phaseRef`, `currentRoundRef`) to access current state inside `setInterval` callbacks. Using state directly would cause stale closures since the interval captures old values. This was the root cause of the original "round 4 of 3" bug in the Timer.tsx approach.
 - **Set count override**: McGill exercises create exactly `rounds.length` sets (default 3) with varying round counts, bypassing the normal `numSets` calculation that would create uniform sets.
