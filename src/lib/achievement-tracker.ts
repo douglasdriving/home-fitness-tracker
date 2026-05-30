@@ -12,6 +12,7 @@ export interface ExerciseWithStatus extends Exercise {
     requiredValue: number;
     requiredExerciseName: string;
   };
+  needsEquipment?: boolean; // true when exercise requires equipment the user doesn't have
 }
 
 export interface UnlockReason {
@@ -51,7 +52,12 @@ export function getBestPerformance(
       if (set.actualReps !== undefined) {
         bestReps = Math.max(bestReps ?? 0, set.actualReps);
       }
-      if (set.actualDuration !== undefined) {
+      // For McGill protocol exercises, use mcgillHoldDuration (per-hold duration)
+      // rather than actualDuration (total work time), because unlock thresholds
+      // are based on single-hold capacity (e.g., 30s hold to unlock hollow body)
+      if (set.mcgillHoldDuration !== undefined) {
+        bestDuration = Math.max(bestDuration ?? 0, set.mcgillHoldDuration);
+      } else if (set.actualDuration !== undefined) {
         bestDuration = Math.max(bestDuration ?? 0, set.actualDuration);
       }
     }
@@ -82,7 +88,10 @@ export function getWorkoutPerformance(
     if (set.actualReps !== undefined) {
       bestReps = Math.max(bestReps ?? 0, set.actualReps);
     }
-    if (set.actualDuration !== undefined) {
+    // For McGill protocol exercises, use mcgillHoldDuration (per-hold duration)
+    if (set.mcgillHoldDuration !== undefined) {
+      bestDuration = Math.max(bestDuration ?? 0, set.mcgillHoldDuration);
+    } else if (set.actualDuration !== undefined) {
       bestDuration = Math.max(bestDuration ?? 0, set.actualDuration);
     }
   }
@@ -299,14 +308,12 @@ export function getExerciseStatuses(
   hasElasticBands: boolean
 ): ExerciseWithStatus[] {
   return allExercises
-    .filter(exercise => {
-      // Filter by equipment availability
-      if (exercise.equipment === 'elastic-band' && !hasElasticBands) {
-        return false;
-      }
-      return true;
-    })
     .map(exercise => {
+      // Check if exercise requires equipment the user doesn't have
+      if (exercise.equipment === 'elastic-band' && !hasElasticBands) {
+        return { ...exercise, status: 'locked' as const, needsEquipment: true };
+      }
+
       // Check if retired
       if (achievements.retiredExercises.includes(exercise.id)) {
         return { ...exercise, status: 'retired' as const };
@@ -368,6 +375,7 @@ export function getAvailableExercises(
       id: ex.id,
       name: ex.name,
       emoji: ex.emoji,
+      primaryMuscleGroup: ex.primaryMuscleGroup,
       muscleGroups: ex.muscleGroups,
       description: ex.description,
       videoUrl: ex.videoUrl,
@@ -381,6 +389,9 @@ export function getAvailableExercises(
       countingMethod: ex.countingMethod,
       unlockRequirement: ex.unlockRequirement,
       retirementThreshold: ex.retirementThreshold,
+      coachingTip: ex.coachingTip,
+      structure: ex.structure,
+      mcgillDefaults: ex.mcgillDefaults,
     }));
 }
 

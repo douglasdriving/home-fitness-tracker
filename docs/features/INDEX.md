@@ -4,18 +4,24 @@
 
 | Page | Route | Features |
 |---|---|---|
-| Dashboard | `/` | Exercise Emoji Icons |
+| Dashboard | `/` | Daily Rotation Mode, Exercise Emoji Icons |
 | Calibration | `/calibration` | Exercise Emoji Icons |
-| Workout Execution | `/workout` | Intensity Feedback, Exercise Emoji Icons |
-| Workout Complete | `/workout-complete` | Exercise Emoji Icons |
-| Stretching Routine | `/stretching` | — |
-| History | `/history` | Exercise Emoji Icons |
-| Exercise Library | `/exercises` | Exercise Emoji Icons |
-| Settings | `/settings` | Exercise Emoji Icons |
+| Workout Execution | `/workout` | Coaching Tips, Intensity Feedback, Exercise Emoji Icons, McGill Protocol |
+| Workout Complete | `/workout-complete` | Exercise Emoji Icons, McGill Protocol |
+| Stretching Routine | `/stretching` | Daily Rotation Mode |
+| History | `/history` | Exercise Emoji Icons, McGill Protocol |
+| Exercise Library | `/exercises` | Exercise Progression, Exercise Emoji Icons, McGill Protocol |
+| Settings | `/settings` | Custom Workout Builder, Exercise Emoji Icons |
 
 ## Features
 
 | Feature | Description | Doc |
 |---|---|---|
+| Coaching Tips | Persistent form cues and safety notes displayed on workout screen during exercise execution | [coaching-tips.md](coaching-tips.md) |
+| Custom Workout Builder | Dev-only tool to manually select exercises and create custom workouts for testing | [custom-workout-builder.md](custom-workout-builder.md) |
+| Daily Rotation Mode | Shorter muscle-group-focused workouts rotating through abs, glutes, lower back with group-specific stretching | [daily-rotation-mode.md](daily-rotation-mode.md) |
 | Exercise Emoji Icons | Visually representative emoji icons displayed before exercise names across all views | [exercise-emoji-icons.md](exercise-emoji-icons.md) |
+| Exercise Data Migration | Converts historical workout data when an exercise changes type (e.g., timed to reps) | [exercise-data-migration.md](exercise-data-migration.md) |
+| Exercise Progression | Unlock chains and retirement thresholds that advance users through harder exercises | [exercise-progression.md](exercise-progression.md) |
 | Intensity Feedback | Post-exercise difficulty ratings that adjust next workout targets | [intensity-feedback.md](intensity-feedback.md) |
+| McGill Protocol | Multiple short holds per side in descending sets for side plank with hybrid progressive overload | [mcgill-protocol.md](mcgill-protocol.md) |

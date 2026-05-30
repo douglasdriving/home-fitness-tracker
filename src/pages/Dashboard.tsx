@@ -7,6 +7,8 @@ import Button from '../components/common/Button';
 import StreakTracker from '../components/common/StreakTracker';
 import StorageWarning from '../components/common/StorageWarning';
 import { getExerciseEmoji } from '../data/exerciseData';
+import { getNextDailyRotationGroup } from '../lib/workout-generator';
+import { MuscleGroup } from '../types/exercise';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -20,17 +22,26 @@ interface StretchState {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const { currentWorkout, loadWorkouts, generateNewWorkout, startWorkout, loadHistory } =
+  const { currentWorkout, loadWorkouts, generateNewWorkout, generateDailyRotationWorkout, startWorkout, loadHistory, workoutHistory } =
     useWorkoutStore();
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
   const [timeConstraint, setTimeConstraint] = useState<string>('');
   const [activeStretchSession, setActiveStretchSession] = useState<StretchState | null>(null);
+  const [nextDailyRotationGroup, setNextDailyRotationGroup] = useState<MuscleGroup>('abs');
 
   useEffect(() => {
     // Load current workout and history
     loadWorkouts();
     loadHistory();
   }, [profile, loadWorkouts, loadHistory]);
+
+  // Determine next daily rotation muscle group
+  useEffect(() => {
+    if (workoutHistory.length > 0) {
+      const nextGroup = getNextDailyRotationGroup(workoutHistory);
+      setNextDailyRotationGroup(nextGroup);
+    }
+  }, [workoutHistory]);
 
   // Check for active stretch session
   useEffect(() => {
@@ -81,6 +92,15 @@ export default function Dashboard() {
       setTimeConstraint(''); // Reset after generation
     } catch (error) {
       console.error('Error generating workout:', error);
+      alert('Failed to generate workout. Please try again.');
+    }
+  };
+
+  const handleGenerateDailyRotation = async () => {
+    try {
+      await generateDailyRotationWorkout();
+    } catch (error) {
+      console.error('Error generating daily rotation workout:', error);
       alert('Failed to generate workout. Please try again.');
     }
   };
@@ -169,9 +189,16 @@ export default function Dashboard() {
         {currentWorkout ? (
           <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-2xl font-display font-bold text-text-bright">
-                WORKOUT #{currentWorkout.workoutNumber}
-              </h2>
+              <div>
+                <h2 className="text-2xl font-display font-bold text-text-bright">
+                  {currentWorkout.workoutMode === 'daily-rotation'
+                    ? `DAILY FOCUS: ${currentWorkout.targetMuscleGroup?.toUpperCase()} #${currentWorkout.workoutNumber}`
+                    : `FULL CORE WORKOUT #${currentWorkout.workoutNumber}`}
+                </h2>
+                <span className="text-xs text-text-muted">
+                  {currentWorkout.workoutMode === 'daily-rotation' ? 'Daily Rotation Mode' : 'Full Body Mode'}
+                </span>
+              </div>
               <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
                 {currentWorkout.estimatedDuration} min
               </span>
@@ -227,31 +254,76 @@ export default function Dashboard() {
             </Button>
           </div>
         ) : (
-          <div className="bg-background-light rounded-lg shadow-lg p-6">
-            <h2 className="text-lg font-semibold text-text mb-4">Generate New Workout</h2>
+          <div className="space-y-4">
+            <h2 className="text-xl font-semibold text-text">Choose Your Workout Mode</h2>
 
-            {/* Time Constraint Input */}
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-text mb-2">
-                Time limit (optional)
-              </label>
-              <input
-                type="number"
-                value={timeConstraint}
-                onChange={(e) => setTimeConstraint(e.target.value)}
-                placeholder="e.g., 15 minutes"
-                min="5"
-                max="60"
-                className="w-full px-4 py-3 bg-background border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted"
-              />
-              <p className="text-xs text-text-muted mt-1">
-                Leave empty for a regular workout, or set a time limit for a shorter session.
-              </p>
+            {/* Daily Focus Session Card */}
+            <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-purple-600">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-bold text-text">🎯 Daily Focus Session</h3>
+                  <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full font-semibold">
+                    SHORTER
+                  </span>
+                </div>
+                <p className="text-sm text-text-muted mb-3">
+                  3 exercises focusing on one muscle group. Faster, focused workout with muscle-group rotation.
+                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
+                    ~18-20 min
+                  </span>
+                  <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
+                    Next: {nextDailyRotationGroup.charAt(0).toUpperCase() + nextDailyRotationGroup.slice(1)}
+                  </span>
+                </div>
+              </div>
+              <Button onClick={handleGenerateDailyRotation} fullWidth variant="primary">
+                Generate Daily Focus
+              </Button>
             </div>
 
-            <Button onClick={handleGenerateWorkout} fullWidth>
-              Generate Workout
-            </Button>
+            {/* Full Core Workout Card */}
+            <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
+              <div className="mb-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-lg font-bold text-text">💪 Full Core Workout</h3>
+                  <span className="text-xs bg-primary text-white px-2 py-1 rounded-full font-semibold">
+                    COMPLETE
+                  </span>
+                </div>
+                <p className="text-sm text-text-muted mb-3">
+                  4 exercises covering all muscle groups (abs, glutes, lower back). Comprehensive full-body core training.
+                </p>
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-medium">
+                    ~30-60 min
+                  </span>
+                  <span className="text-xs bg-primary/10 text-primary px-2 py-1 rounded font-medium">
+                    All muscle groups
+                  </span>
+                </div>
+
+                {/* Time Constraint Input */}
+                <div className="mt-3">
+                  <label className="block text-xs font-medium text-text-muted mb-1">
+                    Time limit (optional)
+                  </label>
+                  <input
+                    type="number"
+                    value={timeConstraint}
+                    onChange={(e) => setTimeConstraint(e.target.value)}
+                    placeholder="e.g., 30 minutes"
+                    min="5"
+                    max="60"
+                    className="w-full px-3 py-2 bg-background border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted text-sm"
+                  />
+                </div>
+              </div>
+              <Button onClick={handleGenerateWorkout} fullWidth variant="primary">
+                Generate Full Workout
+              </Button>
+            </div>
           </div>
         )}
 

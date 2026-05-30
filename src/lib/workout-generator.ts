@@ -2,8 +2,9 @@ import { Workout, WorkoutExercise, WorkoutHistoryEntry, IntensityRating } from '
 import type { Set } from '../types/workout';
 import { StrengthLevels, ExerciseAchievements } from '../types/user';
 import { MuscleGroup, Exercise } from '../types/exercise';
-import { calculateProgressionWithFeedback } from './progression-calculator';
+import { calculateProgressionWithFeedback, calculateMcgillProgression, convertLegacyToMcgill } from './progression-calculator';
 import { getAvailableExercises } from './achievement-tracker';
+import { getExerciseById } from '../data/exerciseData';
 
 interface GenerateWorkoutOptions {
   workoutNumber: number;
@@ -14,6 +15,16 @@ interface GenerateWorkoutOptions {
   excludedExerciseIds?: string[]; // IDs of exercises user wants to exclude
   timeConstraintMinutes?: number; // Optional time limit for workout in minutes
   exerciseAchievements?: ExerciseAchievements; // For filtering locked/retired exercises
+}
+
+interface GenerateDailyRotationOptions {
+  workoutNumber: number;
+  strengthLevels: StrengthLevels;
+  targetMuscleGroup: MuscleGroup;
+  workoutHistory?: WorkoutHistoryEntry[];
+  hasElasticBands?: boolean;
+  excludedExerciseIds?: string[];
+  exerciseAchievements?: ExerciseAchievements;
 }
 
 /**
@@ -152,8 +163,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 
   // Build workout exercises with sets
   let workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => {
-    // Determine primary muscle group for this exercise (first one in the array)
-    const primaryMuscleGroup = exercise.muscleGroups[0];
+    // Use the exercise's designated primary muscle group
+    const primaryMuscleGroup = exercise.primaryMuscleGroup;
     const strengthLevel = strengthLevels[primaryMuscleGroup];
 
     // Check if user has done this exercise before (progressive overload)
@@ -166,45 +177,104 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     console.log(`[WORKOUT GEN] - Last Feedback: ${lastPerformanceData?.feedback ?? 'none'}`);
     console.log(`[WORKOUT GEN] - History entries: ${workoutHistory.length}`);
 
-    let targetValue: number;
-    if (lastPerformanceData !== null) {
-      // Use feedback-based progression
-      const feedback = lastPerformanceData.feedback ?? 3;
-      if (lastPerformanceData.feedback === undefined) {
-        console.warn(`[WORKOUT GEN] - WARNING: No intensity feedback found for ${exercise.name}, defaulting to rating 3 (just right)`);
-      }
-      targetValue = calculateProgressionWithFeedback(
-        lastPerformanceData.performance,
-        exercise.type,
-        feedback
-      );
-      console.log(`[WORKOUT GEN] - Using FEEDBACK PROGRESSION: ${lastPerformanceData.performance} (feedback: ${feedback}) → ${targetValue}`);
-    } else {
-      // First time doing this exercise - use exercise default
-      // This provides beginner-friendly starting values
-      if (exercise.type === 'reps') {
-        targetValue = exercise.defaultReps ?? 10; // Fallback to 10 if somehow missing
+    let sets: Set[];
+
+    // Check if this is a McGill protocol exercise
+    if (exercise.structure === 'mcgill' && exercise.mcgillDefaults) {
+      console.log(`[WORKOUT GEN] - McGill protocol exercise detected`);
+
+      let rounds: number[];
+      let holdDuration: number;
+
+      if (lastPerformanceData !== null) {
+        const feedback = lastPerformanceData.feedback ?? 3;
+
+        // Check if last performance had McGill data
+        if (lastPerformanceData.mcgillRounds && lastPerformanceData.mcgillHoldDuration) {
+          // Use McGill progression
+          console.log(`[WORKOUT GEN] - Using McGill progression from [${lastPerformanceData.mcgillRounds.join(',')}] × ${lastPerformanceData.mcgillHoldDuration}s`);
+          const progression = calculateMcgillProgression(
+            lastPerformanceData.mcgillRounds,
+            lastPerformanceData.mcgillHoldDuration,
+            feedback
+          );
+          rounds = progression.rounds;
+          holdDuration = progression.holdDuration;
+          console.log(`[WORKOUT GEN] - New McGill values: [${rounds.join(',')}] × ${holdDuration}s`);
+        } else {
+          // Convert legacy single-hold to McGill
+          console.log(`[WORKOUT GEN] - Converting legacy ${lastPerformanceData.performance}s to McGill`);
+          const converted = convertLegacyToMcgill(lastPerformanceData.performance);
+          rounds = converted.rounds;
+          holdDuration = converted.holdDuration;
+
+          // Apply progression based on feedback
+          if (feedback !== 3) {
+            const progression = calculateMcgillProgression(rounds, holdDuration, feedback);
+            rounds = progression.rounds;
+            holdDuration = progression.holdDuration;
+          }
+          console.log(`[WORKOUT GEN] - Converted to: [${rounds.join(',')}] × ${holdDuration}s`);
+        }
       } else {
-        targetValue = exercise.defaultDuration ?? 30; // Fallback to 30 seconds
+        // First time - use defaults
+        rounds = exercise.mcgillDefaults.rounds;
+        holdDuration = exercise.mcgillDefaults.holdDuration;
+        console.log(`[WORKOUT GEN] - Using McGill defaults: [${rounds.join(',')}] × ${holdDuration}s`);
       }
-      console.log(`[WORKOUT GEN] - Using EXERCISE DEFAULT: ${targetValue}`);
+
+      // Create sets with McGill protocol structure
+      sets = rounds.map((roundCount, index) => ({
+        setNumber: index + 1,
+        targetDuration: roundCount * holdDuration, // Total work time for compatibility
+        completed: false,
+        mcgillRounds: roundCount,
+        mcgillHoldDuration: holdDuration,
+      }));
+
+      console.log(`[WORKOUT GEN] - Created ${sets.length} McGill sets\n`);
+    } else {
+      // Standard (non-McGill) exercise progression
+      let targetValue: number;
+      if (lastPerformanceData !== null) {
+        // Use feedback-based progression
+        const feedback = lastPerformanceData.feedback ?? 3;
+        if (lastPerformanceData.feedback === undefined) {
+          console.warn(`[WORKOUT GEN] - WARNING: No intensity feedback found for ${exercise.name}, defaulting to rating 3 (just right)`);
+        }
+        targetValue = calculateProgressionWithFeedback(
+          lastPerformanceData.performance,
+          exercise.type,
+          feedback
+        );
+        console.log(`[WORKOUT GEN] - Using FEEDBACK PROGRESSION: ${lastPerformanceData.performance} (feedback: ${feedback}) → ${targetValue}`);
+      } else {
+        // First time doing this exercise - use exercise default
+        // This provides beginner-friendly starting values
+        if (exercise.type === 'reps') {
+          targetValue = exercise.defaultReps ?? 10; // Fallback to 10 if somehow missing
+        } else {
+          targetValue = exercise.defaultDuration ?? 30; // Fallback to 30 seconds
+        }
+        console.log(`[WORKOUT GEN] - Using EXERCISE DEFAULT: ${targetValue}`);
+      }
+
+      // Determine number of sets based on exercise type
+      // Per-side (unilateral) exercises: 3 sets (since each set takes double time)
+      // Other exercises: 4 sets
+      // Will be adjusted later if time constraint is specified
+      const numSets = exercise.countingMethod === 'per-side' ? 3 : 4;
+
+      console.log(`[WORKOUT GEN] - Final Target: ${targetValue} (${exercise.type})\n`);
+
+      // Create sets with the same target value for all sets
+      sets = Array.from({ length: numSets }, (_, index) => ({
+        setNumber: index + 1,
+        targetReps: exercise.type === 'reps' ? targetValue : undefined,
+        targetDuration: exercise.type === 'timed' ? targetValue : undefined,
+        completed: false,
+      }));
     }
-
-    // Determine number of sets based on exercise type
-    // Per-side (unilateral) exercises: 3 sets (since each set takes double time)
-    // Other exercises: 4 sets
-    // Will be adjusted later if time constraint is specified
-    const numSets = exercise.countingMethod === 'per-side' ? 3 : 4;
-
-    console.log(`[WORKOUT GEN] - Final Target: ${targetValue} (${exercise.type})\n`);
-
-    // Create sets with the same target value for all sets
-    const sets: Set[] = Array.from({ length: numSets }, (_, index) => ({
-      setNumber: index + 1,
-      targetReps: exercise.type === 'reps' ? targetValue : undefined,
-      targetDuration: exercise.type === 'timed' ? targetValue : undefined,
-      completed: false,
-    }));
 
     // Calculate rest time (30-60 seconds based on heaviness)
     // Heavier exercises need more rest
@@ -266,22 +336,234 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
 }
 
 /**
+ * Generate a daily rotation workout targeting a specific muscle group
+ *
+ * Strategy:
+ * - Select 3 exercises from the target muscle group
+ * - Use least recently used exercises
+ * - Sets: 3 sets for standard exercises, 4 sets for bilateral (per-side) exercises
+ * - Calculate targets based on progressive overload or exercise defaults
+ */
+export function generateDailyRotationWorkout(options: GenerateDailyRotationOptions): Workout {
+  const {
+    workoutNumber,
+    strengthLevels,
+    targetMuscleGroup,
+    workoutHistory = [],
+    hasElasticBands = false,
+    excludedExerciseIds = [],
+    exerciseAchievements = { unlockedExercises: [], retiredExercises: [] }
+  } = options;
+
+  console.log(`[DAILY ROTATION] Generating workout for ${targetMuscleGroup}`);
+
+  // Get all available exercises (filters out locked and retired)
+  const allAvailableExercises = getAvailableExercises(
+    workoutHistory,
+    exerciseAchievements,
+    hasElasticBands,
+    excludedExerciseIds
+  );
+
+  // Filter to exercises whose PRIMARY muscle group matches the target
+  // This prevents exercises from appearing in multiple rotation days
+  const availableExercises = allAvailableExercises.filter(ex =>
+    ex.primaryMuscleGroup === targetMuscleGroup
+  );
+
+  console.log(`[DAILY ROTATION] ${availableExercises.length} available exercises for ${targetMuscleGroup}`);
+
+  if (availableExercises.length === 0) {
+    console.warn(`No available exercises for ${targetMuscleGroup} after filtering. Using defaults.`);
+    // This should rarely happen, but handle gracefully
+  }
+
+  // Get exercise usage history for prioritization
+  const exerciseLastUsed = getExerciseLastUsed(workoutHistory);
+
+  // Sort by least recently used
+  availableExercises.sort((a, b) => {
+    const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
+    const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
+    return aLastUsed - bLastUsed;
+  });
+
+  // Select top 3 exercises (or fewer if not enough available)
+  const selectedExercises = availableExercises.slice(0, 3);
+
+  console.log(`[DAILY ROTATION] Selected ${selectedExercises.length} exercises`);
+  selectedExercises.forEach((ex, idx) => {
+    const lastUsed = exerciseLastUsed.get(ex.id) ?? -1;
+    console.log(`  ${idx + 1}. ${ex.name}: last used workout #${lastUsed === -1 ? 'never' : lastUsed}`);
+  });
+
+  // Build workout exercises with sets
+  const workoutExercises: WorkoutExercise[] = selectedExercises.map((exercise) => {
+    // Use the target muscle group for strength level
+    const strengthLevel = strengthLevels[targetMuscleGroup];
+
+    // Check for progressive overload
+    const lastPerformanceData = findLastPerformanceWithFeedback(exercise.id, workoutHistory);
+
+    console.log(`[DAILY ROTATION] Exercise: ${exercise.name}`);
+    console.log(`[DAILY ROTATION] - Strength Level: ${strengthLevel}`);
+    console.log(`[DAILY ROTATION] - Last Performance: ${lastPerformanceData?.performance ?? 'none'}`);
+
+    let sets: Set[];
+
+    // Check if this is a McGill protocol exercise
+    if (exercise.structure === 'mcgill' && exercise.mcgillDefaults) {
+      console.log(`[DAILY ROTATION] - McGill protocol exercise detected`);
+
+      let rounds: number[];
+      let holdDuration: number;
+
+      if (lastPerformanceData !== null) {
+        const feedback = lastPerformanceData.feedback ?? 3;
+
+        // Check if last performance had McGill data
+        if (lastPerformanceData.mcgillRounds && lastPerformanceData.mcgillHoldDuration) {
+          // Use McGill progression
+          console.log(`[DAILY ROTATION] - Using McGill progression from [${lastPerformanceData.mcgillRounds.join(',')}] × ${lastPerformanceData.mcgillHoldDuration}s`);
+          const progression = calculateMcgillProgression(
+            lastPerformanceData.mcgillRounds,
+            lastPerformanceData.mcgillHoldDuration,
+            feedback
+          );
+          rounds = progression.rounds;
+          holdDuration = progression.holdDuration;
+          console.log(`[DAILY ROTATION] - New McGill values: [${rounds.join(',')}] × ${holdDuration}s`);
+        } else {
+          // Convert legacy single-hold to McGill
+          console.log(`[DAILY ROTATION] - Converting legacy ${lastPerformanceData.performance}s to McGill`);
+          const converted = convertLegacyToMcgill(lastPerformanceData.performance);
+          rounds = converted.rounds;
+          holdDuration = converted.holdDuration;
+
+          // Apply progression based on feedback
+          if (feedback !== 3) {
+            const progression = calculateMcgillProgression(rounds, holdDuration, feedback);
+            rounds = progression.rounds;
+            holdDuration = progression.holdDuration;
+          }
+          console.log(`[DAILY ROTATION] - Converted to: [${rounds.join(',')}] × ${holdDuration}s`);
+        }
+      } else {
+        // First time - use defaults
+        rounds = exercise.mcgillDefaults.rounds;
+        holdDuration = exercise.mcgillDefaults.holdDuration;
+        console.log(`[DAILY ROTATION] - Using McGill defaults: [${rounds.join(',')}] × ${holdDuration}s`);
+      }
+
+      // Create sets with McGill protocol structure
+      sets = rounds.map((roundCount, index) => ({
+        setNumber: index + 1,
+        targetDuration: roundCount * holdDuration, // Total work time for compatibility
+        completed: false,
+        mcgillRounds: roundCount,
+        mcgillHoldDuration: holdDuration,
+      }));
+
+      console.log(`[DAILY ROTATION] - Created ${sets.length} McGill sets\n`);
+    } else {
+      // Standard (non-McGill) exercise progression
+      let targetValue: number;
+      if (lastPerformanceData !== null) {
+        const feedback = lastPerformanceData.feedback ?? 3;
+        targetValue = calculateProgressionWithFeedback(
+          lastPerformanceData.performance,
+          exercise.type,
+          feedback
+        );
+        console.log(`[DAILY ROTATION] - Using FEEDBACK PROGRESSION: ${lastPerformanceData.performance} (feedback: ${feedback}) → ${targetValue}`);
+      } else {
+        // First time doing this exercise - use exercise default
+        if (exercise.type === 'reps') {
+          targetValue = exercise.defaultReps ?? 10;
+        } else {
+          targetValue = exercise.defaultDuration ?? 30;
+        }
+        console.log(`[DAILY ROTATION] - Using EXERCISE DEFAULT: ${targetValue}`);
+      }
+
+      // Daily rotation mode set counts:
+      // - Per-side exercises: 4 sets (2 per side)
+      // - Standard exercises: 3 sets
+      const numSets = exercise.countingMethod === 'per-side' ? 4 : 3;
+
+      console.log(`[DAILY ROTATION] - Sets: ${numSets} (${exercise.countingMethod ?? 'total'})`);
+      console.log(`[DAILY ROTATION] - Final Target: ${targetValue} (${exercise.type})\n`);
+
+      sets = Array.from({ length: numSets }, (_, index) => ({
+        setNumber: index + 1,
+        targetReps: exercise.type === 'reps' ? targetValue : undefined,
+        targetDuration: exercise.type === 'timed' ? targetValue : undefined,
+        completed: false,
+      }));
+    }
+
+    // Calculate rest time
+    const heavinessScore = exercise.heavinessScore[targetMuscleGroup];
+    const restTime = Math.round(30 + (heavinessScore / 10) * 30);
+
+    return {
+      exerciseId: exercise.id,
+      exerciseName: exercise.name,
+      muscleGroups: exercise.muscleGroups,
+      sets,
+      restTime,
+    };
+  });
+
+  // Calculate estimated duration
+  const estimatedDuration = calculateEstimatedDuration(workoutExercises);
+
+  const workout: Workout = {
+    id: `workout-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+    workoutNumber,
+    generatedDate: Date.now(),
+    status: 'pending',
+    estimatedDuration,
+    exercises: workoutExercises,
+    workoutMode: 'daily-rotation',
+    targetMuscleGroup,
+  };
+
+  return workout;
+}
+
+/**
  * Calculate estimated workout duration in minutes
  * Includes preparation time, setup time, and buffer for pauses
  */
-function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
+export function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
   let totalSeconds = 0;
 
   exercises.forEach((exercise) => {
     // Add setup/preparation time at the start of each exercise (10 seconds)
     totalSeconds += 10;
 
+    const exerciseData = getExerciseById(exercise.exerciseId);
+    const isMcgill = exerciseData?.structure === 'mcgill';
+    const restBetweenRounds = exerciseData?.mcgillDefaults?.restBetweenRounds ?? 5;
+
     exercise.sets.forEach((set) => {
       // Add 5 seconds setup time before each set (get into position)
       totalSeconds += 5;
 
       // Add exercise time
-      if (set.targetReps) {
+      if (set.mcgillRounds && set.mcgillHoldDuration && isMcgill) {
+        // McGill protocol: all rounds on left side, then transition, then all rounds on right
+        // Left side: (holdDuration × rounds) + rest × (rounds - 1)
+        // Transition: 10s
+        // Right side: same as left
+        const transitionTime = 10; // Seconds between sides
+        const holdTimePerSide = set.mcgillHoldDuration * set.mcgillRounds;
+        const restTimePerSide = restBetweenRounds * Math.max(0, set.mcgillRounds - 1);
+        const timePerSide = holdTimePerSide + restTimePerSide;
+
+        totalSeconds += (timePerSide * 2) + transitionTime;
+      } else if (set.targetReps) {
         // Assume 3 seconds per rep
         totalSeconds += (set.targetReps * 3);
       } else if (set.targetDuration) {
@@ -342,7 +624,12 @@ export function getExerciseLastUsed(workoutHistory: WorkoutHistoryEntry[]): Map<
 export function findLastPerformanceWithFeedback(
   exerciseId: string,
   workoutHistory: WorkoutHistoryEntry[]
-): { performance: number; feedback: IntensityRating | undefined } | null {
+): {
+  performance: number;
+  feedback: IntensityRating | undefined;
+  mcgillRounds?: number[];
+  mcgillHoldDuration?: number;
+} | null {
   console.log(`[FIND LAST PERF] Searching for exercise: ${exerciseId}`);
   console.log(`[FIND LAST PERF] Total history entries: ${workoutHistory.length}`);
 
@@ -358,6 +645,23 @@ export function findLastPerformanceWithFeedback(
       const performance = firstSet.actualReps || firstSet.actualDuration || 0;
       const feedback = exercise.intensityFeedback;
 
+      // Check if this is a McGill protocol exercise with rounds data
+      const hasMcgillData = exercise.completedSets.some(set =>
+        set.mcgillRounds !== undefined && set.mcgillHoldDuration !== undefined
+      );
+
+      if (hasMcgillData) {
+        // Collect rounds from all sets (they may differ)
+        const mcgillRounds = exercise.completedSets
+          .map(set => set.mcgillRounds)
+          .filter((rounds): rounds is number => rounds !== undefined);
+        const mcgillHoldDuration = firstSet.mcgillHoldDuration;
+
+        console.log(`[FIND LAST PERF] Found McGill in workout #${historyEntry.workoutNumber}: rounds [${mcgillRounds.join(',')}] × ${mcgillHoldDuration}s, feedback: ${feedback ?? 'none'}`);
+
+        return { performance, feedback, mcgillRounds, mcgillHoldDuration };
+      }
+
       console.log(`[FIND LAST PERF] Found in workout #${historyEntry.workoutNumber}: ${performance} ${firstSet.actualReps ? 'reps' : 'seconds'}, feedback: ${feedback ?? 'none'}`);
 
       return { performance, feedback };
@@ -366,4 +670,35 @@ export function findLastPerformanceWithFeedback(
 
   console.log(`[FIND LAST PERF] No history found for this exercise`);
   return null;
+}
+
+/**
+ * Get the next muscle group in the daily rotation sequence
+ * Sequence: abs → glutes → lowerBack → abs → ...
+ *
+ * @param workoutHistory - Workout history ordered newest-first
+ * @returns The next muscle group to target
+ */
+export function getNextDailyRotationGroup(workoutHistory: WorkoutHistoryEntry[]): MuscleGroup {
+  const rotationSequence: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
+
+  // Find the most recent daily rotation workout
+  const lastDailyRotation = workoutHistory.find(
+    entry => entry.workoutMode === 'daily-rotation'
+  );
+
+  if (!lastDailyRotation || !lastDailyRotation.targetMuscleGroup) {
+    // First time using daily rotation mode, start with abs
+    console.log('[ROTATION] No previous daily rotation workouts found, starting with abs');
+    return 'abs';
+  }
+
+  const lastMuscleGroup = lastDailyRotation.targetMuscleGroup;
+  const currentIndex = rotationSequence.indexOf(lastMuscleGroup);
+  const nextIndex = (currentIndex + 1) % rotationSequence.length;
+  const nextMuscleGroup = rotationSequence[nextIndex];
+
+  console.log(`[ROTATION] Last: ${lastMuscleGroup}, Next: ${nextMuscleGroup}`);
+
+  return nextMuscleGroup;
 }

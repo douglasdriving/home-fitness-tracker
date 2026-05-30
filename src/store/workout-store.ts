@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { Workout, WorkoutHistoryEntry, Set, IntensityRating } from '../types/workout';
 import { db } from '../db/db';
-import { generateWorkout } from '../lib/workout-generator';
+import { generateWorkout, generateDailyRotationWorkout, getNextDailyRotationGroup } from '../lib/workout-generator';
 import { updateStrengthLevelsFromWorkout } from '../lib/progression-calculator';
 import { calculateIntensityScore } from '../lib/intensity-calculator';
 import { useUserStore } from './user-store';
@@ -14,6 +14,7 @@ interface WorkoutStore {
   // Actions
   loadWorkouts: () => Promise<void>;
   generateNewWorkout: (timeConstraintMinutes?: number) => Promise<void>;
+  generateDailyRotationWorkout: () => Promise<void>;
   startWorkout: (workoutId: string) => Promise<void>;
   updateSet: (exerciseIndex: number, setIndex: number, updates: Partial<Set>) => Promise<void>;
   updateWorkoutPosition: (exerciseIndex: number, setIndex: number, phase: 'exercise' | 'rest' | 'exercise-rest') => Promise<void>;
@@ -112,12 +113,69 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         exerciseAchievements: userProfile.exerciseAchievements || { unlockedExercises: [], retiredExercises: [] },
       });
 
+      // Set workoutMode to full-body for the existing workout generator
+      newWorkout.workoutMode = 'full-body';
+
       // Save to database
       await db.workouts.add(newWorkout);
 
       set({ currentWorkout: newWorkout });
     } catch (error) {
       console.error('Failed to generate workout:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Generate a new daily rotation workout (shorter, muscle-group-specific session)
+   */
+  generateDailyRotationWorkout: async () => {
+    const userProfile = useUserStore.getState().profile;
+
+    if (!userProfile || !userProfile.strengthLevels) {
+      throw new Error('User profile or strength levels not found');
+    }
+
+    try {
+      // Delete any existing pending or in-progress workouts (from both modes)
+      const existingWorkouts = await db.workouts
+        .where('status')
+        .anyOf(['pending', 'in-progress'])
+        .toArray();
+
+      for (const workout of existingWorkouts) {
+        await db.workouts.delete(workout.id);
+      }
+
+      // Get workout history for progressive overload and rotation tracking
+      const workoutHistory = await db.history
+        .orderBy('completedDate')
+        .reverse()
+        .toArray();
+
+      // Determine next muscle group in rotation
+      const targetMuscleGroup = getNextDailyRotationGroup(workoutHistory);
+
+      // Get next workout number based on history (completed workouts)
+      const workoutNumber = workoutHistory.length + 1;
+
+      // Generate new daily rotation workout
+      const newWorkout = generateDailyRotationWorkout({
+        workoutNumber,
+        strengthLevels: userProfile.strengthLevels,
+        targetMuscleGroup,
+        workoutHistory,
+        hasElasticBands: userProfile.equipment?.hasElasticBands || false,
+        excludedExerciseIds: userProfile.excludedExercises || [],
+        exerciseAchievements: userProfile.exerciseAchievements || { unlockedExercises: [], retiredExercises: [] },
+      });
+
+      // Save to database
+      await db.workouts.add(newWorkout);
+
+      set({ currentWorkout: newWorkout });
+    } catch (error) {
+      console.error('Failed to generate daily rotation workout:', error);
       throw error;
     }
   },
@@ -209,12 +267,14 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       exerciseName: ex.exerciseName,
       muscleGroups: ex.muscleGroups,
       completedSets: ex.sets
-        .filter((set) => set.completed && (set.actualReps || set.actualDuration))
+        .filter((set) => set.completed && (set.actualReps || set.actualDuration || (set.mcgillRounds && set.mcgillHoldDuration)))
         .map((set) => ({
           setNumber: set.setNumber,
           actualReps: set.actualReps,
           actualDuration: set.actualDuration,
           equipmentUsed: set.equipmentUsed,
+          mcgillRounds: set.mcgillRounds,
+          mcgillHoldDuration: set.mcgillHoldDuration,
         })),
       // Attach intensity feedback if provided (lookup by exercise ID)
       ...(intensityFeedbackMap && intensityFeedbackMap[ex.exerciseId] !== undefined
@@ -233,6 +293,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       totalDuration,
       exercises: completedExercises,
       intensityScore,
+      workoutMode: currentWorkout.workoutMode,
+      targetMuscleGroup: currentWorkout.targetMuscleGroup,
     };
 
     await db.history.add(historyEntry);

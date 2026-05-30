@@ -13,6 +13,8 @@ export interface Workout {
   currentExerciseIndex?: number; // Track position for persistence
   currentSetIndex?: number; // Track position for persistence
   currentPhase?: 'exercise' | 'rest' | 'exercise-rest'; // Track phase for persistence
+  workoutMode?: 'full-body' | 'daily-rotation';
+  targetMuscleGroup?: MuscleGroup;
 }
 
 export interface WorkoutExercise {
@@ -31,6 +33,8 @@ export interface Set {
   actualReps?: number;
   actualDuration?: number; // seconds
   equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
+  mcgillRounds?: number; // Number of short holds for McGill protocol exercises
+  mcgillHoldDuration?: number; // Duration in seconds per hold for McGill protocol
 }
 
 export interface WorkoutHistoryEntry {
@@ -42,6 +46,8 @@ export interface WorkoutHistoryEntry {
   exercises: CompletedExercise[];
   stretchingCompleted?: boolean; // Optional: tracks if post-workout stretching was done
   intensityScore?: number; // Score representing workout difficulty/intensity (0-100)
+  workoutMode?: 'full-body' | 'daily-rotation';
+  targetMuscleGroup?: MuscleGroup;
 }
 
 // Intensity feedback scale: 1-5
@@ -61,4 +67,6 @@ export interface CompletedSet {
   actualReps?: number;
   actualDuration?: number;
   equipmentUsed?: string; // free text for tracking equipment (e.g., "Red band", "Blue + Green bands")
+  mcgillRounds?: number; // Number of short holds for McGill protocol exercises
+  mcgillHoldDuration?: number; // Duration in seconds per hold for McGill protocol
 }

@@ -16,6 +16,7 @@ import Challenges from './pages/Challenges';
 import ChallengeAttempt from './pages/ChallengeAttempt';
 import { useUserStore } from './store/user-store';
 import { backfillStrengthHistory, needsMigration } from './lib/strength-migration';
+import { migrateShoulderTapsToReps, needsShoulderTapsMigration } from './lib/shoulder-taps-migration';
 
 // Workflow verification: Autonomous feedback refinement and implementation cycle working as expected
 function App() {
@@ -47,6 +48,30 @@ function App() {
     };
 
     runAutoBackfill();
+  }, [profile]);
+
+  // Auto-trigger shoulder taps migration on first app load if needed
+  useEffect(() => {
+    const runShoulderTapsMigration = async () => {
+      if (!profile || profile.hasMigratedShoulderTaps) return;
+
+      const migrationNeeded = await needsShoulderTapsMigration();
+      if (migrationNeeded) {
+        console.log('Auto-running shoulder taps migration...');
+        try {
+          await migrateShoulderTapsToReps();
+          useUserStore.getState().setShoulderTapsMigrationCompleted();
+          console.log('Shoulder taps migration complete');
+        } catch (error) {
+          console.error('Shoulder taps migration failed:', error);
+        }
+      } else if (!profile.hasMigratedShoulderTaps) {
+        // No migration needed, but flag not set - set it now
+        useUserStore.getState().setShoulderTapsMigrationCompleted();
+      }
+    };
+
+    runShoulderTapsMigration();
   }, [profile]);
 
   if (isLoading) {

@@ -7,7 +7,7 @@ After completing all sets of an exercise, users rate its difficulty on a 1-5 sca
 ## How It Works
 
 1. User completes all sets of an exercise in `WorkoutExecution`
-2. `IntensityFeedback` component appears, user selects a rating (1-5)
+2. `IntensityFeedback` component appears, user selects a rating (1-5), which immediately proceeds to the next exercise or completes the workout (no separate submit step)
 3. Rating is stored in a React state map keyed by **exercise ID** (not index)
 4. When the last exercise is rated, `completeWorkout(feedbackMap)` is called
 5. `workout-store.ts` maps each exercise to its feedback by exercise ID and saves to IndexedDB history

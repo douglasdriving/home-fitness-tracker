@@ -5,6 +5,7 @@ import {
   shouldRetireExercise,
   checkWorkoutAchievements,
   getAvailableExercises,
+  getExerciseStatuses,
 } from './achievement-tracker';
 import { Exercise } from '../types/exercise';
 import { ExerciseAchievements } from '../types/user';
@@ -26,7 +27,7 @@ const mockExercises: Partial<Exercise>[] = [
     muscleGroups: ['abs'],
     type: 'timed',
     heavinessScore: { abs: 6, glutes: 0, lowerBack: 0 },
-    unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 40 },
+    unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 20 },
     retirementThreshold: { type: 'timed', value: 90 },
   },
   {
@@ -138,22 +139,22 @@ describe('Achievement Tracker', () => {
     });
 
     it('returns false if unlock requirement not met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
-      const history = [createHistoryEntry('crunches-001', 30)];
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
+      const history = [createHistoryEntry('crunches-001', 15)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(false);
     });
 
     it('returns true if unlock requirement is met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
       const history = [createHistoryEntry('crunches-001', 45)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(true);
     });
 
     it('returns true if unlock requirement is exactly met', () => {
-      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 40 crunches
-      const history = [createHistoryEntry('crunches-001', 40)];
+      const exercise = mockExercises[1] as Exercise; // Flutter Kicks needs 20 crunches
+      const history = [createHistoryEntry('crunches-001', 20)];
       const result = isExerciseUnlocked(exercise, history, []);
       expect(result).toBe(true);
     });
@@ -211,7 +212,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(completedWorkout, [], achievements);
 
-      // Flutter Kicks should be unlocked (needs 40 crunches, we did 45 in THIS workout)
+      // Flutter Kicks should be unlocked (needs 20 crunches, we did 45 in THIS workout)
       expect(result.newUnlocks).toContain('flutter-kicks-001');
     });
 
@@ -232,7 +233,7 @@ describe('Achievement Tracker', () => {
       expect(flutterKicksReason?.prereqExerciseName).toBe('Crunches');
       expect(flutterKicksReason?.performanceValue).toBe(45);
       expect(flutterKicksReason?.performanceType).toBe('reps');
-      expect(flutterKicksReason?.thresholdValue).toBe(40);
+      expect(flutterKicksReason?.thresholdValue).toBe(20);
     });
 
     it('detects new retirements when exercise is in current workout', () => {
@@ -367,7 +368,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does NOT allow unlock and retire of same exercise in same workout', () => {
-      // Plank shoulder taps: unlocks at 60s plank, retires at 90s plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
       // If user just unlocked it, they shouldn't immediately retire it
       const currentWorkout: WorkoutHistoryEntry = {
         id: 'h1',
@@ -381,7 +382,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 60s)
+              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 45s)
             ],
           },
           {
@@ -389,7 +390,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank Shoulder Taps',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 95 }, // Exceeds 90s retirement threshold
+              { setNumber: 1, actualReps: 35 }, // Exceeds 30 reps retirement threshold
             ],
           },
         ],
@@ -414,11 +415,11 @@ describe('Achievement Tracker', () => {
     });
 
     it('uses current workout performance only, not combined history', () => {
-      // Prior history: 25 crunches
-      const priorHistory = [createHistoryEntry('crunches-001', 25, undefined, 1)];
+      // Prior history: 15 crunches
+      const priorHistory = [createHistoryEntry('crunches-001', 15, undefined, 1)];
 
-      // Current workout: 20 crunches (combined would be 25+20=45, but individual is only 20)
-      const currentWorkout = createHistoryEntry('crunches-001', 20);
+      // Current workout: 10 crunches (combined would be 15+10=25, but individual is only 10)
+      const currentWorkout = createHistoryEntry('crunches-001', 10);
 
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
@@ -427,7 +428,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(currentWorkout, priorHistory, achievements);
 
-      // Flutter Kicks should NOT be unlocked (needs 40 in single workout, we only did 20)
+      // Flutter Kicks should NOT be unlocked (needs 20 in single workout, we only did 10)
       expect(result.newUnlocks).not.toContain('flutter-kicks-001');
     });
   });
@@ -558,6 +559,34 @@ describe('Achievement Tracker', () => {
     });
   });
 
+  describe('Dead Bug retirement threshold', () => {
+    it('retires Dead Bug when user achieves 20 reps', () => {
+      const completedWorkout = createHistoryEntry('dead-bug-001', 20);
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const result = checkWorkoutAchievements(completedWorkout, [], achievements);
+
+      // Dead Bug should be retired (threshold is 20 reps, we did 20)
+      expect(result.newRetirements).toContain('dead-bug-001');
+    });
+
+    it('does NOT retire Dead Bug when user achieves 19 reps', () => {
+      const completedWorkout = createHistoryEntry('dead-bug-001', 19);
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const result = checkWorkoutAchievements(completedWorkout, [], achievements);
+
+      // Dead Bug should NOT be retired (threshold is 20 reps, we only did 19)
+      expect(result.newRetirements).not.toContain('dead-bug-001');
+    });
+  });
+
   describe('combined unlock and retirement', () => {
     it('can unlock one exercise and retire a different exercise in the same workout', () => {
       const completedWorkout: WorkoutHistoryEntry = {
@@ -592,7 +621,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does not unlock and retire same exercise simultaneously', () => {
-      // Plank shoulder taps: unlocks at 60s plank, retires at 90s plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
       const completedWorkout: WorkoutHistoryEntry = {
         id: 'h1',
         workoutId: 'w1',
@@ -605,7 +634,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (60s)
+              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (45s)
             ],
           },
           {
@@ -613,7 +642,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank Shoulder Taps',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 95 }, // Enough to retire (90s)
+              { setNumber: 1, actualReps: 35 }, // Enough to retire (30 reps)
             ],
           },
         ],
@@ -626,14 +655,102 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(completedWorkout, [], achievements);
 
-      // Plank shoulder taps should be unlocked (60s plank, we did 65s)
+      // Plank shoulder taps should be unlocked (45s plank, we did 65s)
       expect(result.newUnlocks).toContain('plank-shoulder-taps-001');
       // Should NOT also be retired in the same workout
       expect(result.newRetirements).not.toContain('plank-shoulder-taps-001');
     });
   });
 
+  describe('getExerciseStatuses', () => {
+    it('shows band exercises as locked with needsEquipment when user has no bands', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statuses = getExerciseStatuses([], achievements, false);
+
+      const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeDefined();
+      expect(singleLegRdl?.status).toBe('locked');
+      expect(singleLegRdl?.needsEquipment).toBe(true);
+    });
+
+    it('shows band exercises with normal status when user has bands', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statuses = getExerciseStatuses([], achievements, true);
+
+      // Band Clamshells has no unlock requirement, should be active
+      const clamshells = statuses.find(ex => ex.id === 'band-clamshells-001');
+      expect(clamshells).toBeDefined();
+      expect(clamshells?.status).toBe('active');
+      expect(clamshells?.needsEquipment).toBeUndefined();
+
+      // Single-Leg RDL has unlock requirement, should be locked (not needsEquipment)
+      const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeDefined();
+      expect(singleLegRdl?.status).toBe('locked');
+      expect(singleLegRdl?.needsEquipment).toBeUndefined();
+    });
+
+    it('includes all exercises in statuses regardless of equipment', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statusesNoBands = getExerciseStatuses([], achievements, false);
+      const statusesWithBands = getExerciseStatuses([], achievements, true);
+
+      // Both should include all 31 exercises
+      expect(statusesNoBands.length).toBe(statusesWithBands.length);
+    });
+
+    it('excludes equipment-gated exercises from available exercises (workout generation)', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const available = getAvailableExercises([], achievements, false);
+
+      // Band exercises should NOT be available for workout generation
+      const singleLegRdl = available.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeUndefined();
+    });
+  });
+
   describe('edge cases', () => {
+    it('handles removed exercises in historical data gracefully', () => {
+      // Scenario: User has workout history with a removed exercise (prone-y-t-w-001)
+      const historyWithRemovedExercise: WorkoutHistoryEntry = {
+        id: 'h1',
+        workoutId: 'w1',
+        workoutNumber: 1,
+        completedDate: Date.now(),
+        totalDuration: 30,
+        exercises: [
+          {
+            exerciseId: 'prone-y-t-w-001', // This exercise has been removed
+            exerciseName: 'Prone Y-T-W Raises', // Name is stored in history
+            muscleGroups: ['lowerBack'],
+            completedSets: [
+              { setNumber: 1, actualReps: 25 },
+            ],
+          },
+        ],
+      };
+
+      // getBestPerformance should return the stored performance even if exercise is removed
+      const result = getBestPerformance('prone-y-t-w-001', [historyWithRemovedExercise]);
+      expect(result?.reps).toBe(25);
+    });
+
     it('handles empty workout history', () => {
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],

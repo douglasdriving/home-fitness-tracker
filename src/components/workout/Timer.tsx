@@ -20,11 +20,11 @@ export default function Timer({
   countUp = false,
   showSecondsOnly = false,
   bilateral = false,
-  transitionDuration = 10
+  transitionDuration = 10,
 }: TimerProps) {
   const [timeLeft, setTimeLeft] = useState(countUp ? 0 : duration);
   const [isRunning, setIsRunning] = useState(autoStart);
-  const [currentSide, setCurrentSide] = useState<'left' | 'transition' | 'right' | 'complete'>('left');
+  const [currentSide, setCurrentSide] = useState<'left' | 'transition' | 'right' | 'complete'>(bilateral ? 'left' : 'complete');
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const onCompleteRef = useRef(onComplete);
 
@@ -60,7 +60,6 @@ export default function Timer({
             setIsRunning(false);
             playCompletionSound();
 
-            // Handle bilateral transitions
             if (bilateral) {
               setCurrentSide((currentSideValue) => {
                 if (currentSideValue === 'left') {
@@ -100,7 +99,6 @@ export default function Timer({
             setIsRunning(false);
             playCompletionSound();
 
-            // Handle bilateral transitions
             if (bilateral) {
               setCurrentSide((currentSideValue) => {
                 if (currentSideValue === 'left') {

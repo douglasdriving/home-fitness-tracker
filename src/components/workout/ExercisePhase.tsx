@@ -6,11 +6,13 @@
 
 import { useState, useEffect } from 'react';
 import Timer from './Timer';
+import McgillTimer from './McgillTimer';
 import Button from '../common/Button';
 import Input from '../common/Input';
 import ExerciseModal from './ExerciseModal';
 import { WorkoutExercise, Set as WorkoutSet } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
+import { formatMcgillSet } from '../../utils/mcgill-formatter';
 
 interface ExercisePhaseProps {
   currentExercise: WorkoutExercise;
@@ -53,9 +55,13 @@ export default function ExercisePhase({
   }, [previousNote]);
 
   // Get the target value (reps or duration)
+  // For McGill exercises, compute total work time from rounds × holdDuration if targetDuration isn't set
   const targetValue = exercise.type === 'reps'
     ? currentSet.targetReps
-    : currentSet.targetDuration;
+    : currentSet.targetDuration
+      || (currentSet.mcgillRounds && currentSet.mcgillHoldDuration
+        ? currentSet.mcgillRounds * currentSet.mcgillHoldDuration
+        : undefined);
 
   const handleCompleteClick = () => {
     // Auto-fill actual value from target (user aims for target)
@@ -65,6 +71,15 @@ export default function ExercisePhase({
 
   // Format the target display
   const formatTarget = () => {
+    // Check for McGill protocol
+    if (currentSet.mcgillRounds && currentSet.mcgillHoldDuration) {
+      return formatMcgillSet(
+        currentSet.mcgillRounds,
+        currentSet.mcgillHoldDuration,
+        exercise.countingMethod === 'per-side'
+      );
+    }
+
     if (exercise.type === 'reps') {
       const suffix = exercise.countingMethod === 'per-side' ? ' per side' : '';
       return `${currentSet.targetReps}${suffix}`;
@@ -105,6 +120,28 @@ export default function ExercisePhase({
                 </span>
               ))}
             </div>
+
+            {/* Coaching Tip */}
+            {exercise.coachingTip && (
+              <div
+                className={`mt-3 p-3 rounded-lg ${
+                  exercise.coachingTip.includes('⚠️')
+                    ? 'bg-red-500/10 border border-red-500/30'
+                    : 'bg-secondary/10 border border-secondary/30'
+                }`}
+              >
+                <p className="text-sm text-text">
+                  {exercise.coachingTip.includes('⚠️') ? (
+                    exercise.coachingTip
+                  ) : (
+                    <>
+                      <span className="mr-1">💡</span>
+                      {exercise.coachingTip}
+                    </>
+                  )}
+                </p>
+              </div>
+            )}
           </div>
           <div className="text-right">
             <div className="text-sm text-text-muted">Exercise</div>
@@ -134,11 +171,20 @@ export default function ExercisePhase({
         {/* Timer for timed exercises */}
         {exercise.type === 'timed' && (
           <div className="mb-6">
-            <Timer
-              key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
-              duration={currentSet.targetDuration || 30}
-              bilateral={exercise.countingMethod === 'per-side'}
-            />
+            {currentSet.mcgillRounds && currentSet.mcgillHoldDuration ? (
+              <McgillTimer
+                key={`mcgill-timer-${currentExerciseIndex}-${currentSetIndex}`}
+                rounds={currentSet.mcgillRounds}
+                holdDuration={currentSet.mcgillHoldDuration}
+                restBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
+              />
+            ) : (
+              <Timer
+                key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
+                duration={currentSet.targetDuration || 30}
+                bilateral={exercise.countingMethod === 'per-side'}
+              />
+            )}
           </div>
         )}
 

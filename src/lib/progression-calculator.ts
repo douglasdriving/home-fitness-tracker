@@ -235,3 +235,82 @@ export function updateStrengthLevelsFromWorkout(
 
   return updated;
 }
+
+/**
+ * Convert legacy single-hold side plank duration to McGill protocol structure
+ *
+ * Algorithm: Divide legacy duration by 6 (total rounds in default [3+2+1]),
+ * round to nearest 5s, clamp to [10, 30]
+ *
+ * @param lastDuration - Single-hold duration in seconds
+ * @returns McGill protocol configuration with rounds and hold duration
+ */
+export function convertLegacyToMcgill(
+  lastDuration: number
+): { rounds: number[]; holdDuration: number } {
+  // Divide by total rounds (3 + 2 + 1 = 6)
+  const rawHoldDuration = lastDuration / 6;
+
+  // Round to nearest 5s
+  let holdDuration = Math.round(rawHoldDuration / 5) * 5;
+
+  // Clamp to [10, 30]
+  holdDuration = Math.max(10, Math.min(30, holdDuration));
+
+  return {
+    rounds: [3, 2, 1],
+    holdDuration,
+  };
+}
+
+/**
+ * Calculate McGill protocol progression based on intensity feedback
+ *
+ * Hybrid progression logic:
+ * - Feedback 1-2 (too easy): If holdDuration < 30, increase duration by 5s.
+ *   If holdDuration >= 30, increase first set's round count by 1 (cap at 6).
+ * - Feedback 3 (just right): If holdDuration < 25, increase duration by 5s. Otherwise keep same.
+ * - Feedback 4-5 (too hard): Decrease duration by 5s (floor 5s).
+ *   If already at 5s, decrease first set's round count by 1 (floor 1).
+ *
+ * @param lastRounds - Array of round counts per set (e.g., [3, 2, 1])
+ * @param lastHoldDuration - Hold duration in seconds per round
+ * @param feedback - Intensity feedback rating (1-5)
+ * @returns New McGill protocol configuration
+ */
+export function calculateMcgillProgression(
+  lastRounds: number[],
+  lastHoldDuration: number,
+  feedback: IntensityRating
+): { rounds: number[]; holdDuration: number } {
+  const rounds = [...lastRounds]; // Copy to avoid mutation
+  let holdDuration = lastHoldDuration;
+
+  if (feedback === 1 || feedback === 2) {
+    // Too easy
+    if (holdDuration < 30) {
+      holdDuration += 5;
+    } else if (rounds[0] < 6) {
+      rounds[0] += 1;
+    } else {
+      // Already at max rounds, continue increasing duration
+      holdDuration += 5;
+    }
+  } else if (feedback === 3) {
+    // Just right
+    if (holdDuration < 25) {
+      holdDuration += 5;
+    }
+    // Otherwise keep same
+  } else {
+    // Too hard (4 or 5)
+    if (holdDuration > 5) {
+      holdDuration -= 5;
+    } else if (rounds[0] > 1) {
+      rounds[0] -= 1;
+    }
+    // Otherwise keep at minimum (can't go lower)
+  }
+
+  return { rounds, holdDuration };
+}

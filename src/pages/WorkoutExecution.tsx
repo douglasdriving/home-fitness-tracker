@@ -250,6 +250,7 @@ export default function WorkoutExecution() {
           state: {
             workoutId: historyEntry.workoutId,
             completionState,
+            targetMuscleGroup: currentWorkout.targetMuscleGroup,
           },
         });
       } else {

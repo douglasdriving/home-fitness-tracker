@@ -34,4 +34,3 @@ Each exercise in the app has a visually representative emoji icon (e.g., 🐸 fo
 
 - The `WorkoutExercise` type (stored in IndexedDB history) does NOT include emoji — emojis are always looked up at render time from the exercise data to avoid a database migration.
 - The `emoji` field is required on `Exercise`, so any test mocks creating `Exercise` objects must include it.
-- Flag emojis (e.g., 🇧🇬 for Bulgarian Split Squat) are composed of two regional indicator codepoints and may not render on all platforms.

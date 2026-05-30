@@ -28,3 +28,4 @@ dist-ssr
 .direnv/
 test-results/
 .auto-claude/
+playwright-report/index.html
