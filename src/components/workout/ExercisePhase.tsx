@@ -55,9 +55,13 @@ export default function ExercisePhase({
   }, [previousNote]);
 
   // Get the target value (reps or duration)
+  // For McGill exercises, compute total work time from rounds × holdDuration if targetDuration isn't set
   const targetValue = exercise.type === 'reps'
     ? currentSet.targetReps
-    : currentSet.targetDuration;
+    : currentSet.targetDuration
+      || (currentSet.mcgillRounds && currentSet.mcgillHoldDuration
+        ? currentSet.mcgillRounds * currentSet.mcgillHoldDuration
+        : undefined);
 
   const handleCompleteClick = () => {
     // Auto-fill actual value from target (user aims for target)

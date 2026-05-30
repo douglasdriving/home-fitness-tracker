@@ -291,6 +291,7 @@ export default function Settings() {
             const rounds = mcgillRoundsArray[roundsIndex] ?? mcgillRoundsArray[mcgillRoundsArray.length - 1] ?? 3;
             return {
               ...baseSet,
+              targetDuration: rounds * exercise.mcgillDefaults.holdDuration,
               mcgillRounds: rounds,
               mcgillHoldDuration: exercise.mcgillDefaults.holdDuration,
             };

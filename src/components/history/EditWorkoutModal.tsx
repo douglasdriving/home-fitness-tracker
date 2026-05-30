@@ -3,6 +3,7 @@ import { WorkoutHistoryEntry } from '../../types/workout';
 import { format } from 'date-fns';
 import Button from '../common/Button';
 import { getExerciseById } from '../../data/exerciseData';
+import { formatMcgillSet } from '../../utils/mcgill-formatter';
 
 interface EditWorkoutModalProps {
   workout: WorkoutHistoryEntry;
@@ -190,12 +191,17 @@ export default function EditWorkoutModal({ workout, onSave, onClose }: EditWorko
                   {exercise.completedSets.map((set, setIndex) => {
                     const exerciseData = getExerciseById(exercise.exerciseId);
                     const isRepBased = exerciseData?.type === 'reps';
+                    const isMcgill = set.mcgillRounds !== undefined && set.mcgillHoldDuration !== undefined;
 
                     return (
                       <div key={setIndex} className="flex items-center gap-2">
                         <span className="text-sm text-text-muted w-16">Set {set.setNumber}:</span>
 
-                        {isRepBased ? (
+                        {isMcgill ? (
+                          <span className="flex-1 text-sm text-text px-2 py-1">
+                            {formatMcgillSet(set.mcgillRounds!, set.mcgillHoldDuration!, exerciseData?.countingMethod === 'per-side')}
+                          </span>
+                        ) : isRepBased ? (
                           <input
                             type="number"
                             min="0"
@@ -215,9 +221,11 @@ export default function EditWorkoutModal({ workout, onSave, onClose }: EditWorko
                           />
                         )}
 
-                        <span className="text-xs text-text-muted w-12">
-                          {isRepBased ? 'reps' : 'sec'}
-                        </span>
+                        {!isMcgill && (
+                          <span className="text-xs text-text-muted w-12">
+                            {isRepBased ? 'reps' : 'sec'}
+                          </span>
+                        )}
 
                         <button
                           onClick={() => handleDeleteSet(exerciseIndex, setIndex)}

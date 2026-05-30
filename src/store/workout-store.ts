@@ -267,7 +267,7 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       exerciseName: ex.exerciseName,
       muscleGroups: ex.muscleGroups,
       completedSets: ex.sets
-        .filter((set) => set.completed && (set.actualReps || set.actualDuration))
+        .filter((set) => set.completed && (set.actualReps || set.actualDuration || (set.mcgillRounds && set.mcgillHoldDuration)))
         .map((set) => ({
           setNumber: set.setNumber,
           actualReps: set.actualReps,
