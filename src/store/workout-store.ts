@@ -22,6 +22,7 @@ interface WorkoutStore {
   loadHistory: () => Promise<void>;
   deleteHistoryEntry: (historyId: string) => Promise<void>;
   updateHistoryEntry: (historyId: string, updatedEntry: WorkoutHistoryEntry) => Promise<void>;
+  discardWorkout: () => Promise<void>;
   addManualWorkout: (workout: WorkoutHistoryEntry) => Promise<void>;
 }
 
@@ -474,6 +475,22 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       set({ workoutHistory: history });
     } catch (error) {
       console.error('Failed to update history entry:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Discard the current pending/in-progress workout
+   */
+  discardWorkout: async () => {
+    const { currentWorkout } = get();
+    if (!currentWorkout) return;
+
+    try {
+      await db.workouts.delete(currentWorkout.id);
+      set({ currentWorkout: null });
+    } catch (error) {
+      console.error('Failed to discard workout:', error);
       throw error;
     }
   },
