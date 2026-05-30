@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUserStore } from '../store/user-store';
+import { useWorkoutStore } from '../store/workout-store';
 import { db } from '../db/db';
 import { loadUserProfile, saveUserProfile } from '../utils/userProfile';
 import { getExerciseById } from '../data/exerciseData';
@@ -10,15 +11,23 @@ import { allExercises } from '../data/exerciseData';
 import { seedWorkoutHistory, clearWorkoutHistory } from '../utils/seedData';
 import { isIOS, isStandalone } from '../utils/deviceDetection';
 import IOSInstallPrompt from '../components/common/IOSInstallPrompt';
+import { calculateEstimatedDuration } from '../lib/workout-generator';
+import type { Workout, WorkoutExercise, Set } from '../types/workout';
 
 export default function Settings() {
   const navigate = useNavigate();
   const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
+  const { loadWorkouts } = useWorkoutStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<(Event & { prompt(): void; userChoice: Promise<{ outcome: string }> }) | null>(null);
   const [isInstallable, setIsInstallable] = useState(false);
-    const [isSeeding, setIsSeeding] = useState(false);
+  const [isSeeding, setIsSeeding] = useState(false);
+
+  // Custom workout builder state
+  const [selectedExerciseIds, setSelectedExerciseIds] = useState<string[]>([]);
+  const [customSetsCount, setCustomSetsCount] = useState(4);
+  const [isCreatingCustomWorkout, setIsCreatingCustomWorkout] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -242,6 +251,104 @@ export default function Settings() {
     }
   };
 
+  const handleCreateCustomWorkout = async () => {
+    if (selectedExerciseIds.length === 0) {
+      alert('Please select at least one exercise.');
+      return;
+    }
+
+    try {
+      setIsCreatingCustomWorkout(true);
+
+      // Delete any existing pending/in-progress workouts (matches pattern in workout-store.ts)
+      await db.workouts.where('status').anyOf(['pending', 'in-progress']).delete();
+
+      // Get next workout number
+      const historyCount = await db.history.count();
+      const workoutNumber = historyCount + 1;
+
+      // Build workout exercises
+      const workoutExercises: WorkoutExercise[] = selectedExerciseIds.map((exerciseId) => {
+        const exercise = getExerciseById(exerciseId);
+        if (!exercise) {
+          throw new Error(`Exercise not found: ${exerciseId}`);
+        }
+
+        const isMcgill = exercise.structure === 'mcgill';
+        const mcgillRoundsArray = exercise.mcgillDefaults?.rounds ?? [];
+
+        // Build sets
+        const sets: Set[] = Array.from({ length: customSetsCount }, (_, i) => {
+          const setNumber = i + 1;
+          const baseSet: Set = {
+            setNumber,
+            completed: false,
+          };
+
+          if (isMcgill && exercise.mcgillDefaults) {
+            // For McGill exercises, use rounds array (cycle last value if more sets than rounds)
+            const roundsIndex = Math.min(i, mcgillRoundsArray.length - 1);
+            const rounds = mcgillRoundsArray[roundsIndex] ?? mcgillRoundsArray[mcgillRoundsArray.length - 1] ?? 3;
+            return {
+              ...baseSet,
+              mcgillRounds: rounds,
+              mcgillHoldDuration: exercise.mcgillDefaults.holdDuration,
+            };
+          } else if (exercise.type === 'reps') {
+            return {
+              ...baseSet,
+              targetReps: exercise.defaultReps ?? 10,
+            };
+          } else {
+            return {
+              ...baseSet,
+              targetDuration: exercise.defaultDuration ?? 30,
+            };
+          }
+        });
+
+        // Calculate rest time (matches workout-generator.ts:281-282)
+        const restTime = Math.round(30 + (exercise.heavinessScore[exercise.primaryMuscleGroup] / 10) * 30);
+
+        return {
+          exerciseId: exercise.id,
+          exerciseName: exercise.name,
+          muscleGroups: exercise.muscleGroups,
+          sets,
+          restTime,
+        };
+      });
+
+      // Calculate estimated duration
+      const estimatedDuration = calculateEstimatedDuration(workoutExercises);
+
+      // Build workout object
+      const workout: Workout = {
+        id: `workout-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        workoutNumber,
+        generatedDate: Date.now(),
+        status: 'pending',
+        estimatedDuration,
+        exercises: workoutExercises,
+        workoutMode: 'full-body',
+      };
+
+      // Save to database
+      await db.workouts.add(workout);
+
+      // Refresh workout store
+      await loadWorkouts();
+
+      // Navigate to dashboard
+      navigate('/');
+    } catch (error) {
+      console.error('Failed to create custom workout:', error);
+      alert('Failed to create custom workout. Please try again.');
+    } finally {
+      setIsCreatingCustomWorkout(false);
+    }
+  };
+
   return (
     <div className="bg-background min-h-screen">
       <div className="p-4 space-y-6">
@@ -380,17 +487,104 @@ export default function Settings() {
               These tools are only available in development mode. Use them to quickly populate test data.
             </p>
 
-            <div className="space-y-3">
-              <Button onClick={handleSeedWorkoutHistory} fullWidth disabled={isSeeding}>
-                {isSeeding ? 'Seeding...' : 'Seed Workout History (15 workouts)'}
-              </Button>
+            <div className="space-y-6">
+              {/* Custom Workout Builder */}
+              <div className="space-y-3">
+                <h3 className="text-md font-semibold text-text mb-2">Custom Workout Builder</h3>
 
-              <button
-                onClick={handleClearWorkoutHistory}
-                className="w-full px-6 py-3 rounded-lg font-medium transition-colors bg-background-lighter text-text hover:bg-background-lighter/80"
-              >
-                Clear Workout History
-              </button>
+                {/* Exercise Selection */}
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <label className="text-sm font-medium text-text">
+                      Select Exercises ({selectedExerciseIds.length}/4)
+                    </label>
+                    {selectedExerciseIds.length > 0 && (
+                      <button
+                        onClick={() => setSelectedExerciseIds([])}
+                        className="text-xs text-primary hover:text-primary/80"
+                      >
+                        Clear All
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="max-h-48 overflow-y-auto border border-background-lighter rounded-lg bg-background-light">
+                    {allExercises.map((exercise) => {
+                      const isSelected = selectedExerciseIds.includes(exercise.id);
+                      const isDisabled = !isSelected && selectedExerciseIds.length >= 4;
+
+                      return (
+                        <label
+                          key={exercise.id}
+                          className={`flex items-center p-2 border-b border-background-lighter last:border-b-0 ${
+                            isDisabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:bg-background-lighter/50'
+                          }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={isSelected}
+                            disabled={isDisabled}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedExerciseIds([...selectedExerciseIds, exercise.id]);
+                              } else {
+                                setSelectedExerciseIds(selectedExerciseIds.filter((id) => id !== exercise.id));
+                              }
+                            }}
+                            className="mr-3"
+                          />
+                          <span className="text-lg mr-2">{exercise.emoji}</span>
+                          <div className="flex-1">
+                            <div className="text-sm font-medium text-text">{exercise.name}</div>
+                            <div className="text-xs text-text-muted">
+                              {exercise.muscleGroups.join(', ')} • {exercise.type === 'reps' ? 'Reps' : 'Timed'}
+                            </div>
+                          </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Sets Selector */}
+                <div className="space-y-2">
+                  <label className="text-sm font-medium text-text">Sets per Exercise</label>
+                  <select
+                    value={customSetsCount}
+                    onChange={(e) => setCustomSetsCount(Number(e.target.value))}
+                    className="w-full px-3 py-2 rounded-lg bg-background-light border border-background-lighter text-text"
+                  >
+                    {[1, 2, 3, 4, 5, 6].map((count) => (
+                      <option key={count} value={count}>
+                        {count} {count === 1 ? 'set' : 'sets'}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Create Button */}
+                <Button
+                  onClick={handleCreateCustomWorkout}
+                  fullWidth
+                  disabled={selectedExerciseIds.length === 0 || isCreatingCustomWorkout}
+                >
+                  {isCreatingCustomWorkout ? 'Creating...' : 'Create Custom Workout'}
+                </Button>
+              </div>
+
+              {/* Seed/Clear History Tools */}
+              <div className="space-y-3 pt-3 border-t border-background-lighter">
+                <Button onClick={handleSeedWorkoutHistory} fullWidth disabled={isSeeding}>
+                  {isSeeding ? 'Seeding...' : 'Seed Workout History (15 workouts)'}
+                </Button>
+
+                <button
+                  onClick={handleClearWorkoutHistory}
+                  className="w-full px-6 py-3 rounded-lg font-medium transition-colors bg-background-lighter text-text hover:bg-background-lighter/80"
+                >
+                  Clear Workout History
+                </button>
+              </div>
             </div>
 
             <div className="mt-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-lg">

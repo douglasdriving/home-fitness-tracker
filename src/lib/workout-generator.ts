@@ -536,7 +536,7 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
  * Calculate estimated workout duration in minutes
  * Includes preparation time, setup time, and buffer for pauses
  */
-function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
+export function calculateEstimatedDuration(exercises: WorkoutExercise[]): number {
   let totalSeconds = 0;
 
   exercises.forEach((exercise) => {
