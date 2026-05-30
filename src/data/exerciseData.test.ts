@@ -142,6 +142,13 @@ describe('exerciseData', () => {
       expect(description).toContain('foot');
     });
 
+    it('should have a coaching tip reminding about the elastic loop band', () => {
+      const singleLegRDL = getExerciseById('single-leg-rdl-001');
+      expect(singleLegRDL).toBeDefined();
+      expect(singleLegRDL?.coachingTip).toBeDefined();
+      expect(singleLegRDL?.coachingTip?.toLowerCase()).toContain('elastic loop band');
+    });
+
     it('should maintain its existing fields', () => {
       const singleLegRDL = getExerciseById('single-leg-rdl-001');
       expect(singleLegRDL).toBeDefined();

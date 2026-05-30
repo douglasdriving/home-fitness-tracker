@@ -361,7 +361,8 @@
     "equipment": "elastic-band",
     "countingMethod": "per-side",
     "unlockRequirement": { "exerciseId": "band-lateral-walk-001", "type": "reps", "value": 25 },
-    "retirementThreshold": { "type": "reps", "value": 35 }
+    "retirementThreshold": { "type": "reps", "value": 35 },
+    "coachingTip": "Remember to use the elastic loop band! Step on it with your working foot and hold the other end in your opposite hand."
   },
   {
     "id": "hip-thrust-001",
