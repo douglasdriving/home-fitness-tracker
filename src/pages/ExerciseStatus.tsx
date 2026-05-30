@@ -103,8 +103,17 @@ export default function ExerciseStatus() {
                       {formatMuscleGroups(exercise.muscleGroups)}
                     </div>
 
+                    {/* Equipment requirement for locked exercises */}
+                    {exercise.status === 'locked' && exercise.needsEquipment && (
+                      <div className="mt-2">
+                        <div className="text-xs text-purple-400">
+                          Requires resistance band (enable in Settings)
+                        </div>
+                      </div>
+                    )}
+
                     {/* Unlock progress for locked exercises */}
-                    {exercise.status === 'locked' && exercise.unlockProgress && (
+                    {exercise.status === 'locked' && exercise.unlockProgress && !exercise.needsEquipment && (
                       <div className="mt-2">
                         <div className="text-xs text-text-muted">
                           {exercise.unlockProgress.currentValue}/{exercise.unlockProgress.requiredValue}{' '}

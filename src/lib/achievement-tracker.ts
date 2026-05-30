@@ -12,6 +12,7 @@ export interface ExerciseWithStatus extends Exercise {
     requiredValue: number;
     requiredExerciseName: string;
   };
+  needsEquipment?: boolean; // true when exercise requires equipment the user doesn't have
 }
 
 export interface UnlockReason {
@@ -307,14 +308,12 @@ export function getExerciseStatuses(
   hasElasticBands: boolean
 ): ExerciseWithStatus[] {
   return allExercises
-    .filter(exercise => {
-      // Filter by equipment availability
-      if (exercise.equipment === 'elastic-band' && !hasElasticBands) {
-        return false;
-      }
-      return true;
-    })
     .map(exercise => {
+      // Check if exercise requires equipment the user doesn't have
+      if (exercise.equipment === 'elastic-band' && !hasElasticBands) {
+        return { ...exercise, status: 'locked' as const, needsEquipment: true };
+      }
+
       // Check if retired
       if (achievements.retiredExercises.includes(exercise.id)) {
         return { ...exercise, status: 'retired' as const };

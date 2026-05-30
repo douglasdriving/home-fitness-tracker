@@ -5,6 +5,7 @@ import {
   shouldRetireExercise,
   checkWorkoutAchievements,
   getAvailableExercises,
+  getExerciseStatuses,
 } from './achievement-tracker';
 import { Exercise } from '../types/exercise';
 import { ExerciseAchievements } from '../types/user';
@@ -658,6 +659,69 @@ describe('Achievement Tracker', () => {
       expect(result.newUnlocks).toContain('plank-shoulder-taps-001');
       // Should NOT also be retired in the same workout
       expect(result.newRetirements).not.toContain('plank-shoulder-taps-001');
+    });
+  });
+
+  describe('getExerciseStatuses', () => {
+    it('shows band exercises as locked with needsEquipment when user has no bands', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statuses = getExerciseStatuses([], achievements, false);
+
+      const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeDefined();
+      expect(singleLegRdl?.status).toBe('locked');
+      expect(singleLegRdl?.needsEquipment).toBe(true);
+    });
+
+    it('shows band exercises with normal status when user has bands', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statuses = getExerciseStatuses([], achievements, true);
+
+      // Band Clamshells has no unlock requirement, should be active
+      const clamshells = statuses.find(ex => ex.id === 'band-clamshells-001');
+      expect(clamshells).toBeDefined();
+      expect(clamshells?.status).toBe('active');
+      expect(clamshells?.needsEquipment).toBeUndefined();
+
+      // Single-Leg RDL has unlock requirement, should be locked (not needsEquipment)
+      const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeDefined();
+      expect(singleLegRdl?.status).toBe('locked');
+      expect(singleLegRdl?.needsEquipment).toBeUndefined();
+    });
+
+    it('includes all exercises in statuses regardless of equipment', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statusesNoBands = getExerciseStatuses([], achievements, false);
+      const statusesWithBands = getExerciseStatuses([], achievements, true);
+
+      // Both should include all 31 exercises
+      expect(statusesNoBands.length).toBe(statusesWithBands.length);
+    });
+
+    it('excludes equipment-gated exercises from available exercises (workout generation)', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const available = getAvailableExercises([], achievements, false);
+
+      // Band exercises should NOT be available for workout generation
+      const singleLegRdl = available.find(ex => ex.id === 'single-leg-rdl-001');
+      expect(singleLegRdl).toBeUndefined();
     });
   });
 
