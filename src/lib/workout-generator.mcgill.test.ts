@@ -190,6 +190,66 @@ describe('McGill protocol workout generation', () => {
       expect(sidePlankExercise?.sets[2].mcgillHoldDuration).toBe(30);
     });
 
+    it('progresses hold duration when feedback is "just right" and duration below 25s', () => {
+      const history: WorkoutHistoryEntry[] = [
+        {
+          id: 'w1',
+          workoutId: 'w1',
+          workoutNumber: 1,
+          completedDate: Date.now() - 86400000,
+          totalDuration: 30,
+          exercises: [
+            {
+              exerciseId: 'side-plank-001',
+              exerciseName: 'Side Plank',
+              muscleGroups: ['abs', 'lowerBack'],
+              completedSets: [
+                {
+                  setNumber: 1,
+                  actualDuration: 30,
+                  mcgillRounds: 3,
+                  mcgillHoldDuration: 10,
+                },
+                {
+                  setNumber: 2,
+                  actualDuration: 20,
+                  mcgillRounds: 2,
+                  mcgillHoldDuration: 10,
+                },
+              ],
+              intensityFeedback: 3, // Just right
+            },
+          ],
+        },
+      ];
+
+      const workout = generateWorkout({
+        workoutNumber: 2,
+        strengthLevels: mockStrengthLevels,
+        workoutHistory: history,
+        excludedExerciseIds: ['crunches-001', 'toe-touches-001', 'bicycle-crunches-001', 'leg-raises-001', 'plank-001', 'bird-dog-001', 'hollow-body-hold-001', 'glute-bridge-001', 'donkey-kicks-001', 'bulgarian-split-squat-001', 'single-leg-glute-bridge-001', 'superman-001', 'reverse-hyperextension-001', 'frog-pumps-001', 'good-morning-001', 'back-extension-hold-001'],
+        exerciseAchievements: {
+          unlockedExercises: ['dead-bug-001', 'side-plank-001'],
+          retiredExercises: [],
+        },
+      });
+
+      const sidePlankExercise = workout.exercises.find(
+        ex => ex.exerciseId === 'side-plank-001'
+      );
+
+      expect(sidePlankExercise).toBeDefined();
+
+      // "Just right" with 10s hold should increase to 15s (below 25s threshold)
+      expect(sidePlankExercise?.sets[0].mcgillHoldDuration).toBe(15);
+      expect(sidePlankExercise?.sets[0].mcgillRounds).toBe(3);
+      expect(sidePlankExercise?.sets[0].targetDuration).toBe(45); // 3 × 15
+
+      expect(sidePlankExercise?.sets[1].mcgillHoldDuration).toBe(15);
+      expect(sidePlankExercise?.sets[1].mcgillRounds).toBe(2);
+      expect(sidePlankExercise?.sets[1].targetDuration).toBe(30); // 2 × 15
+    });
+
     it('decreases hold duration when feedback is "too hard"', () => {
       const history: WorkoutHistoryEntry[] = [
         {
