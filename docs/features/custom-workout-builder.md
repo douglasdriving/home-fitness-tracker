@@ -11,7 +11,10 @@ A development-only tool in the Settings page that allows developers to manually 
 3. Developer chooses sets per exercise (1-6) via a dropdown
 4. Clicking "Create Custom Workout" triggers `handleCreateCustomWorkout`:
    - Deletes any existing pending/in-progress workouts from the database
-   - Builds `WorkoutExercise[]` with proper sets based on exercise type (reps, timed, or McGill protocol)
+   - Queries workout history from Dexie for progressive overload
+   - For each exercise, looks up last performance and intensity feedback via `findLastPerformanceWithFeedback()`
+   - Applies the same progression logic as the normal workout generator: `calculateMcgillProgression()` for McGill exercises, `calculateProgressionWithFeedback()` for standard exercises, `convertLegacyToMcgill()` for legacy side plank history
+   - Falls back to exercise defaults only when no history exists
    - Calculates rest times from exercise `heavinessScore` and estimated duration via `calculateEstimatedDuration`
    - Saves the `Workout` object to Dexie (`db.workouts.add`)
    - Calls `loadWorkouts()` to refresh the Zustand workout store
@@ -23,7 +26,8 @@ A development-only tool in the Settings page that allows developers to manually 
 | File | Role |
 |---|---|
 | `src/pages/Settings.tsx` | Custom workout builder UI and `handleCreateCustomWorkout` handler |
-| `src/lib/workout-generator.ts` | Exports `calculateEstimatedDuration` used for duration estimation |
+| `src/lib/workout-generator.ts` | Exports `calculateEstimatedDuration` and `findLastPerformanceWithFeedback` |
+| `src/lib/progression-calculator.ts` | `calculateProgressionWithFeedback`, `calculateMcgillProgression`, `convertLegacyToMcgill` for progressive overload |
 | `src/data/exerciseData.ts` | `allExercises` array and `getExerciseById` for exercise lookup |
 | `src/types/workout.ts` | `Workout`, `WorkoutExercise`, and `Set` type definitions |
 | `src/store/workout-store.ts` | `loadWorkouts()` to refresh current workout after creation |
@@ -36,3 +40,4 @@ A development-only tool in the Settings page that allows developers to manually 
 - **Existing pending workouts are deleted** before creating the new one. Without this, the Dashboard would show the old workout instead of the new custom one.
 - **`loadWorkouts()` must be called** after the DB write or the newly created workout won't appear on the Dashboard (it reads from the Zustand store, not directly from the DB).
 - Exercise defaults may be undefined (`defaultReps`, `defaultDuration`), so fallbacks of 10 reps and 30 seconds are used.
+- **Progressive overload** is applied using the same logic as the normal workout generator. If previous history exists for an exercise, the builder uses feedback-based progression instead of defaults. This means repeated custom workouts with the same exercise will produce different targets based on intensity feedback.
