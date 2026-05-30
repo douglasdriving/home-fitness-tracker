@@ -22,7 +22,7 @@ interface StretchState {
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useUserStore();
-  const { currentWorkout, loadWorkouts, generateNewWorkout, generateDailyRotationWorkout, startWorkout, loadHistory, workoutHistory } =
+  const { currentWorkout, loadWorkouts, generateNewWorkout, generateDailyRotationWorkout, startWorkout, discardWorkout, loadHistory, workoutHistory } =
     useWorkoutStore();
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
   const [timeConstraint, setTimeConstraint] = useState<string>('');
@@ -114,6 +114,17 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Error starting workout:', error);
       alert('Failed to start workout. Please try again.');
+    }
+  };
+
+  const handleDiscardWorkout = async () => {
+    if (!currentWorkout) return;
+    if (!confirm('Discard this workout plan?')) return;
+
+    try {
+      await discardWorkout();
+    } catch (error) {
+      console.error('Error discarding workout:', error);
     }
   };
 
@@ -252,6 +263,13 @@ export default function Dashboard() {
             <Button onClick={handleStartWorkout} fullWidth>
               {currentWorkout.status === 'in-progress' ? 'Continue' : 'Start'}
             </Button>
+
+            <button
+              onClick={handleDiscardWorkout}
+              className="w-full mt-2 py-2 text-sm text-text-muted hover:text-red-500 transition-colors"
+            >
+              Discard workout
+            </button>
           </div>
         ) : (
           <div className="space-y-4">
