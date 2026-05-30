@@ -297,6 +297,43 @@ describe('McgillTimer', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
+  it('progress bar never moves backward during rest phases', () => {
+    const { container } = render(
+      <McgillTimer
+        rounds={3}
+        holdDuration={10}
+        restBetweenRounds={5}
+        transitionDuration={10}
+      />
+    );
+
+    const getProgressWidth = () => {
+      const progressBar = container.querySelector('.bg-primary.h-2.rounded-full');
+      const style = progressBar?.getAttribute('style') || '';
+      const match = style.match(/width:\s*([\d.]+)%/);
+      return match ? parseFloat(match[1]) : 0;
+    };
+
+    // Start timer
+    act(() => {
+      screen.getByText('Start').click();
+    });
+
+    let previousProgress = 0;
+
+    // Advance through the full protocol 1 second at a time,
+    // verifying progress never decreases
+    // Total time: 3*10*2 (holds) + 2*5*2 (rests) + 10 (transition) = 90s
+    for (let i = 0; i < 90; i++) {
+      act(() => {
+        vi.advanceTimersByTime(1000);
+      });
+      const currentProgress = getProgressWidth();
+      expect(currentProgress).toBeGreaterThanOrEqual(previousProgress);
+      previousProgress = currentProgress;
+    }
+  });
+
   it('matches default McGill protocol: 3 rounds x 10s per side', () => {
     const onComplete = vi.fn();
     render(

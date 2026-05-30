@@ -171,17 +171,28 @@ export default function McgillTimer({
     }
 
     // Add completed rounds on current side
-    const completedRoundsOnSide = currentRound - 1;
-    elapsed += completedRoundsOnSide * holdDuration;
-    if (completedRoundsOnSide > 0) {
-      elapsed += completedRoundsOnSide * restBetweenRounds;
-    }
+    // During hold phases: currentRound-1 rounds are fully done (hold+rest each)
+    // During rest phases: currentRound holds are done, currentRound-1 rests are done
+    const isResting = phase === 'left-rest' || phase === 'right-rest';
 
-    // Add current phase time elapsed
-    if (phase === 'left-hold' || phase === 'right-hold') {
-      elapsed += holdDuration - timeLeft;
-    } else if (phase === 'left-rest' || phase === 'right-rest') {
+    if (isResting) {
+      // The current round's hold is complete; we're resting after it
+      elapsed += currentRound * holdDuration;
+      // Previous rests between rounds are also complete
+      if (currentRound - 1 > 0) {
+        elapsed += (currentRound - 1) * restBetweenRounds;
+      }
+      // Add elapsed time within this rest
       elapsed += restBetweenRounds - timeLeft;
+    } else {
+      // Hold phase: previous rounds (hold+rest) are complete
+      const completedRoundsOnSide = currentRound - 1;
+      elapsed += completedRoundsOnSide * holdDuration;
+      if (completedRoundsOnSide > 0) {
+        elapsed += completedRoundsOnSide * restBetweenRounds;
+      }
+      // Add elapsed time within this hold
+      elapsed += holdDuration - timeLeft;
     }
 
     return elapsed;
