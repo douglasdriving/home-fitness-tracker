@@ -22,6 +22,7 @@ The tip persists throughout all sets of the exercise and requires no scrolling o
 | Hollow Body Hold | `hollow-body-hold-001` | Safety warning |
 | Mountain Climbers | `mountain-climbers-001` | Standard (equipment note) |
 | Fire Hydrants | `fire-hydrants-001` | Standard (equipment note) |
+| Single-Leg Romanian Deadlift | `single-leg-rdl-001` | Standard (equipment reminder) |
 
 ## Key files
 
