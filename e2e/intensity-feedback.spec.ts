@@ -172,11 +172,8 @@ test.describe('Intensity Feedback System', () => {
     // Intensity feedback should appear
     await expect(page.getByText(/how did that feel/i)).toBeVisible({ timeout: 5000 });
 
-    // Select "Just right" (rating 3)
+    // Select "Just right" (rating 3) - should auto-submit
     await page.getByText(/just right/i).click();
-
-    // Click continue
-    await page.getByRole('button', { name: /continue/i }).click();
 
     // Should now either be in rest phase (before next exercise) or on next exercise
     // Either rest timer or another exercise name should be visible
@@ -236,9 +233,8 @@ test.describe('Intensity Feedback System', () => {
       }
     }
 
-    // Rate as "Way too hard" (5)
+    // Rate as "Way too hard" (5) - should auto-submit
     await page.getByText(/way too hard/i).click();
-    await page.getByRole('button', { name: /continue/i }).click();
 
     // Complete remaining exercises quickly (just skip through)
     while (true) {
@@ -255,7 +251,6 @@ test.describe('Intensity Feedback System', () => {
         const feedbackVisible = await page.getByText(/how did that feel/i).isVisible({ timeout: 1000 }).catch(() => false);
         if (feedbackVisible) {
           await page.getByText(/just right/i).click();
-          await page.getByRole('button', { name: /continue/i }).click();
         }
         continue;
       }
@@ -328,10 +323,9 @@ test.describe('Intensity Feedback System', () => {
       }
     }
 
-    // Rate as "A bit too easy" (2)
+    // Rate as "A bit too easy" (2) - should auto-submit
     await expect(page.getByText(/how did that feel/i)).toBeVisible({ timeout: 5000 });
     await page.getByText(/a bit too easy/i).click();
-    await page.getByRole('button', { name: /continue/i }).click();
 
     // Complete remaining exercises
     while (true) {
@@ -345,7 +339,6 @@ test.describe('Intensity Feedback System', () => {
         const feedbackVisible = await page.getByText(/how did that feel/i).isVisible({ timeout: 1000 }).catch(() => false);
         if (feedbackVisible) {
           await page.getByText(/just right/i).click();
-          await page.getByRole('button', { name: /continue/i }).click();
         }
         continue;
       }
@@ -428,7 +421,6 @@ test.describe('Intensity Feedback System', () => {
 
     await expect(page.getByText(/how did that feel/i)).toBeVisible({ timeout: 5000 });
     await page.getByText(/way too hard/i).click();
-    await page.getByRole('button', { name: /continue/i }).click();
 
     // Complete remaining exercises
     while (true) {
@@ -442,7 +434,6 @@ test.describe('Intensity Feedback System', () => {
         const feedbackVisible = await page.getByText(/how did that feel/i).isVisible({ timeout: 1000 }).catch(() => false);
         if (feedbackVisible) {
           await page.getByText(/just right/i).click();
-          await page.getByRole('button', { name: /continue/i }).click();
         }
         continue;
       }
