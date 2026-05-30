@@ -31,6 +31,9 @@ The McGill protocol replaces the traditional single long hold for the side plank
 | `src/components/workout/McgillTimer.tsx` | Dedicated McGill timer with left-hold/left-rest/transition/right-hold/right-rest/complete state machine |
 | `src/components/workout/ExercisePhase.tsx` | McGill target display; routes McGill exercises to `McgillTimer`, others to `Timer` |
 | `src/utils/mcgill-formatter.ts` | `formatMcgillSet()` helper for consistent "3x10s per side" formatting |
+| `src/components/history/WorkoutDetailModal.tsx` | History detail view with McGill format display |
+| `src/components/history/EditWorkoutModal.tsx` | History edit view showing McGill format (read-only for McGill sets) |
+| `src/store/workout-store.ts` | `completeWorkout()` filter preserves McGill sets in history |
 
 ## Gotchas
 
@@ -38,3 +41,5 @@ The McGill protocol replaces the traditional single long hold for the side plank
 - **`targetDuration` compatibility**: McGill sets store `targetDuration = mcgillRounds * mcgillHoldDuration` so existing code that reads `targetDuration` for duration estimates continues to work. UI components override the display to show "3x10s" instead of "30s".
 - **Stale closure risk**: `McgillTimer` uses refs (`phaseRef`, `currentRoundRef`) to access current state inside `setInterval` callbacks. Using state directly would cause stale closures since the interval captures old values. This was the root cause of the original "round 4 of 3" bug in the Timer.tsx approach.
 - **Set count override**: McGill exercises create exactly `rounds.length` sets (default 3) with varying round counts, bypassing the normal `numSets` calculation that would create uniform sets.
+- **`completeWorkout` filter**: The history save filter checks `set.completed && (actualReps || actualDuration || (mcgillRounds && mcgillHoldDuration))`. All three branches are needed because McGill sets may have `actualDuration=0` if `targetDuration` was omitted (e.g., from custom workout builder). Any new code path that creates McGill sets must include `targetDuration` or the filter's McGill fallback will catch it.
+- **`EditWorkoutModal`**: McGill sets display as read-only text ("3×10s per side") rather than editable number inputs, since editing individual rounds/hold durations doesn't map to a single number field.
