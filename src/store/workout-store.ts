@@ -194,7 +194,9 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
     const updatedWorkout: Workout = {
       ...workout,
       status: 'in-progress',
-      startedDate: Date.now(), // Track when workout actually started
+      // Only set startedDate when transitioning from 'pending' to 'in-progress'
+      // If already in-progress (e.g., resuming after app restart), preserve the original startedDate
+      startedDate: workout.status === 'in-progress' ? workout.startedDate : Date.now(),
     };
 
     await db.workouts.put(updatedWorkout);

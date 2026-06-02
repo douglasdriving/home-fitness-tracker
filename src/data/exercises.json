@@ -310,10 +310,9 @@
     "source": "ACE Fitness",
     "heavinessScore": { "abs": 0, "glutes": 6, "lowerBack": 0 },
     "type": "reps",
-    "defaultReps": 12,
-    "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "band-clamshells-001", "type": "reps", "value": 20 },
-    "retirementThreshold": { "type": "reps", "value": 40 }
+    "defaultReps": 24,
+    "unlockRequirement": { "exerciseId": "band-clamshells-001", "type": "reps", "value": 40 },
+    "retirementThreshold": { "type": "reps", "value": 80 }
   },
   {
     "id": "single-leg-glute-bridge-001",

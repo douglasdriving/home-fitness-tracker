@@ -47,7 +47,7 @@ Instead of abstract strength scores, the app uses **concrete achievements** tied
 | Fire Hydrants (band) | 5 | — | 40 reps |
 | Band Lateral Walk | 5 | — | 40 reps |
 | Frog Pumps | 5 | 18 Glute Bridges | 50 reps |
-| Curtsy Lunge | 6 | 20 Band Clamshells | 40 reps |
+| Curtsy Lunge | 6 | 40 Band Clamshells | 80 reps |
 | Single-Leg Glute Bridge | 6 | 20 Donkey Kicks | 30 reps |
 | Band Glute Bridge | 6 | 20 Fire Hydrants | — |
 | Single-Leg Romanian DL | 7 | 25 Band Lateral Walk | 35 reps |

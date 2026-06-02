@@ -162,4 +162,45 @@ describe('exerciseData', () => {
       expect(singleLegRDL?.primaryMuscleGroup).toBe('glutes');
     });
   });
+
+  describe('Curtsy Lunge conversion to total reps', () => {
+    it('should not have per-side counting method', () => {
+      const curtsyLunge = getExerciseById('curtsy-lunge-001');
+      expect(curtsyLunge).toBeDefined();
+      // Should be undefined (default is 'total') or explicitly 'total'
+      expect(curtsyLunge?.countingMethod).not.toBe('per-side');
+    });
+
+    it('should have defaultReps of 24 (doubled from original 12)', () => {
+      const curtsyLunge = getExerciseById('curtsy-lunge-001');
+      expect(curtsyLunge).toBeDefined();
+      expect(curtsyLunge?.defaultReps).toBe(24);
+    });
+
+    it('should have unlock requirement of 40 Band Clamshells (doubled from 20)', () => {
+      const curtsyLunge = getExerciseById('curtsy-lunge-001');
+      expect(curtsyLunge).toBeDefined();
+      expect(curtsyLunge?.unlockRequirement).toBeDefined();
+      expect(curtsyLunge?.unlockRequirement?.exerciseId).toBe('band-clamshells-001');
+      expect(curtsyLunge?.unlockRequirement?.value).toBe(40);
+    });
+
+    it('should have retirement threshold of 80 reps (doubled from 40)', () => {
+      const curtsyLunge = getExerciseById('curtsy-lunge-001');
+      expect(curtsyLunge).toBeDefined();
+      expect(curtsyLunge?.retirementThreshold).toBeDefined();
+      expect(curtsyLunge?.retirementThreshold?.value).toBe(80);
+    });
+
+    it('should maintain unchanged properties', () => {
+      const curtsyLunge = getExerciseById('curtsy-lunge-001');
+      expect(curtsyLunge).toBeDefined();
+
+      // These should NOT be doubled
+      expect(curtsyLunge?.name).toBe('Curtsy Lunge');
+      expect(curtsyLunge?.primaryMuscleGroup).toBe('glutes');
+      expect(curtsyLunge?.type).toBe('reps');
+      expect(curtsyLunge?.heavinessScore).toEqual({ abs: 0, glutes: 6, lowerBack: 0 });
+    });
+  });
 });
