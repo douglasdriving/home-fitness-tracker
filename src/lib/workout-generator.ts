@@ -487,9 +487,9 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
       }
 
       // Daily rotation mode set counts:
-      // - Per-side exercises: 4 sets (2 per side)
+      // - Per-side exercises: 2 sets (done on each side = 4 total work units)
       // - Standard exercises: 3 sets
-      const numSets = exercise.countingMethod === 'per-side' ? 4 : 3;
+      const numSets = exercise.countingMethod === 'per-side' ? 2 : 3;
 
       console.log(`[DAILY ROTATION] - Sets: ${numSets} (${exercise.countingMethod ?? 'total'})`);
       console.log(`[DAILY ROTATION] - Final Target: ${targetValue} (${exercise.type})\n`);

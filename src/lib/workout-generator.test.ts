@@ -467,7 +467,7 @@ describe('generateDailyRotationWorkout', () => {
   });
 
   describe('set count', () => {
-    it('should give per-side exercises exactly 4 sets (2 per side)', () => {
+    it('should give per-side exercises exactly 2 sets', () => {
       // Use glutes since it has per-side exercises like donkey kicks
       const workout = generateDailyRotationWorkout({
         workoutNumber: 1,
@@ -481,7 +481,7 @@ describe('generateDailyRotationWorkout', () => {
         expect(exercise).toBeDefined();
 
         if (exercise?.countingMethod === 'per-side') {
-          expect(workoutExercise.sets.length).toBe(4);
+          expect(workoutExercise.sets.length).toBe(2);
         }
       });
     });
