@@ -8,7 +8,7 @@ A shorter, muscle-group-focused workout mode that coexists with the existing ful
 
 1. **Mode selection**: Dashboard shows two equally-prominent cards. The Daily Focus card displays which muscle group is next in the rotation.
 2. **Rotation tracking**: `getNextDailyRotationGroup()` scans workout history for the most recent `daily-rotation` entry and advances the sequence (abs → glutes → lowerBack → abs). First-time users start with abs.
-3. **Workout generation**: `generateDailyRotationWorkout()` filters available exercises by `primaryMuscleGroup` (not the full `muscleGroups` array), sorts by least recently used, and selects the top 3. This prevents multi-tagged exercises from appearing in multiple rotation days. Set counts differ from full-body mode: 3 sets for standard exercises, 4 sets (2 per side) for bilateral exercises.
+3. **Workout generation**: `generateDailyRotationWorkout()` filters available exercises by `primaryMuscleGroup` (not the full `muscleGroups` array), sorts by least recently used, and selects the top 3. This prevents multi-tagged exercises from appearing in multiple rotation days. Set counts differ from full-body mode: 3 sets for standard exercises, 2 sets for bilateral exercises.
 4. **Mode clearing**: Generating a workout in either mode deletes any pending/in-progress workout from the other mode.
 5. **Workout execution**: Reuses the existing `WorkoutExecution` flow unchanged. The `targetMuscleGroup` is passed through to the stretching navigation.
 6. **Stretching**: `StretchingRoutine` receives `targetMuscleGroup` via location state. When present, it filters to 2-3 muscle-group-specific stretches instead of the full 8-stretch routine.
@@ -27,7 +27,7 @@ A shorter, muscle-group-focused workout mode that coexists with the existing ful
 ## Gotchas
 
 - **Rotation is history-based**: The next muscle group is derived from workout history, not stored separately. If history is cleared, rotation resets to abs.
-- **Set count asymmetry**: Daily rotation uses 3/4 sets (standard/bilateral), while full-body uses 4/3 sets. This is intentional per the issue spec.
+- **Set count asymmetry**: Daily rotation uses 3/2 sets (standard/bilateral), while full-body uses 4/3 sets. This is intentional to balance total work units: bilateral exercises are done on each side, so 2 sets = 4 work units, making them comparable to standard exercises' 3 sets.
 - **Stretch state persistence**: `StretchState` in localStorage includes `targetMuscleGroup` to ensure resuming a daily-rotation stretch session still filters correctly.
 - **Backward compatibility**: Both new fields are optional. Old workouts without `workoutMode` are treated as full-body and excluded from rotation tracking queries.
 - **Primary vs secondary muscle groups**: Each exercise has a `primaryMuscleGroup` field that determines which rotation day it belongs to. The `muscleGroups` array still lists all targeted groups (used by full-body mode for balanced selection). This prevents exercises like Dead Bug (abs + lowerBack) from appearing in both the abs and lowerBack rotation days.
