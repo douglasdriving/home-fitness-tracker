@@ -13,6 +13,7 @@ import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { MuscleGroup } from '../types/exercise';
+import { useUserStore } from '../store/user-store';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
@@ -26,6 +27,7 @@ interface StretchState {
 export default function StretchingRoutine() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { profile } = useUserStore();
   const workoutId = location.state?.workoutId;
   const completionState = location.state?.completionState;
   const targetMuscleGroup: MuscleGroup | undefined = location.state?.targetMuscleGroup;
@@ -136,8 +138,14 @@ export default function StretchingRoutine() {
       console.error('Failed to clear stretch state:', error);
     }
 
-    // Navigate to workout complete page with the completion state
-    if (completionState) {
+    // Check if meditation should be shown
+    const autoShowMeditation = profile?.preferences?.autoShowMeditation ?? true;
+
+    if (autoShowMeditation && completionState) {
+      // Navigate to meditation with completion state
+      navigate('/meditation', { state: { completionState, workoutId } });
+    } else if (completionState) {
+      // Navigate to workout complete page with the completion state
       navigate('/workout-complete', { state: completionState });
     } else {
       navigate('/');
@@ -152,8 +160,15 @@ export default function StretchingRoutine() {
       } catch (error) {
         console.error('Failed to clear stretch state:', error);
       }
-      // Navigate to workout complete page with the completion state
-      if (completionState) {
+
+      // Check if meditation should be shown
+      const autoShowMeditation = profile?.preferences?.autoShowMeditation ?? true;
+
+      if (autoShowMeditation && completionState) {
+        // Navigate to meditation with completion state
+        navigate('/meditation', { state: { completionState, workoutId } });
+      } else if (completionState) {
+        // Navigate to workout complete page with the completion state
         navigate('/workout-complete', { state: completionState });
       } else {
         navigate('/');

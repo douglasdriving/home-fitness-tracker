@@ -8,7 +8,8 @@
 | Calibration | `/calibration` | Exercise Emoji Icons |
 | Workout Execution | `/workout` | Coaching Tips, Intensity Feedback, Exercise Emoji Icons, McGill Protocol |
 | Workout Complete | `/workout-complete` | Exercise Emoji Icons, McGill Protocol |
-| Stretching Routine | `/stretching` | Daily Rotation Mode |
+| Stretching Routine | `/stretching` | Daily Rotation Mode (chains to Meditation Timer) |
+| Meditation Timer | `/meditation` | Progressive post-workout meditation |
 | History | `/history` | Exercise Emoji Icons, McGill Protocol, Workout Duration Tracking |
 | Exercise Library | `/exercises` | Exercise Progression, Exercise Emoji Icons, McGill Protocol |
 | Settings | `/settings` | Custom Workout Builder, Exercise Emoji Icons |
@@ -25,4 +26,5 @@
 | Exercise Progression | Unlock chains and retirement thresholds that advance users through harder exercises | [exercise-progression.md](exercise-progression.md) |
 | Intensity Feedback | Post-exercise difficulty ratings that adjust next workout targets | [intensity-feedback.md](intensity-feedback.md) |
 | McGill Protocol | Multiple short holds per side in descending sets for side plank with hybrid progressive overload | [mcgill-protocol.md](mcgill-protocol.md) |
+| Meditation Timer | Progressive post-workout meditation timer with habit-based duration increases (1-15 min) | [meditation-timer.md](meditation-timer.md) |
 | Workout Duration Tracking | Tracks elapsed time from workout start to completion, surviving app closures and resumes | [workout-duration-tracking.md](workout-duration-tracking.md) |

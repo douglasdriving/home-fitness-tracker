@@ -243,14 +243,24 @@ export default function WorkoutExecution() {
         retirementReasons: retirementReasons.length > 0 ? retirementReasons : undefined,
       };
 
-      // New flow: stretching first (if enabled), then workout complete
+      // New flow: stretching first (if enabled), then meditation (if enabled), then workout complete
       const autoShowStretching = profile?.preferences?.autoShowStretching ?? true;
+      const autoShowMeditation = profile?.preferences?.autoShowMeditation ?? true;
+
       if (autoShowStretching) {
         navigate('/stretching', {
           state: {
             workoutId: historyEntry.workoutId,
             completionState,
             targetMuscleGroup: currentWorkout.targetMuscleGroup,
+          },
+        });
+      } else if (autoShowMeditation) {
+        // Stretching disabled but meditation enabled - go directly to meditation
+        navigate('/meditation', {
+          state: {
+            completionState,
+            workoutId: historyEntry.workoutId,
           },
         });
       } else {

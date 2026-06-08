@@ -8,6 +8,7 @@ import {
 } from '../utils/userProfile';
 import { calculateStrengthFromCalibration } from '../lib/progression-calculator';
 import { db } from '../db/db';
+import { getMeditationDuration } from '../utils/meditation';
 
 interface UserStore {
   profile: UserProfile | null;
@@ -18,7 +19,7 @@ interface UserStore {
   completeCalibration: (data: CalibrationData) => void;
   updateStrengthLevels: (levels: Partial<StrengthLevels>) => void;
   updateEquipment: (equipment: { hasElasticBands?: boolean }) => void;
-  updatePreferences: (preferences: { autoShowStretching?: boolean }) => void;
+  updatePreferences: (preferences: { autoShowStretching?: boolean; autoShowMeditation?: boolean }) => void;
   excludeExercise: (exerciseId: string) => void;
   includeExercise: (exerciseId: string) => void;
   setBackfillCompleted: () => void;
@@ -30,6 +31,8 @@ interface UserStore {
   addUnlockedExercises: (exerciseIds: string[]) => void;
   addRetiredExercises: (exerciseIds: string[]) => void;
   restoreRetiredExercise: (exerciseId: string) => void;
+  // Meditation actions
+  completeMeditation: () => void;
 }
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -92,7 +95,7 @@ export const useUserStore = create<UserStore>((set, get) => ({
     set({ profile: updatedProfile });
   },
 
-  updatePreferences: (preferences: { autoShowStretching?: boolean }) => {
+  updatePreferences: (preferences: { autoShowStretching?: boolean; autoShowMeditation?: boolean }) => {
     const profile = get().profile;
     if (!profile) return;
 
@@ -320,6 +323,30 @@ export const useUserStore = create<UserStore>((set, get) => ({
       exerciseAchievements: {
         ...profile.exerciseAchievements,
         retiredExercises: updatedRetired,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  completeMeditation: () => {
+    const profile = get().profile;
+    if (!profile) return;
+
+    const currentState = profile.meditationState ?? {
+      completionCount: 0,
+      currentDurationSeconds: 60,
+    };
+
+    const newCount = currentState.completionCount + 1;
+    const newDuration = getMeditationDuration(newCount);
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      meditationState: {
+        completionCount: newCount,
+        currentDurationSeconds: newDuration,
       },
     };
 

@@ -7,6 +7,12 @@ export interface ExerciseAchievements {
   retiredExercises: string[];    // IDs of exercises auto-retired (mastered)
 }
 
+// Tracks post-workout meditation progress
+export interface MeditationState {
+  completionCount: number;
+  currentDurationSeconds: number;
+}
+
 export interface UserProfile {
   userId: string;
   createdDate: number; // timestamp
@@ -19,6 +25,7 @@ export interface UserProfile {
   excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
   preferences?: {
     autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
+    autoShowMeditation?: boolean; // Auto-show meditation after stretching (default: true)
   };
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   hasMigratedShoulderTaps?: boolean; // Flag to track if plank shoulder taps migration has been completed
@@ -27,6 +34,7 @@ export interface UserProfile {
   workoutFrequencyDays?: number; // Target frequency: work out every X days (default: 2, meaning max 1 day gap)
   challengeState?: UserChallengeState; // Challenge mode progress
   exerciseAchievements?: ExerciseAchievements; // Exercise unlock/retirement tracking
+  meditationState?: MeditationState; // Post-workout meditation progress
 }
 
 export interface CalibrationData {
