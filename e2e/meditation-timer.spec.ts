@@ -103,10 +103,9 @@ test.describe('Meditation Timer', () => {
 
     // Should now be on meditation page
     await expect(page.locator('h1').filter({ hasText: /meditation/i })).toBeVisible({ timeout: 10000 });
-    await expect(page.getByText(/session #1/i)).toBeVisible();
   });
 
-  test('meditation shows correct initial duration (1 minute)', async ({ page }) => {
+  test('meditation timer shows countdown with progress bar', async ({ page }) => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
 
@@ -114,8 +113,11 @@ test.describe('Meditation Timer', () => {
     page.on('dialog', dialog => dialog.accept());
     await page.getByText(/skip all/i).click();
 
-    // Should show 1 minute duration
-    await expect(page.getByText(/1 minute/i)).toBeVisible();
+    // Should show the timer with countdown display (1:00 for 60 seconds)
+    await expect(page.getByText('1:00')).toBeVisible();
+
+    // Should have a Start button (countdown timer, not auto-started)
+    await expect(page.getByRole('button', { name: /start/i })).toBeVisible();
   });
 
   test('skipping meditation navigates to workout complete without incrementing count', async ({ page }) => {
@@ -176,48 +178,13 @@ test.describe('Meditation Timer', () => {
     await expect(page.locator('h1').filter({ hasText: /meditation/i })).toBeVisible({ timeout: 10000 });
   });
 
-  test('meditation shows progressive session numbers', async ({ page }) => {
-    // Start with 4 completions
-    await setupCalibratedUser(page, {
-      meditationState: { completionCount: 4, currentDurationSeconds: 60 },
-    });
-    await completeWorkout(page);
-
-    // Skip stretching
-    page.on('dialog', dialog => dialog.accept());
-    await page.getByText(/skip all/i).click();
-
-    // Should show session #5
-    await expect(page.getByText(/session #5/i)).toBeVisible();
-  });
-
-  test('meditation shows increased duration after milestone', async ({ page }) => {
-    // Start with 5 completions (should be at 2 minutes now)
-    await setupCalibratedUser(page, {
-      meditationState: { completionCount: 5, currentDurationSeconds: 120 },
-    });
-    await completeWorkout(page);
-
-    // Skip stretching
-    page.on('dialog', dialog => dialog.accept());
-    await page.getByText(/skip all/i).click();
-
-    // Should show 2 minutes duration
-    await expect(page.getByText(/2 minutes/i)).toBeVisible();
-    await expect(page.getByText(/session #6/i)).toBeVisible();
-  });
-
-  test('meditation timer shows tips and has skip button', async ({ page }) => {
+  test('meditation has skip button in header', async ({ page }) => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
 
     // Skip stretching
     page.on('dialog', dialog => dialog.accept());
     await page.getByText(/skip all/i).click();
-
-    // Should show meditation tips
-    await expect(page.getByText(/meditation tips/i)).toBeVisible();
-    await expect(page.getByText(/find a comfortable seated position/i)).toBeVisible();
 
     // Should have Skip button in header
     await expect(page.locator('button:has-text("Skip")').first()).toBeVisible();
@@ -252,35 +219,5 @@ test.describe('Meditation Timer', () => {
 
     // Should redirect to home
     await expect(page).toHaveURL('/');
-  });
-
-  test('meditation shows milestone message at count divisible by 5', async ({ page }) => {
-    // Start with 4 completions (next one will be 5th, a milestone)
-    await setupCalibratedUser(page, {
-      meditationState: { completionCount: 4, currentDurationSeconds: 60 },
-    });
-    await completeWorkout(page);
-
-    // Skip stretching
-    page.on('dialog', dialog => dialog.accept());
-    await page.getByText(/skip all/i).click();
-
-    // Should show milestone message
-    await expect(page.getByText(/next session your meditation time will increase/i)).toBeVisible();
-  });
-
-  test('meditation shows cap reached message at 30 completions', async ({ page }) => {
-    // Start with 29 completions
-    await setupCalibratedUser(page, {
-      meditationState: { completionCount: 29, currentDurationSeconds: 600 },
-    });
-    await completeWorkout(page);
-
-    // Skip stretching
-    page.on('dialog', dialog => dialog.accept());
-    await page.getByText(/skip all/i).click();
-
-    // Should show cap reached message
-    await expect(page.getByText(/you've reached the maximum meditation duration/i)).toBeVisible();
   });
 });

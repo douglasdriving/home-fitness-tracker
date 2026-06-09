@@ -24,12 +24,11 @@ vi.mock('../hooks/useWakeLock', () => ({
   useWakeLock: vi.fn(),
 }));
 
-// Mock Timer component
+// Mock Timer component - countdown mode (no countUp prop)
 vi.mock('../components/workout/Timer', () => ({
-  default: ({ duration, onComplete, countUp }: { duration: number; onComplete?: () => void; countUp?: boolean }) => (
+  default: ({ duration, onComplete }: { duration: number; onComplete?: () => void }) => (
     <div data-testid="timer">
       <div>Duration: {duration}s</div>
-      <div>Count Up: {countUp ? 'yes' : 'no'}</div>
       <button onClick={onComplete}>Complete Timer</button>
     </div>
   ),
@@ -81,28 +80,10 @@ describe('MeditationTimer', () => {
     );
 
     expect(screen.getByText(/Duration: 60s/)).toBeInTheDocument();
-    expect(screen.getByText(/Session #1/)).toBeInTheDocument();
+    expect(screen.getByTestId('timer')).toBeInTheDocument();
   });
 
-  it('should display correct session number', () => {
-    (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-      profile: {
-        ...defaultProfile,
-        meditationState: { completionCount: 5, currentDurationSeconds: 120 },
-      },
-      completeMeditation: mockCompleteMeditation,
-    });
-
-    render(
-      <BrowserRouter>
-        <MeditationTimer />
-      </BrowserRouter>
-    );
-
-    expect(screen.getByText(/Session #6/)).toBeInTheDocument();
-  });
-
-  it('should show correct duration for different completion counts', () => {
+  it('should pass correct duration for different completion counts', () => {
     (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
       profile: {
         ...defaultProfile,
@@ -183,45 +164,17 @@ describe('MeditationTimer', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Session #1/)).toBeInTheDocument();
     expect(screen.getByText(/Duration: 60s/)).toBeInTheDocument();
   });
 
-  it('should use count-up timer mode', () => {
+  it('should render header with title and skip button', () => {
     render(
       <BrowserRouter>
         <MeditationTimer />
       </BrowserRouter>
     );
 
-    expect(screen.getByText(/Count Up: yes/)).toBeInTheDocument();
-  });
-
-  it('should format duration text correctly', () => {
-    const testCases = [
-      { duration: 60, expected: '1 minute' },
-      { duration: 120, expected: '2 minutes' },
-      { duration: 300, expected: '5 minutes' },
-      { duration: 900, expected: '15 minutes' },
-    ];
-
-    testCases.forEach(({ duration, expected }) => {
-      (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
-        profile: {
-          ...defaultProfile,
-          meditationState: { completionCount: 0, currentDurationSeconds: duration },
-        },
-        completeMeditation: mockCompleteMeditation,
-      });
-
-      const { unmount } = render(
-        <BrowserRouter>
-          <MeditationTimer />
-        </BrowserRouter>
-      );
-
-      expect(screen.getByText(expected)).toBeInTheDocument();
-      unmount();
-    });
+    expect(screen.getByText(/Meditation/)).toBeInTheDocument();
+    expect(screen.getByText(/Skip/)).toBeInTheDocument();
   });
 });
