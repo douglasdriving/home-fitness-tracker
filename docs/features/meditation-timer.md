@@ -30,10 +30,10 @@ WorkoutExecution → WorkoutComplete
 
 ### Timer Behavior
 
-- **Count-up mode**: Timer counts from 0 to the target duration
+- **Countdown mode**: Timer starts at the target duration and counts down to 0, with a progress bar that fills as time elapses (same pattern as timed exercises and stretching)
 - **Auto-start**: User must manually press Start (no auto-start)
-- **Completion sound**: Plays when timer reaches target duration naturally
-- **Skip option**: Always visible, no confirmation dialog (low friction)
+- **Completion sound**: Plays when timer reaches zero
+- **Skip option**: Always visible in header, no confirmation dialog (low friction)
 - **No persistence**: If user navigates away, session is lost (same as skipping)
 
 ### Completion vs Skip
@@ -150,19 +150,11 @@ If a user navigates directly to `/meditation` without `completionState` in locat
 
 ### 5. Skip vs Complete Logic
 
-The Timer component has a `Reset` button in count-up mode (not a `Skip` button). The page provides its own `Skip` button in the header. Clicking this custom Skip button navigates to WorkoutComplete **without** calling `completeMeditation()`.
+The Timer component uses countdown mode with Start/Pause and Skip buttons. The page also provides a separate `Skip` button in the header for skipping meditation entirely. Clicking the header Skip button navigates to WorkoutComplete **without** calling `completeMeditation()`.
 
 ### 6. Wake Lock
 
 The page uses `useWakeLock()` to keep the screen awake during meditation, preventing the screen from dimming/sleeping mid-session.
-
-### 7. Progression Milestone UI
-
-The page shows special messages:
-- **At multiples of 5 (5, 10, 15, etc.)**: "Next session your meditation time will increase!"
-- **At exactly 30 completions**: "You've reached the maximum meditation duration - excellent dedication!"
-
-These are calculated based on `sessionNumber` (completionCount + 1).
 
 ## Edge Cases Tested
 
