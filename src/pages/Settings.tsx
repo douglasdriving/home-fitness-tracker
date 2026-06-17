@@ -475,6 +475,21 @@ export default function Settings() {
                 </div>
               </div>
             </label>
+
+            <label className="flex items-center gap-3 cursor-pointer p-3 bg-background-light rounded-lg hover:bg-background-lighter transition-colors">
+              <input
+                type="checkbox"
+                checked={profile?.preferences?.autoShowMeditation ?? true}
+                onChange={(e) => updatePreferences({ autoShowMeditation: e.target.checked })}
+                className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
+              />
+              <div>
+                <div className="font-medium text-text">Post-Workout Meditation</div>
+                <div className="text-xs text-text-muted">
+                  Show a guided meditation timer after stretching to build a mindfulness habit.
+                </div>
+              </div>
+            </label>
           </div>
         </div>
 

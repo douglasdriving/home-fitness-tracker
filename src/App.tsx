@@ -7,6 +7,7 @@ import WorkoutExecution from './pages/WorkoutExecution';
 import WorkoutComplete from './pages/WorkoutComplete';
 
 import StretchingRoutine from './pages/StretchingRoutine';
+import MeditationTimer from './pages/MeditationTimer';
 import History from './pages/History';
 import ExerciseStatus from './pages/ExerciseStatus';
 import ExerciseLibrary from './pages/ExerciseLibrary';
@@ -96,6 +97,7 @@ function App() {
             <Route path="/workout-complete" element={<WorkoutComplete />} />
 
             <Route path="/stretching" element={<StretchingRoutine />} />
+            <Route path="/meditation" element={<MeditationTimer />} />
             <Route path="/history" element={<History />} />
             <Route path="/exercises" element={<ExerciseStatus />} />
             <Route path="/exercise-library" element={<ExerciseLibrary />} />

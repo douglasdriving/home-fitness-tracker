@@ -1,0 +1,180 @@
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
+import MeditationTimer from './MeditationTimer';
+import { useUserStore } from '../store/user-store';
+
+// Mock the store
+vi.mock('../store/user-store', () => ({
+  useUserStore: vi.fn(),
+}));
+
+// Mock react-router-dom hooks
+vi.mock('react-router-dom', async () => {
+  const actual = await vi.importActual('react-router-dom');
+  return {
+    ...actual,
+    useNavigate: vi.fn(),
+    useLocation: vi.fn(),
+  };
+});
+
+// Mock wake lock hook
+vi.mock('../hooks/useWakeLock', () => ({
+  useWakeLock: vi.fn(),
+}));
+
+// Mock Timer component - countdown mode (no countUp prop)
+vi.mock('../components/workout/Timer', () => ({
+  default: ({ duration, onComplete }: { duration: number; onComplete?: () => void }) => (
+    <div data-testid="timer">
+      <div>Duration: {duration}s</div>
+      <button onClick={onComplete}>Complete Timer</button>
+    </div>
+  ),
+}));
+
+describe('MeditationTimer', () => {
+  const mockNavigate = vi.fn();
+  const mockCompleteMeditation = vi.fn();
+
+  const defaultProfile = {
+    userId: 'test-user',
+    createdDate: Date.now(),
+    calibrationCompleted: true,
+    strengthLevels: { abs: 5, glutes: 5, lowerBack: 5, lastUpdated: Date.now() },
+    preferences: { autoShowMeditation: true },
+    meditationState: {
+      completionCount: 0,
+      currentDurationSeconds: 60,
+    },
+  };
+
+  const defaultCompletionState = {
+    workoutId: 'workout-123',
+    completedExercises: [],
+    totalReps: 100,
+    totalDuration: 600,
+  };
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    (useNavigate as unknown as ReturnType<typeof vi.fn>).mockReturnValue(mockNavigate);
+    (useLocation as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      state: {
+        completionState: defaultCompletionState,
+        workoutId: 'workout-123',
+      },
+    });
+    (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      profile: defaultProfile,
+      completeMeditation: mockCompleteMeditation,
+    });
+  });
+
+  it('should render meditation timer with correct initial duration', () => {
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByText(/Duration: 60s/)).toBeInTheDocument();
+    expect(screen.getByTestId('timer')).toBeInTheDocument();
+  });
+
+  it('should pass correct duration for different completion counts', () => {
+    (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      profile: {
+        ...defaultProfile,
+        meditationState: { completionCount: 10, currentDurationSeconds: 180 },
+      },
+      completeMeditation: mockCompleteMeditation,
+    });
+
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByText(/Duration: 180s/)).toBeInTheDocument();
+  });
+
+  it('should call completeMeditation and navigate on timer completion', async () => {
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    const completeButton = screen.getByText('Complete Timer');
+    fireEvent.click(completeButton);
+
+    await waitFor(() => {
+      expect(mockCompleteMeditation).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/workout-complete', {
+        state: defaultCompletionState,
+      });
+    });
+  });
+
+  it('should navigate to workout-complete on skip without calling completeMeditation', () => {
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    const skipButton = screen.getByText(/Skip/);
+    fireEvent.click(skipButton);
+
+    expect(mockCompleteMeditation).not.toHaveBeenCalled();
+    expect(mockNavigate).toHaveBeenCalledWith('/workout-complete', {
+      state: defaultCompletionState,
+    });
+  });
+
+  it('should redirect to home if no completion state provided', () => {
+    (useLocation as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      state: null,
+    });
+
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    expect(mockNavigate).toHaveBeenCalledWith('/');
+  });
+
+  it('should handle missing meditation state with defaults', () => {
+    (useUserStore as unknown as ReturnType<typeof vi.fn>).mockReturnValue({
+      profile: {
+        ...defaultProfile,
+        meditationState: undefined,
+      },
+      completeMeditation: mockCompleteMeditation,
+    });
+
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByText(/Duration: 60s/)).toBeInTheDocument();
+  });
+
+  it('should render header with title and skip button', () => {
+    render(
+      <BrowserRouter>
+        <MeditationTimer />
+      </BrowserRouter>
+    );
+
+    expect(screen.getByText(/Meditation/)).toBeInTheDocument();
+    expect(screen.getByText(/Skip/)).toBeInTheDocument();
+  });
+});
