@@ -7,6 +7,38 @@ Items to implement in the app or routine, arising from coaching sessions.
 - [ ] Action item description
 -->
 
+## 2026-06-17 - McGill Interval Holds as Default
+
+- [ ] **Convert all strength timed-holds to ceiling-based interval structure**: Apply the McGill short-repeated-hold model (already used for side plank) to all strength/endurance holds — plank, hollow body hold, back extension hold, and any future timed strength hold.
+- [ ] **Ceiling-based progression logic**: Set a max single-hold duration (~30–40s for core holds, tunable per exercise). Below the ceiling = one continuous hold. Once progression would exceed the ceiling, add a rep (another hold) instead of adding seconds. Track progression by reps/total holds rather than single-hold duration.
+- [ ] **Exclude stretching/mobility holds**: Stretches (cobra, figure-four, etc.) stay as long continuous holds — do NOT convert.
+- [ ] **Priority exercise — Plank**: Douglas's most-grinding hold right now (~75s/set). Convert first. Suggested: ~30s holds × multiple reps rather than 8× 10s resets.
+- [ ] **Hollow Body Hold**: Convert — intervals are also a safety improvement (back stays on floor).
+
+### Stretching Set Revisions
+
+Guiding principle: **stretch a muscle by moving opposite to its action.** Erectors extend → release with flexion; abs flex → release with extension; glutes extend the hip → release with hip flexion across the body.
+
+- [ ] **Lower back day stretches → child's pose, lying spinal twist, figure-four**. Replaces the old set (child's pose, cat-cow, cobra). Rationale: lower back trains the erectors (extensors), so the cooldown should *release* them via flexion + rotation (child's pose, spinal twist). Cobra is spinal *extension* — it contracts the erectors you just worked, so it's removed. Figure-four added: it's a glute/piriformis stretch, and hip tightness is a major driver of lumbar tension (also offloads the lumbar spine). Cat-cow dropped (low-value mobility drill).
+- [ ] **Abs day stretches → cobra, lying spinal twist, side-bend**. Replaces old set (cat-cow, cobra, lying spinal twist). Abs flex the spine, so release via extension (cobra → rectus abdominis) + rotation (spinal twist → obliques) + lateral flexion (standing/kneeling side-bend → obliques). Cat-cow dropped in favor of the side-bend for more direct oblique work.
+- [ ] **Glutes day stretches → figure-four/pigeon, lying spinal twist, hip flexor stretch**. Figure-four/pigeon is the primary glute/piriformis release; lying spinal twist (cross-body) also hits the glute. Hip flexor stretch (kneeling lunge) kept deliberately despite being the antagonist — Douglas sits ~8h/day, so hip flexor mobility is his highest-value mobility work, and glutes day is the natural home for it.
+
+### Posterior-Chain Day Consolidation
+- [ ] **Merge glutes + lower back into one "Posterior-Chain Day."** Rotation becomes Abs → Posterior Chain → [3rd slot TBD]. Removes the dedicated lower-back isolation day.
+- [ ] **Selection by movement role, not random draw** (PROPOSED — confirm with Douglas next session). Fill 3 slots:
+  - Slot 1 — **Hinge** (every session): single-leg RDL (banded), banded good morning, band pull-through [+ weighted RDL/good morning if a kettlebell is acquired]
+  - Slot 2 — **Glute builder** (every session): hip thrust, glute bridge, single-leg glute bridge, frog pumps, banded glute bridge
+  - Slot 3 — **Rotating accessory** (alternates): (a) erector extension — superman, reverse superman (leg-lift), back-extension hold, swimmers; (b) glute-med/lateral — clamshells, fire hydrants, lateral band walk, donkey kicks, curtsy lunge
+- [ ] **Safety rule:** every Posterior-Chain session must contain a hinge (Slot 1) AND, on alternating sessions, a direct spinal-extension move (Slot 3a). Don't let both drop out at once.
+- [ ] **Retire bird dog** — motor-control skill mastered at 28 reps/side; more reps just makes it an endurance drill.
+- [ ] **Remove reverse hyperextension** — room can't accommodate it. Floor substitute: reverse superman / leg-lift (added to Slot 3a pool).
+- [ ] **Good morning → banded only** — bodyweight version is too light to load the hinge.
+- [ ] **Add reverse superman (leg-lift) and swimmers** to the lower-back/extension exercise pool (no equipment needed).
+
+### Open for Next Session
+- [ ] **Decide the 3rd rotation slot**: upper body vs. legs vs. other. Douglas is open, undecided. This is the next conversation.
+- [ ] **Equipment decisions** tied to the 3rd slot: kettlebell/dumbbells (~300–500 SEK, double-duty for posterior chain), pull-up bar (needs doorframe check).
+
 ## 2026-05-29 - Program Structure
 
 ### Session Design

@@ -10,6 +10,48 @@ A running log of fitness decisions made during coaching sessions, with rationale
 **Impact on app:** What should change in the app (if anything)
 -->
 
+## 2026-06-17 - Make McGill-Style Interval Holds the Default for All Strength Holds
+
+**Decision:** Extend the McGill short-repeated-hold structure (already used for side plank) to ALL strength/endurance timed holds — plank, hollow body hold, back extension hold, etc. Stretching/mobility holds are explicitly excluded and stay as long continuous holds.
+
+**Mechanism — ceiling-based conversion:** Rather than deciding per-exercise, set a universal ceiling on single-hold duration (~30–40s for core holds; tunable per exercise). Below the ceiling, a hold stays as one continuous piece. Once progression would push a single hold past the ceiling, progression adds a *rep* (another hold) instead of adding seconds. This means short holds early in progression stay simple, and only long holds become interval-style — automatically, with no per-exercise eligibility decision.
+
+**Rationale:**
+- Core stability is an endurance quality, not a max-duration quality — repeated submaximal holds train it as well or better than one long grind.
+- Form stays crisp: each rep stops before quality degrades (breathing stops, hips sag, white-knuckling).
+- Directly addresses the boredom of long static holds (Douglas's plank was at ~75s/set and felt like a grind).
+- For hollow body hold specifically, intervals are *safer*: short holds with rest reset before the lower back peels off the floor (important given scoliosis history).
+- The principle is general — side plank only got it first because it's part of McGill's canonical "big three," not because it's uniquely suited.
+
+**Exception:** Stretches/mobility holds (cobra, figure-four, etc.) keep continuous holds — continuous time-under-stretch is the point there.
+
+**Impact on app:** Each strength timed-hold exercise needs its progression logic changed from "add seconds" to "ceiling + add reps" once it hits the ceiling. Note: progression for converted holds tracks reps/total holds rather than single-hold duration (same change made for side plank on 2026-05-29).
+
+## 2026-06-17 - Stretching Sets Revised per Muscle Group
+
+**Decision:** Revise the post-workout stretch set for each muscle group using the principle *stretch a muscle by moving opposite to its action.*
+- **Abs:** cobra, lying spinal twist, side-bend (abs flex → release with extension + rotation + lateral flexion)
+- **Glutes:** figure-four/pigeon, lying spinal twist, hip flexor stretch (hip flexor kept despite being the antagonist — Douglas sits ~8h/day)
+- **Lower back:** child's pose, lying spinal twist, figure-four (erectors extend → release with flexion + rotation; cobra removed because it contracts the erectors)
+
+**Rationale:** The old lower-back set (child's pose, cat-cow, cobra) included cobra, which is spinal *extension* — it works the erectors rather than releasing them, illogical right after extension training. Verified against erector-spinae stretching and figure-four/piriformis sources. Douglas's own preference (figure-four + spinal twist over cobra) turned out to be physiologically correct.
+
+**Impact on app:** Update the muscle-group-specific stretch routines (the targeted-stretch feature defined 2026-05-29). Lower-back stretches change from {child's pose, cat-cow, cobra} to {child's pose, lying spinal twist, figure-four}; abs and glutes updated as above.
+
+## 2026-06-17 - Consolidate Lower Back into a Posterior-Chain Day
+
+**Decision:** Drop the dedicated lower-back isolation day. Fold lower-back training into glutes day, reconceived as a "Posterior-Chain Day." Rotation becomes **Abs → Posterior Chain → [new 3rd slot, TBD]**. Retire **bird dog** (motor-control drill, skill mastered at 28 reps/side) and remove **reverse hyper** (room can't accommodate it). **Good morning** survives only as a banded variation (bodyweight is too light).
+
+**Rationale:**
+- Douglas's goal for the lower back is *maintenance*, not building — the original mission (eliminate back pain) is accomplished.
+- The erectors are already trained on other days: loaded via hip hinges (glutes day) and stabilized via planks (abs day). A dedicated day only adds dynamic spinal *extension*, which for back *health* is the least important stimulus (McGill school favors stability over isolation extension).
+- The lower back is a posterior-chain muscle — hard to progressively overload in isolation with bodyweight, and naturally trained alongside glutes/hams in hinge patterns.
+- Consolidating frees the 3rd rotation slot for the muscle-group expansion Douglas wants (upper body or legs — TBD next session).
+
+**Safety condition:** Posterior-Chain Day must always include (a) a hip hinge and (b) one direct spinal-extension move (superman / back-extension hold) as insurance, so erector training is never fully dropped.
+
+**Impact on app:** Replace separate "glutes" and "lower back" rotation days with one "Posterior Chain" day. Selection logic should fill 3 movement-pattern roles (hinge / glute builder / rotating accessory) rather than drawing randomly — see proposed template in action-items.md (pending Douglas's confirmation). Retire bird dog and reverse hyper; restrict good morning to banded.
+
 ## 2026-05-29 - Switch to Daily Short Sessions with Rolling Rotation
 
 **Decision:** Move from 2x/week full-body 60-minute sessions to 5x/week (weekday) 20-minute focused sessions, one muscle group per day. Rolling rotation: Abs → Glutes → Lower Back → repeat. Floor is 3 sessions/week, not 5.
