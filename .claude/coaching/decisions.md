@@ -38,6 +38,30 @@ A running log of fitness decisions made during coaching sessions, with rationale
 
 **Impact on app:** Update the muscle-group-specific stretch routines (the targeted-stretch feature defined 2026-05-29). Lower-back stretches change from {child's pose, cat-cow, cobra} to {child's pose, lying spinal twist, figure-four}; abs and glutes updated as above.
 
+## 2026-06-18 - Add Pre-Workout Dynamic Warmups
+
+**Decision:** Add a short (~2–4 min) dynamic warmup before each session, parameterized by muscle group (parallel to the existing post-workout stretch routines). Dynamic movement before, static stretching after. Upper body stretch set also defined: doorway pec, overhead lat, overhead triceps (optional wrist stretch).
+
+**Rationale:**
+- Warmup benefits: raises muscle temp/blood flow, lubricates joints, primes the nervous system (strong from set 1), and rehearses the movement pattern (the highest-value part).
+- **Specific to Douglas:** he trains in the morning when the spine is stiffest and least tolerant of loading (McGill), and he's now adding load (hinges, push-ups). Both raise warmup value. Injury-prevention evidence is modest for light bodyweight work — not overselling it — but the morning-spine and increasing-load angles justify it.
+- Dynamic-before/static-after: cold static stretching can slightly reduce strength output and isn't a true warmup. Douglas already stretches after (correct); the pre-session work should be movement.
+- The band pull-aparts (added for upper body posture) already double as a warmup move — Douglas intuited this.
+
+**Impact on app:** NEW feature — the app currently has post-workout stretching but no warmup. Add a day-specific dynamic warmup block at the START of each session (abs: cat-cow/trunk rotations/hip circles/slow bird dogs; posterior chain: leg swings/hip circles/bodyweight bridges + hinges; upper body: arm circles/scapular push-ups/easy incline push-ups/band pull-aparts). Add the upper-body stretch set (doorway pec, overhead lat, triceps, optional wrist) to the post-workout stretch routines.
+
+## 2026-06-18 - Add Upper Body as the 3rd Rotation Slot
+
+**Decision:** Fill the freed 3rd rotation slot with **Upper Body**. Rotation is now **Abs → Posterior Chain → Upper Body**. Legs were considered and ruled out as redundant (Douglas bikes ~60–80 min/day, and posterior-chain day already trains glutes/hamstrings). Upper body is a full push+pull session (not a push/pull split). Start with no-equipment exercises; pull-up bar deferred.
+
+**Rationale:**
+- Upper body is the genuine gap — the whole program to date is core + posterior chain, with almost no pressing/pulling. Biggest hole in overall strength and physique.
+- Brings back the *skill development* element Douglas said the routine was missing (pull-up / handstand-pushup progressions are chase-able goals).
+- **Pull is prioritized over push** because Douglas sits ~8h/day: pushing reinforces rounded-forward posture, pulling reverses it. Upper body day doubles as posture insurance (parallels how core work was back insurance).
+- Full upper session (not split) because the 3-way rotation already puts upper body at only ~1.6×/week; splitting into push/pull days would drop each pattern to ~1×/6 days — too infrequent. Push/pull are antagonists, so pairing them in one session is efficient and enforces balance.
+
+**Impact on app:** Add an "Upper Body" rotation day with the same role-based 3-slot selection (horizontal pull / horizontal push every session + alternating vertical). Exercise pool is bodyweight + loop-band + furniture-based (push-ups, pike push-ups, band/table rows, band lat pulldown, band/backpack overhead press). Add band pull-aparts as a warmup staple for upper days. Pull-up-bar exercises (pull-ups/chin-ups) gated behind a future equipment flag. Likely needs new upper-body exercises added to the library (the app's exercise data is currently core-only).
+
 ## 2026-06-17 - Consolidate Lower Back into a Posterior-Chain Day
 
 **Decision:** Drop the dedicated lower-back isolation day. Fold lower-back training into glutes day, reconceived as a "Posterior-Chain Day." Rotation becomes **Abs → Posterior Chain → [new 3rd slot, TBD]**. Retire **bird dog** (motor-control drill, skill mastered at 28 reps/side) and remove **reverse hyper** (room can't accommodate it). **Good morning** survives only as a banded variation (bodyweight is too light).

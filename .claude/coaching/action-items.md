@@ -22,11 +22,26 @@ Guiding principle: **stretch a muscle by moving opposite to its action.** Erecto
 - [ ] **Lower back day stretches → child's pose, lying spinal twist, figure-four**. Replaces the old set (child's pose, cat-cow, cobra). Rationale: lower back trains the erectors (extensors), so the cooldown should *release* them via flexion + rotation (child's pose, spinal twist). Cobra is spinal *extension* — it contracts the erectors you just worked, so it's removed. Figure-four added: it's a glute/piriformis stretch, and hip tightness is a major driver of lumbar tension (also offloads the lumbar spine). Cat-cow dropped (low-value mobility drill).
 - [ ] **Abs day stretches → cobra, lying spinal twist, side-bend**. Replaces old set (cat-cow, cobra, lying spinal twist). Abs flex the spine, so release via extension (cobra → rectus abdominis) + rotation (spinal twist → obliques) + lateral flexion (standing/kneeling side-bend → obliques). Cat-cow dropped in favor of the side-bend for more direct oblique work.
 - [ ] **Glutes day stretches → figure-four/pigeon, lying spinal twist, hip flexor stretch**. Figure-four/pigeon is the primary glute/piriformis release; lying spinal twist (cross-body) also hits the glute. Hip flexor stretch (kneeling lunge) kept deliberately despite being the antagonist — Douglas sits ~8h/day, so hip flexor mobility is his highest-value mobility work, and glutes day is the natural home for it.
+- [ ] **Upper body day stretches → doorway pec stretch, overhead lat stretch, overhead triceps stretch** (optional 4th: wrist flexor/extensor stretch given push-up wrist load). Doorway pec is the star — releases the pushing muscles AND counteracts rounded-forward desk posture (same double-duty logic as the hip flexor on glutes day). Overhead lat = pulling muscles; triceps = pushing.
+
+### Add Pre-Workout Warmups (NEW APP FEATURE)
+- [ ] **Add a short dynamic warmup before each session** (~2–4 min), parameterized by muscle group — the app currently has post-workout stretching but NO warmup. Built into every session.
+- [ ] **Principle: dynamic (movement) before, static (holds) after.** Do NOT put static stretches pre-workout (cold static stretching can slightly reduce strength). Each warmup = the day's movements done light + regional mobility.
+- [ ] **Day-specific warmups:**
+  - *Abs:* cat-cow, gentle trunk rotations, hip circles, a few slow bird dogs
+  - *Posterior chain:* leg swings, hip circles, bodyweight glute bridges + bodyweight hinges (glute activation before loading)
+  - *Upper body:* arm circles, scapular push-ups, a few easy incline push-ups, band pull-aparts (the pull-aparts already double as warmup + posture work)
+- [ ] **Why it matters for Douglas specifically:** (1) trains in the morning when the spine is stiffest/least tolerant of loading (McGill back-science); (2) now adding load (hinges, push-ups) which raises the value of warming up. Injury-prevention evidence is modest for light bodyweight work, but the morning-spine + increasing-load angles make it worthwhile.
 
 ### Posterior-Chain Day Consolidation
 - [ ] **Merge glutes + lower back into one "Posterior-Chain Day."** Rotation becomes Abs → Posterior Chain → [3rd slot TBD]. Removes the dedicated lower-back isolation day.
-- [ ] **Selection by movement role, not random draw** (PROPOSED — confirm with Douglas next session). Fill 3 slots:
-  - Slot 1 — **Hinge** (every session): single-leg RDL (banded), banded good morning, band pull-through [+ weighted RDL/good morning if a kettlebell is acquired]
+- [ ] **Selection by movement role, not random draw** (CONFIRMED 2026-06-18 — 3-slot structure approved; Slot 1 exercises pending Douglas's apartment testing). Fill 3 slots:
+  - Slot 1 — **Hinge** (every session). Pool, grouped by equipment:
+    - *Loop-band (test fit):* banded single-leg RDL (confirmed working ✅), banded two-leg RDL/deadlift (stand on band, hold loop in both hands), banded good morning (needs a long loop), band pull-through (needs a low rear anchor)
+    - *Household weight (bulletproof, adjustable by adding books/water):* backpack single-leg RDL, backpack good morning, backpack/suitcase deadlift
+    - *Advanced bodyweight:* Nordic curl (hamstring-dominant; can also live in Slot 3)
+    - *If kettlebell acquired:* KB deadlift, KB RDL, KB swing (swing is a top-tier posterior-chain option)
+    - **Testing note:** Douglas to trial multiple options against his actual bands + apartment (band length, low anchor availability, room) and keep whichever work. Hinge slot is already covered by banded single-leg RDL + backpack variants regardless of the uncertain band exercises.
   - Slot 2 — **Glute builder** (every session): hip thrust, glute bridge, single-leg glute bridge, frog pumps, banded glute bridge
   - Slot 3 — **Rotating accessory** (alternates): (a) erector extension — superman, reverse superman (leg-lift), back-extension hold, swimmers; (b) glute-med/lateral — clamshells, fire hydrants, lateral band walk, donkey kicks, curtsy lunge
 - [ ] **Safety rule:** every Posterior-Chain session must contain a hinge (Slot 1) AND, on alternating sessions, a direct spinal-extension move (Slot 3a). Don't let both drop out at once.
@@ -35,9 +50,19 @@ Guiding principle: **stretch a muscle by moving opposite to its action.** Erecto
 - [ ] **Good morning → banded only** — bodyweight version is too light to load the hinge.
 - [ ] **Add reverse superman (leg-lift) and swimmers** to the lower-back/extension exercise pool (no equipment needed).
 
-### Open for Next Session
-- [ ] **Decide the 3rd rotation slot**: upper body vs. legs vs. other. Douglas is open, undecided. This is the next conversation.
-- [ ] **Equipment decisions** tied to the 3rd slot: kettlebell/dumbbells (~300–500 SEK, double-duty for posterior chain), pull-up bar (needs doorframe check).
+### Upper Body Day — 3rd Rotation Slot (CONFIRMED 2026-06-18)
+- [ ] **Rotation is now Abs → Posterior Chain → Upper Body.** Legs ruled out as redundant (Douglas bikes ~60–80 min/day + posterior chain hits hams/glutes).
+- [ ] **Full upper-body session** (push + pull together, NOT a push/pull split — splitting would drop each pattern to ~1×/6 days, too infrequent). 3-slot template:
+  - Slot 1 — **Horizontal Pull** (every session, posture priority): band rows (loop band + anchor), inverted/table rows (under a sturdy table), doorway rows. [+ pull-ups when/if bar added]
+  - Slot 2 — **Horizontal Push** (every session): push-ups + progressions (incline → standard → feet-elevated → archer), dips between chairs
+  - Slot 3 — **Rotating accessory** (alternates): (a) vertical pull — band lat pulldown (high anchor) [pull-ups later]; (b) vertical push — pike push-ups (→ handstand progression) or band/backpack overhead press
+- [ ] **Warmup staple: band pull-aparts** (~1 min, every upper session) — counteracts forward-shoulder desk posture. Hold a loop band at arm's length, pull apart to chest.
+- [ ] **PULL is prioritized over push** — Douglas sits ~8h/day; pushing reinforces rounded posture, pulling reverses it. Posture insurance, not just aesthetics.
+- [ ] **Start WITHOUT a pull-up bar** — push-ups, pike push-ups, band/table rows cover it today. Pull-up bar deferred (doorframe check) until/unless it feels needed; would add pull-ups (vertical pull + a chase-able skill goal).
+
+### Still Open
+- [ ] **Pull-up bar** — optional future add; Douglas to check doorframes if/when he wants the vertical-pull goal exercise.
+- [ ] **Kettlebell/dumbbells** (~300–500 SEK) — optional; would load hinges (posterior chain) and overhead press (upper body). Backpack-as-weight is the free interim solution.
 
 ## 2026-05-29 - Program Structure
 

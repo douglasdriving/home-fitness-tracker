@@ -9,7 +9,7 @@ Have worked out on and off in my adult life, mainly doing cardio. Sometimes I ha
 ## Current Routine
 Daily (weekday) ~20-minute focused sessions, one muscle group per day, rolling rotation. The switch (made 2026-05-29) went fully live and adherence is excellent — running ~5 sessions/week, well above the 3/week floor. Works out in the morning, about 1h after waking up with coffee, before heading to coworking space.
 
-**Routine is evolving (as of 2026-06-17):** the dedicated Lower Back day is being folded into glutes day as a "Posterior-Chain Day," freeing the rotation to **Abs → Posterior Chain → [new 3rd muscle group, TBD — upper body or legs]**. See decisions.md / action-items.md.
+**Routine is evolving (as of 2026-06-18):** the dedicated Lower Back day is folded into glutes day as a "Posterior-Chain Day," and the freed slot now holds **Upper Body**. New rotation: **Abs → Posterior Chain → Upper Body**. Upper body is a full push+pull session with pull prioritized (desk-job posture); started without a pull-up bar. See decisions.md / action-items.md.
 
 Also bikes to work every day, about 30-40 minutes each way.
 
