@@ -18,7 +18,7 @@ const mockExercises: Partial<Exercise>[] = [
     name: 'Crunches',
     muscleGroups: ['abs'],
     type: 'reps',
-    heavinessScore: { abs: 3, glutes: 0, lowerBack: 0 },
+    heavinessScore: { abs: 3, glutes: 0, lowerBack: 0, upperBody: 0 },
     retirementThreshold: { type: 'reps', value: 50 },
   },
   {
@@ -26,7 +26,7 @@ const mockExercises: Partial<Exercise>[] = [
     name: 'Flutter Kicks',
     muscleGroups: ['abs'],
     type: 'timed',
-    heavinessScore: { abs: 6, glutes: 0, lowerBack: 0 },
+    heavinessScore: { abs: 6, glutes: 0, lowerBack: 0, upperBody: 0 },
     unlockRequirement: { exerciseId: 'crunches-001', type: 'reps', value: 20 },
     retirementThreshold: { type: 'timed', value: 90 },
   },
@@ -35,7 +35,7 @@ const mockExercises: Partial<Exercise>[] = [
     name: 'Plank',
     muscleGroups: ['abs', 'lowerBack'],
     type: 'timed',
-    heavinessScore: { abs: 5, glutes: 0, lowerBack: 3 },
+    heavinessScore: { abs: 5, glutes: 0, lowerBack: 3, upperBody: 0 },
     retirementThreshold: { type: 'timed', value: 120 },
   },
 ];
@@ -166,7 +166,7 @@ describe('Achievement Tracker', () => {
         id: 'test-001',
         muscleGroups: ['abs'],
         type: 'reps',
-        heavinessScore: { abs: 5, glutes: 0, lowerBack: 0 },
+        heavinessScore: { abs: 5, glutes: 0, lowerBack: 0, upperBody: 0 },
       } as Exercise;
 
       const result = shouldRetireExercise(exercise, []);

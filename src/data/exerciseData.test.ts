@@ -65,7 +65,7 @@ describe('exerciseData', () => {
     it('should have primaryMuscleGroup set on every exercise', () => {
       allExercises.forEach(exercise => {
         expect(exercise.primaryMuscleGroup).toBeDefined();
-        expect(['abs', 'glutes', 'lowerBack']).toContain(exercise.primaryMuscleGroup);
+        expect(['abs', 'glutes', 'lowerBack', 'upperBody']).toContain(exercise.primaryMuscleGroup);
       });
     });
 
@@ -112,7 +112,7 @@ describe('exerciseData', () => {
 
   describe('Starter exercises per muscle group', () => {
     it('should have at least 3 starter exercises per primary muscle group (without bands)', () => {
-      const muscleGroups = ['abs', 'glutes', 'lowerBack'] as const;
+      const muscleGroups = ['abs', 'glutes', 'lowerBack', 'upperBody'] as const;
 
       muscleGroups.forEach(group => {
         const starters = allExercises.filter(
@@ -158,7 +158,7 @@ describe('exerciseData', () => {
       expect(singleLegRDL?.type).toBe('reps');
       expect(singleLegRDL?.defaultReps).toBe(10);
       expect(singleLegRDL?.countingMethod).toBe('per-side');
-      expect(singleLegRDL?.heavinessScore).toEqual({ abs: 0, glutes: 7, lowerBack: 5 });
+      expect(singleLegRDL?.heavinessScore).toEqual({ abs: 0, glutes: 7, lowerBack: 5, upperBody: 0 });
       expect(singleLegRDL?.primaryMuscleGroup).toBe('glutes');
     });
   });
@@ -200,7 +200,80 @@ describe('exerciseData', () => {
       expect(curtsyLunge?.name).toBe('Curtsy Lunge');
       expect(curtsyLunge?.primaryMuscleGroup).toBe('glutes');
       expect(curtsyLunge?.type).toBe('reps');
-      expect(curtsyLunge?.heavinessScore).toEqual({ abs: 0, glutes: 6, lowerBack: 0 });
+      expect(curtsyLunge?.heavinessScore).toEqual({ abs: 0, glutes: 6, lowerBack: 0, upperBody: 0 });
+    });
+  });
+
+  describe('Upper body exercises (issue #26)', () => {
+    const upperBodyExercises = () =>
+      allExercises.filter(ex => ex.primaryMuscleGroup === 'upperBody');
+
+    // The issue summary says "10" but its slot tables enumerate 11 fully-specified
+    // exercises (3 horizontal-pull + 5 horizontal-push + 1 vertical-pull + 2
+    // vertical-push). We implement all 11 as enumerated; "10" is an issue miscount.
+    it('should add exactly 11 upper body exercises', () => {
+      expect(upperBodyExercises()).toHaveLength(11);
+    });
+
+    it('every upper body exercise carries upperBody scope and a positive heaviness', () => {
+      upperBodyExercises().forEach(ex => {
+        expect(ex.muscleGroups[0]).toBe('upperBody');
+        expect(ex.heavinessScore.upperBody).toBeGreaterThan(0);
+      });
+    });
+
+    it('every upper body exercise has a valid upperBodySlot', () => {
+      const validSlots = ['horizontal-pull', 'horizontal-push', 'vertical-pull', 'vertical-push'];
+      upperBodyExercises().forEach(ex => {
+        expect(validSlots).toContain(ex.upperBodySlot);
+      });
+    });
+
+    it('no non-upper-body exercise has an upperBodySlot', () => {
+      const leaked = allExercises.filter(
+        ex => ex.primaryMuscleGroup !== 'upperBody' && ex.upperBodySlot !== undefined
+      );
+      expect(leaked).toHaveLength(0);
+    });
+
+    it('covers all four slots, each with at least one exercise', () => {
+      const slots = upperBodyExercises().map(ex => ex.upperBodySlot);
+      expect(slots).toContain('horizontal-pull');
+      expect(slots).toContain('horizontal-push');
+      expect(slots).toContain('vertical-pull');
+      expect(slots).toContain('vertical-push');
+    });
+
+    it('vertical-pull slot has only the band-dependent Band Lat Pulldown (known pre-bar gap)', () => {
+      const verticalPull = upperBodyExercises().filter(ex => ex.upperBodySlot === 'vertical-pull');
+      expect(verticalPull.map(ex => ex.id)).toEqual(['band-lat-pulldown-001']);
+      expect(verticalPull[0].equipment).toBe('elastic-band');
+    });
+
+    it('has a complete horizontal-push progression chain', () => {
+      const chairDips = getExerciseById('chair-dips-001');
+      const feetElevated = getExerciseById('feet-elevated-pushups-001');
+      const archer = getExerciseById('archer-pushups-001');
+
+      expect(chairDips?.unlockRequirement).toEqual({ exerciseId: 'pushups-001', type: 'reps', value: 15 });
+      expect(feetElevated?.unlockRequirement).toEqual({ exerciseId: 'pushups-001', type: 'reps', value: 20 });
+      expect(archer?.unlockRequirement).toEqual({ exerciseId: 'feet-elevated-pushups-001', type: 'reps', value: 12 });
+    });
+
+    it('every unlockRequirement on an upper body exercise references an existing exercise', () => {
+      upperBodyExercises().forEach(ex => {
+        if (ex.unlockRequirement) {
+          expect(getExerciseById(ex.unlockRequirement.exerciseId)).toBeDefined();
+        }
+      });
+    });
+
+    it('migrates every existing (non-upper-body) exercise with upperBody: 0', () => {
+      allExercises
+        .filter(ex => ex.primaryMuscleGroup !== 'upperBody')
+        .forEach(ex => {
+          expect(ex.heavinessScore.upperBody).toBe(0);
+        });
     });
   });
 });

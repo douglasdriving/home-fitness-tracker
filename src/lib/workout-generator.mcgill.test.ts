@@ -7,6 +7,7 @@ const mockStrengthLevels: StrengthLevels = {
   abs: 10,
   glutes: 10,
   lowerBack: 10,
+  upperBody: 10,
   lastUpdated: Date.now(),
 };
 

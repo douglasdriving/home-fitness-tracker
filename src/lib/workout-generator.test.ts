@@ -11,6 +11,7 @@ describe('generateWorkout', () => {
     abs: 50,
     glutes: 50,
     lowerBack: 50,
+    upperBody: 50,
     lastUpdated: Date.now(),
   };
 
@@ -60,14 +61,14 @@ describe('generateWorkout', () => {
       // Test with low strength level
       const lowStrengthWorkout = generateWorkout({
         workoutNumber: 1,
-        strengthLevels: { abs: 20, glutes: 20, lowerBack: 20, lastUpdated: Date.now() },
+        strengthLevels: { abs: 20, glutes: 20, lowerBack: 20, upperBody: 20, lastUpdated: Date.now() },
         hasElasticBands: true,
       });
 
       // Test with high strength level
       const highStrengthWorkout = generateWorkout({
         workoutNumber: 2,
-        strengthLevels: { abs: 80, glutes: 80, lowerBack: 80, lastUpdated: Date.now() },
+        strengthLevels: { abs: 80, glutes: 80, lowerBack: 80, upperBody: 80, lastUpdated: Date.now() },
         hasElasticBands: true,
       });
 
@@ -343,6 +344,7 @@ describe('generateDailyRotationWorkout', () => {
     abs: 50,
     glutes: 50,
     lowerBack: 50,
+    upperBody: 50,
     lastUpdated: Date.now(),
   };
 

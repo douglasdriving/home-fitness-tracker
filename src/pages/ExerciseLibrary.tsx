@@ -36,6 +36,7 @@ export default function ExerciseLibrary() {
     { value: 'abs', label: 'Abs' },
     { value: 'glutes', label: 'Glutes' },
     { value: 'lowerBack', label: 'Lower Back' },
+    { value: 'upperBody', label: 'Upper Body' },
   ];
 
   return (

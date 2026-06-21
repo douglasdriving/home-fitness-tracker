@@ -53,5 +53,8 @@ export interface StrengthLevels {
   abs: number;
   glutes: number;
   lowerBack: number;
+  // upperBody is indexed by MuscleGroup like the others; it stays at its default
+  // until the rotation follow-on issue actually selects/calibrates upper body work.
+  upperBody: number;
   lastUpdated: number; // timestamp
 }

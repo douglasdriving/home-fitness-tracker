@@ -121,6 +121,7 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       abs: 0,
       glutes: 0,
       lowerBack: 0,
+      upperBody: 0, // Required by the exhaustive record; full-body targets only abs/glutes/lowerBack until the rotation follow-on issue.
     };
 
     selectedExercises.forEach(ex => {

@@ -21,6 +21,7 @@ export function calculateStrengthFromCalibration(
     abs: 0,
     glutes: 0,
     lowerBack: 0,
+    upperBody: 0,
     lastUpdated: now,
   };
 

@@ -180,6 +180,7 @@ export default function Settings() {
           abs: DEFAULT_STRENGTH_LEVEL,
           glutes: DEFAULT_STRENGTH_LEVEL,
           lowerBack: DEFAULT_STRENGTH_LEVEL,
+          upperBody: DEFAULT_STRENGTH_LEVEL,
           lastUpdated: Date.now(),
         },
       };

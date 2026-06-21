@@ -137,6 +137,10 @@ export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
   abs: ['stretch-cat-cow', 'stretch-cobra', 'stretch-lying-twist'],
   glutes: ['stretch-figure-four', 'stretch-hip-flexor', 'stretch-lying-twist'],
   lowerBack: ['stretch-child-pose', 'stretch-cat-cow', 'stretch-cobra'],
+  // Placeholder: upper-body stretches are added when the rotation follow-on issue
+  // wires upperBody into the daily sequence. getStretchesForMuscleGroup is never
+  // called for 'upperBody' until then.
+  upperBody: [],
 };
 
 // Helper function to get stretches for a specific muscle group
