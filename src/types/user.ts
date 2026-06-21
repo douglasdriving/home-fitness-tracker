@@ -24,6 +24,7 @@ export interface UserProfile {
   };
   excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
   preferences?: {
+    autoShowWarmup?: boolean; // Auto-show dynamic warmup before workouts (default: true)
     autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
     autoShowMeditation?: boolean; // Auto-show meditation after stretching (default: true)
   };

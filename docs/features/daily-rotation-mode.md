@@ -10,9 +10,10 @@ A shorter, muscle-group-focused workout mode that coexists with the existing ful
 2. **Rotation tracking**: `getNextDailyRotationGroup()` scans workout history for the most recent `daily-rotation` entry and advances the sequence (abs → glutes → upperBody → abs). First-time users start with abs.
 3. **Workout generation**: `generateDailyRotationWorkout()` filters available exercises by `primaryMuscleGroup` (not the full `muscleGroups` array), sorts by least recently used, and selects the top 3. This prevents multi-tagged exercises from appearing in multiple rotation days. Set counts differ from full-body mode: 3 sets for standard exercises, 2 sets for bilateral exercises. **Upper body is the exception**: instead of generic LRU it fills 3 role slots — Slot 1 horizontal-pull, Slot 2 horizontal-push, Slot 3 alternating vertical-pull/vertical-push (LRU within each slot). The Slot 3 variant is derived from history via `getNextUpperBodyVerticalSlot()` and flips each session; it falls back to the other vertical slot when the intended pool is empty (e.g. band-less users have no vertical-pull exercise).
 4. **Mode clearing**: Generating a workout in either mode deletes any pending/in-progress workout from the other mode.
-5. **Workout execution**: Reuses the existing `WorkoutExecution` flow unchanged. The `targetMuscleGroup` is passed through to the stretching navigation.
-6. **Stretching**: `StretchingRoutine` receives `targetMuscleGroup` via location state. When present, `getStretchesForMuscleGroup()` returns the 3 muscle-group-specific stretches (from `muscleGroupStretches`) instead of the full routine. Each set follows the principle of *stretching a muscle by moving opposite to its action*: abs → Cobra, Lying Spinal Twist, Side-Bend; glutes → Figure-Four, Lying Spinal Twist, Hip Flexor; lowerBack → Child's Pose, Lying Spinal Twist, Figure-Four; upperBody → Doorway Pec, Overhead Lat, Overhead Triceps.
-7. **History**: `completeWorkout()` copies `workoutMode` and `targetMuscleGroup` from the workout to the history entry, enabling rotation tracking and mode-aware display.
+5. **Warmup**: When the `autoShowWarmup` preference is on (default), starting a *fresh* workout routes through `WarmupRoutine` (`/warmup`) before `WorkoutExecution`, carrying `workoutId` and `targetMuscleGroup` in location state. `getWarmupForMuscleGroup()` returns muscle-group-specific dynamic movement (abs → Cat-Cow Flow, Trunk Rotations, Hip Circles, Slow Bird Dogs; glutes → Leg Swings, Hip Circles, Glute Bridges, Hinges; lowerBack → Cat-Cow Flow, Hip Circles, Hinges; upperBody → Arm Circles, Scapular Push-ups, Incline Push-ups, Band Pull-Aparts), or a generic full-body primer when no `targetMuscleGroup` is present. The principle is *dynamic movement before, static holds after*. Skip All and finishing the last move both navigate to `/workout`; resuming an already in-progress workout bypasses the warmup.
+6. **Workout execution**: Reuses the existing `WorkoutExecution` flow unchanged. The `targetMuscleGroup` is passed through to the stretching navigation.
+7. **Stretching**: `StretchingRoutine` receives `targetMuscleGroup` via location state. When present, `getStretchesForMuscleGroup()` returns the 3 muscle-group-specific stretches (from `muscleGroupStretches`) instead of the full routine. Each set follows the principle of *stretching a muscle by moving opposite to its action*: abs → Cobra, Lying Spinal Twist, Side-Bend; glutes → Figure-Four, Lying Spinal Twist, Hip Flexor; lowerBack → Child's Pose, Lying Spinal Twist, Figure-Four; upperBody → Doorway Pec, Overhead Lat, Overhead Triceps.
+8. **History**: `completeWorkout()` copies `workoutMode` and `targetMuscleGroup` from the workout to the history entry, enabling rotation tracking and mode-aware display.
 
 ## Key files
 
@@ -20,7 +21,9 @@ A shorter, muscle-group-focused workout mode that coexists with the existing ful
 - `src/store/workout-store.ts` — `generateDailyRotationWorkout` store action with rotation tracking and mode clearing
 - `src/pages/Dashboard.tsx` — Two-mode selection UI with next rotation group indicator
 - `src/pages/StretchingRoutine.tsx` — Muscle-group filtering via `activeRoutine` useMemo
+- `src/pages/WarmupRoutine.tsx` — Pre-workout dynamic warmup, muscle-group filtering via `activeRoutine` useMemo
 - `src/data/stretchingData.ts` — `muscleGroupStretches` mapping and `getStretchesForMuscleGroup()` helper
+- `src/data/warmupData.ts` — `muscleGroupWarmups` mapping, `genericWarmup`, and `getWarmupForMuscleGroup()` helper
 - `src/types/workout.ts` — `workoutMode` and `targetMuscleGroup` fields on `Workout` and `WorkoutHistoryEntry`
 - `src/pages/WorkoutExecution.tsx` — Passes `targetMuscleGroup` to stretching navigation state
 

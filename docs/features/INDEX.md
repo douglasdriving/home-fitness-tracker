@@ -4,8 +4,9 @@
 
 | Page | Route | Features |
 |---|---|---|
-| Dashboard | `/` | Daily Rotation Mode, Exercise Emoji Icons |
+| Dashboard | `/` | Daily Rotation Mode, Pre-Workout Warmup, Exercise Emoji Icons |
 | Calibration | `/calibration` | Exercise Emoji Icons |
+| Warmup Routine | `/warmup` | Pre-Workout Warmup |
 | Workout Execution | `/workout` | Coaching Tips, Intensity Feedback, Exercise Emoji Icons, McGill Protocol |
 | Workout Complete | `/workout-complete` | Exercise Emoji Icons, McGill Protocol |
 | Stretching Routine | `/stretching` | Daily Rotation Mode (chains to Meditation Timer) |
@@ -27,5 +28,6 @@
 | Intensity Feedback | Post-exercise difficulty ratings that adjust next workout targets | [intensity-feedback.md](intensity-feedback.md) |
 | McGill Protocol | Ceiling-based short-hold protocol for static timed holds (Side Plank, Plank, Hollow Body Hold, Back Extension Hold): multiple short holds in descending sets, adding reps instead of seconds once a per-exercise hold ceiling is reached | [mcgill-protocol.md](mcgill-protocol.md) |
 | Meditation Timer | Progressive post-workout meditation timer with habit-based duration increases (1-15 min) | [meditation-timer.md](meditation-timer.md) |
+| Pre-Workout Warmup | Short muscle-group-specific dynamic warmup shown before each workout, gated by the autoShowWarmup preference, with localStorage resume | [pre-workout-warmup.md](pre-workout-warmup.md) |
 | Upper Body Exercises | New `upperBody` muscle group and 11 slot-tagged upper body exercises (now wired into the Daily Rotation Mode upper body day) | [upper-body-exercises.md](upper-body-exercises.md) |
 | Workout Duration Tracking | Tracks elapsed time from workout start to completion, surviving app closures and resumes | [workout-duration-tracking.md](workout-duration-tracking.md) |

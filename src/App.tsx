@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard';
 import WorkoutExecution from './pages/WorkoutExecution';
 import WorkoutComplete from './pages/WorkoutComplete';
 
+import WarmupRoutine from './pages/WarmupRoutine';
 import StretchingRoutine from './pages/StretchingRoutine';
 import MeditationTimer from './pages/MeditationTimer';
 import History from './pages/History';
@@ -93,6 +94,7 @@ function App() {
         <div className="max-w-md mx-auto">
           <Routes>
             <Route path="/" element={<Dashboard />} />
+            <Route path="/warmup" element={<WarmupRoutine />} />
             <Route path="/workout" element={<WorkoutExecution />} />
             <Route path="/workout-complete" element={<WorkoutComplete />} />
 
