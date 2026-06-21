@@ -430,6 +430,126 @@ describe('McGill protocol workout generation', () => {
     });
   });
 
+  describe('Plank (single-sided ceiling-based McGill protocol)', () => {
+    // Exclude every abs exercise except plank-001 so it is the selected abs exercise.
+    const ABS_EXCLUDE_EXCEPT_PLANK = [
+      'crunches-001', 'toe-touches-001', 'dead-bug-001', 'reverse-crunches-001',
+      'flutter-kicks-001', 'bicycle-crunches-001', 'plank-shoulder-taps-001',
+      'side-plank-001', 'mountain-climbers-001', 'leg-raises-001', 'v-ups-001',
+      'hollow-body-hold-001', 'dragon-flag-tuck-001',
+    ];
+
+    it('generates Plank with default McGill structure [3,2,1] × 15s', () => {
+      const workout = generateWorkout({
+        workoutNumber: 1,
+        strengthLevels: mockStrengthLevels,
+        workoutHistory: [],
+        excludedExerciseIds: ABS_EXCLUDE_EXCEPT_PLANK,
+        exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
+      });
+
+      const plank = workout.exercises.find(ex => ex.exerciseId === 'plank-001');
+      expect(plank).toBeDefined();
+      expect(plank?.sets).toHaveLength(3);
+
+      expect(plank?.sets[0].mcgillRounds).toBe(3);
+      expect(plank?.sets[0].mcgillHoldDuration).toBe(15);
+      expect(plank?.sets[0].targetDuration).toBe(45); // 3 × 15
+
+      expect(plank?.sets[1].mcgillRounds).toBe(2);
+      expect(plank?.sets[1].mcgillHoldDuration).toBe(15);
+      expect(plank?.sets[1].targetDuration).toBe(30); // 2 × 15
+
+      expect(plank?.sets[2].mcgillRounds).toBe(1);
+      expect(plank?.sets[2].mcgillHoldDuration).toBe(15);
+      expect(plank?.sets[2].targetDuration).toBe(15); // 1 × 15
+    });
+
+    it('migrates legacy single-hold plank history (75s) to the interval format', () => {
+      const history: WorkoutHistoryEntry[] = [
+        {
+          id: 'w1',
+          workoutId: 'w1',
+          workoutNumber: 1,
+          completedDate: Date.now() - 86400000,
+          totalDuration: 300,
+          exercises: [
+            {
+              exerciseId: 'plank-001',
+              exerciseName: 'Plank',
+              muscleGroups: ['abs', 'lowerBack'],
+              completedSets: [
+                { setNumber: 1, actualDuration: 75 }, // legacy single hold, no McGill fields
+                { setNumber: 2, actualDuration: 75 },
+              ],
+              intensityFeedback: 3, // Just right
+            },
+          ],
+        },
+      ];
+
+      const workout = generateWorkout({
+        workoutNumber: 2,
+        strengthLevels: mockStrengthLevels,
+        workoutHistory: history,
+        excludedExerciseIds: ABS_EXCLUDE_EXCEPT_PLANK,
+        exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
+      });
+
+      const plank = workout.exercises.find(ex => ex.exerciseId === 'plank-001');
+      expect(plank).toBeDefined();
+      // 75 / 6 = 12.5 → rounds to 15 (under the 30s ceiling, no clamp)
+      expect(plank?.sets[0].mcgillRounds).toBe(3);
+      expect(plank?.sets[0].mcgillHoldDuration).toBe(15);
+      expect(plank?.sets[1].mcgillRounds).toBe(2);
+      expect(plank?.sets[1].mcgillHoldDuration).toBe(15);
+      expect(plank?.sets[2].mcgillRounds).toBe(1);
+      expect(plank?.sets[2].mcgillHoldDuration).toBe(15);
+    });
+
+    it('adds a rep instead of seconds once the 30s ceiling is hit (too easy)', () => {
+      const history: WorkoutHistoryEntry[] = [
+        {
+          id: 'w1',
+          workoutId: 'w1',
+          workoutNumber: 1,
+          completedDate: Date.now() - 86400000,
+          totalDuration: 300,
+          exercises: [
+            {
+              exerciseId: 'plank-001',
+              exerciseName: 'Plank',
+              muscleGroups: ['abs', 'lowerBack'],
+              completedSets: [
+                { setNumber: 1, actualDuration: 90, mcgillRounds: 3, mcgillHoldDuration: 30 },
+                { setNumber: 2, actualDuration: 60, mcgillRounds: 2, mcgillHoldDuration: 30 },
+                { setNumber: 3, actualDuration: 30, mcgillRounds: 1, mcgillHoldDuration: 30 },
+              ],
+              intensityFeedback: 1, // Way too easy
+            },
+          ],
+        },
+      ];
+
+      const workout = generateWorkout({
+        workoutNumber: 2,
+        strengthLevels: mockStrengthLevels,
+        workoutHistory: history,
+        excludedExerciseIds: ABS_EXCLUDE_EXCEPT_PLANK,
+        exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
+      });
+
+      const plank = workout.exercises.find(ex => ex.exerciseId === 'plank-001');
+      expect(plank).toBeDefined();
+      // At ceiling (30s) + too easy → add a rep to the first set, hold stays at 30s
+      expect(plank?.sets[0].mcgillRounds).toBe(4);
+      expect(plank?.sets[0].mcgillHoldDuration).toBe(30);
+      expect(plank?.sets[0].targetDuration).toBe(120); // 4 × 30
+      expect(plank?.sets[1].mcgillRounds).toBe(2);
+      expect(plank?.sets[1].mcgillHoldDuration).toBe(30);
+    });
+  });
+
   describe('daily rotation mode', () => {
     it('generates McGill protocol in daily rotation mode', () => {
       const workout = generateDailyRotationWorkout({

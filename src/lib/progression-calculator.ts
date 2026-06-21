@@ -237,16 +237,18 @@ export function updateStrengthLevelsFromWorkout(
 }
 
 /**
- * Convert legacy single-hold side plank duration to McGill protocol structure
+ * Convert a legacy single-hold timed duration to McGill protocol structure
  *
  * Algorithm: Divide legacy duration by 6 (total rounds in default [3+2+1]),
- * round to nearest 5s, clamp to [10, 30]
+ * round to nearest 5s, clamp to [10, holdCeiling]
  *
  * @param lastDuration - Single-hold duration in seconds
+ * @param holdCeiling - Per-hold ceiling in seconds (defaults to 30 for Side Plank)
  * @returns McGill protocol configuration with rounds and hold duration
  */
 export function convertLegacyToMcgill(
-  lastDuration: number
+  lastDuration: number,
+  holdCeiling: number = 30
 ): { rounds: number[]; holdDuration: number } {
   // Divide by total rounds (3 + 2 + 1 = 6)
   const rawHoldDuration = lastDuration / 6;
@@ -254,8 +256,8 @@ export function convertLegacyToMcgill(
   // Round to nearest 5s
   let holdDuration = Math.round(rawHoldDuration / 5) * 5;
 
-  // Clamp to [10, 30]
-  holdDuration = Math.max(10, Math.min(30, holdDuration));
+  // Clamp to [10, holdCeiling]
+  holdDuration = Math.max(10, Math.min(holdCeiling, holdDuration));
 
   return {
     rounds: [3, 2, 1],
@@ -266,29 +268,34 @@ export function convertLegacyToMcgill(
 /**
  * Calculate McGill protocol progression based on intensity feedback
  *
- * Hybrid progression logic:
- * - Feedback 1-2 (too easy): If holdDuration < 30, increase duration by 5s.
- *   If holdDuration >= 30, increase first set's round count by 1 (cap at 6).
- * - Feedback 3 (just right): If holdDuration < 25, increase duration by 5s. Otherwise keep same.
+ * Hybrid progression logic (ceiling-based):
+ * - Feedback 1-2 (too easy): If holdDuration < holdCeiling, increase duration by 5s.
+ *   If holdDuration >= holdCeiling, increase first set's round count by 1 (cap at 6).
+ * - Feedback 3 (just right): If holdDuration < holdCeiling - 5, increase duration by 5s. Otherwise keep same.
  * - Feedback 4-5 (too hard): Decrease duration by 5s (floor 5s).
  *   If already at 5s, decrease first set's round count by 1 (floor 1).
+ *
+ * Once a single hold would exceed the per-exercise ceiling, progression adds a
+ * rep (round) instead of more seconds — keeping form crisp on static holds.
  *
  * @param lastRounds - Array of round counts per set (e.g., [3, 2, 1])
  * @param lastHoldDuration - Hold duration in seconds per round
  * @param feedback - Intensity feedback rating (1-5)
+ * @param holdCeiling - Per-hold ceiling in seconds (defaults to 30 for Side Plank)
  * @returns New McGill protocol configuration
  */
 export function calculateMcgillProgression(
   lastRounds: number[],
   lastHoldDuration: number,
-  feedback: IntensityRating
+  feedback: IntensityRating,
+  holdCeiling: number = 30
 ): { rounds: number[]; holdDuration: number } {
   const rounds = [...lastRounds]; // Copy to avoid mutation
   let holdDuration = lastHoldDuration;
 
   if (feedback === 1 || feedback === 2) {
     // Too easy
-    if (holdDuration < 30) {
+    if (holdDuration < holdCeiling) {
       holdDuration += 5;
     } else if (rounds[0] < 6) {
       rounds[0] += 1;
@@ -298,7 +305,7 @@ export function calculateMcgillProgression(
     }
   } else if (feedback === 3) {
     // Just right
-    if (holdDuration < 25) {
+    if (holdDuration < holdCeiling - 5) {
       holdDuration += 5;
     }
     // Otherwise keep same

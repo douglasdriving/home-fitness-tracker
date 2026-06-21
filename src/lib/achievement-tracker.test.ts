@@ -368,7 +368,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does NOT allow unlock and retire of same exercise in same workout', () => {
-      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 30s plank, retires at 30 reps plank-shoulder-taps
       // If user just unlocked it, they shouldn't immediately retire it
       const currentWorkout: WorkoutHistoryEntry = {
         id: 'h1',
@@ -382,7 +382,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 45s)
+              { setNumber: 1, actualDuration: 65 }, // Unlocks plank-shoulder-taps (needs 30s)
             ],
           },
           {
@@ -621,7 +621,7 @@ describe('Achievement Tracker', () => {
     });
 
     it('does not unlock and retire same exercise simultaneously', () => {
-      // Plank shoulder taps: unlocks at 45s plank, retires at 30 reps plank-shoulder-taps
+      // Plank shoulder taps: unlocks at 30s plank, retires at 30 reps plank-shoulder-taps
       const completedWorkout: WorkoutHistoryEntry = {
         id: 'h1',
         workoutId: 'w1',
@@ -634,7 +634,7 @@ describe('Achievement Tracker', () => {
             exerciseName: 'Plank',
             muscleGroups: ['abs', 'lowerBack'],
             completedSets: [
-              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (45s)
+              { setNumber: 1, actualDuration: 65 }, // Enough to unlock plank-shoulder-taps (30s)
             ],
           },
           {
@@ -655,7 +655,7 @@ describe('Achievement Tracker', () => {
 
       const result = checkWorkoutAchievements(completedWorkout, [], achievements);
 
-      // Plank shoulder taps should be unlocked (45s plank, we did 65s)
+      // Plank shoulder taps should be unlocked (30s plank, we did 65s)
       expect(result.newUnlocks).toContain('plank-shoulder-taps-001');
       // Should NOT also be retired in the same workout
       expect(result.newRetirements).not.toContain('plank-shoulder-taps-001');

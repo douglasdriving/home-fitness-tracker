@@ -186,6 +186,9 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
       let rounds: number[];
       let holdDuration: number;
 
+      // Per-exercise hold ceiling (defaults to 30 for Side Plank)
+      const holdCeiling = exercise.mcgillDefaults.holdCeiling ?? 30;
+
       if (lastPerformanceData !== null) {
         const feedback = lastPerformanceData.feedback ?? 3;
 
@@ -196,7 +199,8 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
           const progression = calculateMcgillProgression(
             lastPerformanceData.mcgillRounds,
             lastPerformanceData.mcgillHoldDuration,
-            feedback
+            feedback,
+            holdCeiling
           );
           rounds = progression.rounds;
           holdDuration = progression.holdDuration;
@@ -204,13 +208,13 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
         } else {
           // Convert legacy single-hold to McGill
           console.log(`[WORKOUT GEN] - Converting legacy ${lastPerformanceData.performance}s to McGill`);
-          const converted = convertLegacyToMcgill(lastPerformanceData.performance);
+          const converted = convertLegacyToMcgill(lastPerformanceData.performance, holdCeiling);
           rounds = converted.rounds;
           holdDuration = converted.holdDuration;
 
           // Apply progression based on feedback
           if (feedback !== 3) {
-            const progression = calculateMcgillProgression(rounds, holdDuration, feedback);
+            const progression = calculateMcgillProgression(rounds, holdDuration, feedback, holdCeiling);
             rounds = progression.rounds;
             holdDuration = progression.holdDuration;
           }
@@ -418,6 +422,9 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
       let rounds: number[];
       let holdDuration: number;
 
+      // Per-exercise hold ceiling (defaults to 30 for Side Plank)
+      const holdCeiling = exercise.mcgillDefaults.holdCeiling ?? 30;
+
       if (lastPerformanceData !== null) {
         const feedback = lastPerformanceData.feedback ?? 3;
 
@@ -428,7 +435,8 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
           const progression = calculateMcgillProgression(
             lastPerformanceData.mcgillRounds,
             lastPerformanceData.mcgillHoldDuration,
-            feedback
+            feedback,
+            holdCeiling
           );
           rounds = progression.rounds;
           holdDuration = progression.holdDuration;
@@ -436,13 +444,13 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
         } else {
           // Convert legacy single-hold to McGill
           console.log(`[DAILY ROTATION] - Converting legacy ${lastPerformanceData.performance}s to McGill`);
-          const converted = convertLegacyToMcgill(lastPerformanceData.performance);
+          const converted = convertLegacyToMcgill(lastPerformanceData.performance, holdCeiling);
           rounds = converted.rounds;
           holdDuration = converted.holdDuration;
 
           // Apply progression based on feedback
           if (feedback !== 3) {
-            const progression = calculateMcgillProgression(rounds, holdDuration, feedback);
+            const progression = calculateMcgillProgression(rounds, holdDuration, feedback, holdCeiling);
             rounds = progression.rounds;
             holdDuration = progression.holdDuration;
           }
@@ -545,6 +553,7 @@ export function calculateEstimatedDuration(exercises: WorkoutExercise[]): number
 
     const exerciseData = getExerciseById(exercise.exerciseId);
     const isMcgill = exerciseData?.structure === 'mcgill';
+    const isPerSide = exerciseData?.countingMethod === 'per-side';
     const restBetweenRounds = exerciseData?.mcgillDefaults?.restBetweenRounds ?? 5;
 
     exercise.sets.forEach((set) => {
@@ -553,16 +562,19 @@ export function calculateEstimatedDuration(exercises: WorkoutExercise[]): number
 
       // Add exercise time
       if (set.mcgillRounds && set.mcgillHoldDuration && isMcgill) {
-        // McGill protocol: all rounds on left side, then transition, then all rounds on right
-        // Left side: (holdDuration × rounds) + rest × (rounds - 1)
-        // Transition: 10s
-        // Right side: same as left
-        const transitionTime = 10; // Seconds between sides
+        // McGill protocol per set: (holdDuration × rounds) + rest × (rounds - 1)
         const holdTimePerSide = set.mcgillHoldDuration * set.mcgillRounds;
         const restTimePerSide = restBetweenRounds * Math.max(0, set.mcgillRounds - 1);
         const timePerSide = holdTimePerSide + restTimePerSide;
 
-        totalSeconds += (timePerSide * 2) + transitionTime;
+        if (isPerSide) {
+          // Per-side (e.g. Side Plank): both sides plus a transition between them
+          const transitionTime = 10; // Seconds between sides
+          totalSeconds += (timePerSide * 2) + transitionTime;
+        } else {
+          // Single-sided static hold (e.g. Plank): one continuous run, no transition
+          totalSeconds += timePerSide;
+        }
       } else if (set.targetReps) {
         // Assume 3 seconds per rep
         totalSeconds += (set.targetReps * 3);

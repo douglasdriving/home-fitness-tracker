@@ -1,12 +1,16 @@
 /**
  * McgillTimer Component
- * Dedicated timer for the McGill side plank protocol.
+ * Dedicated timer for the McGill short-hold protocol.
  *
- * McGill protocol flow per set:
+ * Per-side flow (e.g. Side Plank, `perSide={true}`):
  *   1. All rounds on LEFT side (hold → rest → hold → rest → hold)
  *   2. Transition to right side
  *   3. All rounds on RIGHT side (hold → rest → hold → rest → hold)
  *   4. Complete
+ *
+ * Single-sided flow (e.g. Plank, `perSide={false}`):
+ *   1. All rounds (hold → rest → hold → rest → hold)
+ *   2. Complete
  *
  * This is intentionally separate from the general Timer component to avoid
  * complicating that code with McGill-specific state management.
@@ -29,6 +33,7 @@ interface McgillTimerProps {
   holdDuration: number;        // Hold duration in seconds per round
   restBetweenRounds?: number;  // Rest between rounds within a side (default 5)
   transitionDuration?: number; // Rest when switching sides (default 10)
+  perSide?: boolean;           // Whether the exercise is bilateral (default true for backward compat)
   onComplete?: () => void;
 }
 
@@ -37,6 +42,7 @@ export default function McgillTimer({
   holdDuration,
   restBetweenRounds = 5,
   transitionDuration = 10,
+  perSide = true,
   onComplete,
 }: McgillTimerProps) {
   const [phase, setPhase] = useState<McgillPhase>('idle');
@@ -53,6 +59,12 @@ export default function McgillTimer({
   useEffect(() => { phaseRef.current = phase; }, [phase]);
   useEffect(() => { currentRoundRef.current = currentRound; }, [currentRound]);
   useEffect(() => { onCompleteRef.current = onComplete; }, [onComplete]);
+
+  const finishWorkout = () => {
+    setIsRunning(false);
+    setPhase('complete');
+    if (onCompleteRef.current) onCompleteRef.current();
+  };
 
   // Countdown interval
   useEffect(() => {
@@ -77,10 +89,15 @@ export default function McgillTimer({
             if (round < rounds) {
               setPhase('left-rest');
               return restBetweenRounds;
-            } else {
+            } else if (perSide) {
+              // Bilateral: switch to the right side
               setCurrentRound(1);
               setPhase('transition');
               return transitionDuration;
+            } else {
+              // Single-sided: all rounds done
+              finishWorkout();
+              return 0;
             }
           }
 
@@ -100,9 +117,7 @@ export default function McgillTimer({
               setPhase('right-rest');
               return restBetweenRounds;
             } else {
-              setIsRunning(false);
-              setPhase('complete');
-              if (onCompleteRef.current) onCompleteRef.current();
+              finishWorkout();
               return 0;
             }
           }
@@ -125,7 +140,7 @@ export default function McgillTimer({
         intervalRef.current = null;
       }
     };
-  }, [isRunning, phase, rounds, holdDuration, restBetweenRounds, transitionDuration]);
+  }, [isRunning, phase, rounds, holdDuration, restBetweenRounds, transitionDuration, perSide]);
 
   const handleStart = () => {
     if (phase === 'idle' || phase === 'complete') {
@@ -147,9 +162,10 @@ export default function McgillTimer({
   };
 
   // Calculate overall progress
-  const totalHoldTime = rounds * holdDuration * 2; // both sides
-  const totalRestTime = Math.max(0, rounds - 1) * restBetweenRounds * 2; // rest between rounds, both sides
-  const totalTransitionTime = transitionDuration;
+  const sides = perSide ? 2 : 1;
+  const totalHoldTime = rounds * holdDuration * sides;
+  const totalRestTime = Math.max(0, rounds - 1) * restBetweenRounds * sides; // rest between rounds, all sides
+  const totalTransitionTime = perSide ? transitionDuration : 0;
   const totalDuration = totalHoldTime + totalRestTime + totalTransitionTime;
 
   const getElapsed = (): number => {
@@ -203,8 +219,8 @@ export default function McgillTimer({
   const getStatusText = (): string => {
     if (phase === 'idle') return 'Ready to start';
     if (phase === 'complete') return 'Complete!';
-    if (phase === 'left-hold') return `Left Side — Hold ${currentRound} of ${rounds}`;
-    if (phase === 'left-rest') return 'Left Side — Rest';
+    if (phase === 'left-hold') return perSide ? `Left Side — Hold ${currentRound} of ${rounds}` : `Hold ${currentRound} of ${rounds}`;
+    if (phase === 'left-rest') return perSide ? 'Left Side — Rest' : 'Rest';
     if (phase === 'transition') return 'Switch to Right Side';
     if (phase === 'right-hold') return `Right Side — Hold ${currentRound} of ${rounds}`;
     if (phase === 'right-rest') return 'Right Side — Rest';
@@ -225,12 +241,51 @@ export default function McgillTimer({
     return '';
   };
 
+  // Render round dots for a single side/row.
+  // `active` indicates this row's side is the one currently in progress.
+  const renderRoundDots = (side: 'left' | 'right', label?: string) => {
+    const isHoldPhase = side === 'left' ? phase === 'left-hold' : phase === 'right-hold';
+    const isRestPhase = side === 'left' ? phase === 'left-rest' : phase === 'right-rest';
+    const isActiveSide = isHoldPhase || isRestPhase;
+    // For the left row in per-side mode, once we move past the left side all dots are done.
+    const leftSideDone = side === 'left' && (phase === 'transition' || phase === 'right-hold' || phase === 'right-rest');
+
+    return (
+      <div className="flex items-center gap-1">
+        {label && <span className="text-xs text-text-muted mr-1">{label}</span>}
+        {Array.from({ length: rounds }, (_, i) => {
+          const roundNum = i + 1;
+          let dotClass = 'bg-background-lighter'; // pending
+
+          if (leftSideDone) {
+            dotClass = 'bg-primary';
+          } else if (isActiveSide) {
+            if (roundNum < currentRound) {
+              dotClass = 'bg-primary'; // completed
+            } else if (roundNum === currentRound && isHoldPhase) {
+              dotClass = 'bg-primary/50'; // current
+            } else if (roundNum === currentRound && isRestPhase) {
+              dotClass = 'bg-primary'; // just completed, resting
+            }
+          }
+
+          return (
+            <div
+              key={`${side}-${i}`}
+              className={`w-2.5 h-2.5 rounded-full ${dotClass} transition-colors`}
+            />
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
       {/* Status and side indicator */}
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
-          {phase !== 'idle' && phase !== 'complete' && (
+          {perSide && phase !== 'idle' && phase !== 'complete' && (
             <span className="text-lg font-bold text-text-muted">
               {getSideIndicator()}
             </span>
@@ -252,63 +307,17 @@ export default function McgillTimer({
         />
       </div>
 
-      {/* Round dots - visual indicator of rounds per side */}
+      {/* Round dots - visual indicator of rounds */}
       {phase !== 'idle' && phase !== 'complete' && rounds > 1 && (
         <div className="flex justify-center gap-4 mb-3">
-          {/* Left side dots */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-text-muted mr-1">L</span>
-            {Array.from({ length: rounds }, (_, i) => {
-              const isLeftSide = phase === 'left-hold' || phase === 'left-rest';
-              const roundNum = i + 1;
-              let dotClass = 'bg-background-lighter'; // pending
-
-              if (!isLeftSide) {
-                // On transition or right side: all left rounds are done
-                dotClass = 'bg-primary';
-              } else if (roundNum < currentRound) {
-                dotClass = 'bg-primary'; // completed
-              } else if (roundNum === currentRound && phase === 'left-hold') {
-                dotClass = 'bg-primary/50'; // current
-              } else if (roundNum === currentRound && phase === 'left-rest') {
-                dotClass = 'bg-primary'; // just completed, resting
-              }
-
-              return (
-                <div
-                  key={`left-${i}`}
-                  className={`w-2.5 h-2.5 rounded-full ${dotClass} transition-colors`}
-                />
-              );
-            })}
-          </div>
-
-          {/* Right side dots */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-text-muted mr-1">R</span>
-            {Array.from({ length: rounds }, (_, i) => {
-              const isRightSide = phase === 'right-hold' || phase === 'right-rest';
-              const roundNum = i + 1;
-              let dotClass = 'bg-background-lighter'; // pending
-
-              if (isRightSide) {
-                if (roundNum < currentRound) {
-                  dotClass = 'bg-primary'; // completed
-                } else if (roundNum === currentRound && phase === 'right-hold') {
-                  dotClass = 'bg-primary/50'; // current
-                } else if (roundNum === currentRound && phase === 'right-rest') {
-                  dotClass = 'bg-primary'; // just completed, resting
-                }
-              }
-
-              return (
-                <div
-                  key={`right-${i}`}
-                  className={`w-2.5 h-2.5 rounded-full ${dotClass} transition-colors`}
-                />
-              );
-            })}
-          </div>
+          {perSide ? (
+            <>
+              {renderRoundDots('left', 'L')}
+              {renderRoundDots('right', 'R')}
+            </>
+          ) : (
+            renderRoundDots('left')
+          )}
         </div>
       )}
 

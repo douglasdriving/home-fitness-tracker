@@ -334,6 +334,97 @@ describe('McgillTimer', () => {
     }
   });
 
+  describe('single-sided mode (perSide=false, e.g. Plank)', () => {
+    it('shows "Hold X of Y" without a side label', () => {
+      render(<McgillTimer rounds={3} holdDuration={15} perSide={false} />);
+
+      act(() => {
+        screen.getByText('Start').click();
+      });
+
+      expect(screen.getByText(/^Hold 1 of 3$/)).toBeInTheDocument();
+      expect(screen.queryByText(/Left Side/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Right Side/)).not.toBeInTheDocument();
+    });
+
+    it('does not render L/R round-dot labels', () => {
+      render(<McgillTimer rounds={3} holdDuration={15} perSide={false} />);
+
+      act(() => {
+        screen.getByText('Start').click();
+      });
+
+      expect(screen.queryByText('L')).not.toBeInTheDocument();
+      expect(screen.queryByText('R')).not.toBeInTheDocument();
+    });
+
+    it('completes after a single run with no transition or right side', () => {
+      const onComplete = vi.fn();
+      render(
+        <McgillTimer
+          rounds={2}
+          holdDuration={5}
+          restBetweenRounds={3}
+          perSide={false}
+          onComplete={onComplete}
+        />
+      );
+
+      act(() => {
+        screen.getByText('Start').click();
+      });
+
+      // Hold 1
+      expect(screen.getByText(/^Hold 1 of 2$/)).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(5000); });
+
+      // Rest (no "Left Side" prefix)
+      expect(screen.getByText('Rest')).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(3000); });
+
+      // Hold 2
+      expect(screen.getByText(/^Hold 2 of 2$/)).toBeInTheDocument();
+      act(() => { vi.advanceTimersByTime(5000); });
+
+      // Should be complete immediately — no transition, no right side
+      expect(screen.queryByText('Switch to Right Side')).not.toBeInTheDocument();
+      expect(screen.getByText('Complete!')).toBeInTheDocument();
+      expect(onComplete).toHaveBeenCalledTimes(1);
+    });
+
+    it('progress reaches 100% over the single-sided duration only', () => {
+      const { container } = render(
+        <McgillTimer
+          rounds={2}
+          holdDuration={10}
+          restBetweenRounds={5}
+          perSide={false}
+        />
+      );
+
+      const getProgressWidth = () => {
+        const progressBar = container.querySelector('.bg-primary.h-2.rounded-full');
+        const style = progressBar?.getAttribute('style') || '';
+        const match = style.match(/width:\s*([\d.]+)%/);
+        return match ? parseFloat(match[1]) : 0;
+      };
+
+      act(() => {
+        screen.getByText('Start').click();
+      });
+
+      // Total single-sided time: 2*10 (holds) + 1*5 (rest) = 25s
+      let previousProgress = 0;
+      for (let i = 0; i < 25; i++) {
+        act(() => { vi.advanceTimersByTime(1000); });
+        const currentProgress = getProgressWidth();
+        expect(currentProgress).toBeGreaterThanOrEqual(previousProgress);
+        previousProgress = currentProgress;
+      }
+      expect(previousProgress).toBeGreaterThanOrEqual(99);
+    });
+  });
+
   it('matches default McGill protocol: 3 rounds x 10s per side', () => {
     const onComplete = vi.fn();
     render(

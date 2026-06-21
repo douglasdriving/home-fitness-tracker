@@ -7,7 +7,9 @@ Items to implement in the app or routine, arising from coaching sessions.
 - [ ] Action item description
 -->
 
-## 2026-06-17 - McGill Interval Holds as Default
+## 2026-06-17
+
+### McGill Interval Holds as Default
 
 - [ ] **Convert all strength timed-holds to ceiling-based interval structure**: Apply the McGill short-repeated-hold model (already used for side plank) to all strength/endurance holds — plank, hollow body hold, back extension hold, and any future timed strength hold.
 - [ ] **Ceiling-based progression logic**: Set a max single-hold duration (~30–40s for core holds, tunable per exercise). Below the ceiling = one continuous hold. Once progression would exceed the ceiling, add a rep (another hold) instead of adding seconds. Track progression by reps/total holds rather than single-hold duration.

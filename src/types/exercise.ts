@@ -19,6 +19,7 @@ export interface McgillProtocolConfig {
   rounds: number[]; // Number of rounds per set (e.g., [3, 2, 1])
   holdDuration: number; // Default hold duration in seconds per round
   restBetweenRounds: number; // Rest duration in seconds between rounds within a set
+  holdCeiling?: number; // Per-hold duration ceiling (seconds); once reached, progression adds rounds instead of seconds. Defaults to 30.
 }
 
 export interface Exercise {
