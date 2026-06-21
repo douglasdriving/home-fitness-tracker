@@ -377,6 +377,7 @@ export function getAvailableExercises(
       emoji: ex.emoji,
       primaryMuscleGroup: ex.primaryMuscleGroup,
       muscleGroups: ex.muscleGroups,
+      upperBodySlot: ex.upperBodySlot,
       description: ex.description,
       videoUrl: ex.videoUrl,
       imageUrl: ex.imageUrl,

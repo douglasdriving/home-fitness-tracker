@@ -1,6 +1,6 @@
 /**
  * Stretching Routine Data
- * 5-minute post-workout stretching routine targeting abs, glutes, and lower back
+ * 5-minute post-workout stretching routine targeting abs, glutes, lower back, and upper body
  */
 
 import { MuscleGroup } from '../types/exercise';
@@ -112,6 +112,45 @@ export const stretchingRoutine: StretchExercise[] = [
     bilateral: true
   },
   {
+    id: 'stretch-doorway-pec',
+    name: 'Doorway Pec Stretch',
+    duration: 30,
+    instructions: [
+      'Stand in a doorway',
+      'Place one forearm on the frame, elbow at shoulder height, upper arm parallel to the floor',
+      'Step forward gently until you feel a stretch across the chest',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Chest', 'Shoulders'],
+    bilateral: true
+  },
+  {
+    id: 'stretch-overhead-lat',
+    name: 'Overhead Lat Stretch',
+    duration: 30,
+    instructions: [
+      'Stand tall and reach one arm straight overhead',
+      'Grab that wrist with the opposite hand and gently pull it across your body while leaning slightly to the opposite side',
+      'Feel the stretch along the side of your back',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Lats', 'Upper Back'],
+    bilateral: true
+  },
+  {
+    id: 'stretch-overhead-triceps',
+    name: 'Overhead Triceps Stretch',
+    duration: 30,
+    instructions: [
+      'Raise one arm overhead and bend the elbow so your hand reaches down your upper back',
+      'Use the opposite hand to gently press the elbow back',
+      'Keep the torso upright',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Triceps'],
+    bilateral: true
+  },
+  {
     id: 'stretch-final-child-pose',
     name: "Final Relaxation - Child's Pose",
     duration: 30,
@@ -137,10 +176,7 @@ export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
   abs: ['stretch-cat-cow', 'stretch-cobra', 'stretch-lying-twist'],
   glutes: ['stretch-figure-four', 'stretch-hip-flexor', 'stretch-lying-twist'],
   lowerBack: ['stretch-child-pose', 'stretch-cat-cow', 'stretch-cobra'],
-  // Placeholder: upper-body stretches are added when the rotation follow-on issue
-  // wires upperBody into the daily sequence. getStretchesForMuscleGroup is never
-  // called for 'upperBody' until then.
-  upperBody: [],
+  upperBody: ['stretch-doorway-pec', 'stretch-overhead-lat', 'stretch-overhead-triceps'],
 };
 
 // Helper function to get stretches for a specific muscle group

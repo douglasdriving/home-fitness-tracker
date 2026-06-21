@@ -12,6 +12,14 @@ import { MuscleGroup } from '../types/exercise';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
 
+// Display labels for the daily rotation muscle groups (handles multiword names)
+const ROTATION_GROUP_LABELS: Record<MuscleGroup, string> = {
+  abs: 'Abs',
+  glutes: 'Glutes',
+  lowerBack: 'Lower Back',
+  upperBody: 'Upper Body',
+};
+
 interface StretchState {
   workoutId: string;
   currentStretchIndex: number;
@@ -292,7 +300,7 @@ export default function Dashboard() {
                     ~18-20 min
                   </span>
                   <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
-                    Next: {nextDailyRotationGroup.charAt(0).toUpperCase() + nextDailyRotationGroup.slice(1)}
+                    Next: {ROTATION_GROUP_LABELS[nextDailyRotationGroup]}
                   </span>
                 </div>
               </div>

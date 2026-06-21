@@ -386,15 +386,23 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
   // Get exercise usage history for prioritization
   const exerciseLastUsed = getExerciseLastUsed(workoutHistory);
 
-  // Sort by least recently used
-  availableExercises.sort((a, b) => {
-    const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
-    const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
-    return aLastUsed - bLastUsed;
-  });
+  let selectedExercises: Exercise[];
 
-  // Select top 3 exercises (or fewer if not enough available)
-  const selectedExercises = availableExercises.slice(0, 3);
+  if (targetMuscleGroup === 'upperBody') {
+    // Upper body uses a fixed 3-slot role structure instead of generic LRU:
+    // Slot 1 = horizontal pull, Slot 2 = horizontal push, Slot 3 = alternating vertical.
+    selectedExercises = selectUpperBodyExercises(availableExercises, exerciseLastUsed, workoutHistory);
+  } else {
+    // Sort by least recently used
+    availableExercises.sort((a, b) => {
+      const aLastUsed = exerciseLastUsed.get(a.id) ?? -1;
+      const bLastUsed = exerciseLastUsed.get(b.id) ?? -1;
+      return aLastUsed - bLastUsed;
+    });
+
+    // Select top 3 exercises (or fewer if not enough available)
+    selectedExercises = availableExercises.slice(0, 3);
+  }
 
   console.log(`[DAILY ROTATION] Selected ${selectedExercises.length} exercises`);
   selectedExercises.forEach((ex, idx) => {
@@ -687,13 +695,13 @@ export function findLastPerformanceWithFeedback(
 
 /**
  * Get the next muscle group in the daily rotation sequence
- * Sequence: abs → glutes → lowerBack → abs → ...
+ * Sequence: abs → glutes → upperBody → abs → ...
  *
  * @param workoutHistory - Workout history ordered newest-first
  * @returns The next muscle group to target
  */
 export function getNextDailyRotationGroup(workoutHistory: WorkoutHistoryEntry[]): MuscleGroup {
-  const rotationSequence: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
+  const rotationSequence: MuscleGroup[] = ['abs', 'glutes', 'upperBody'];
 
   // Find the most recent daily rotation workout
   const lastDailyRotation = workoutHistory.find(
@@ -708,10 +716,89 @@ export function getNextDailyRotationGroup(workoutHistory: WorkoutHistoryEntry[])
 
   const lastMuscleGroup = lastDailyRotation.targetMuscleGroup;
   const currentIndex = rotationSequence.indexOf(lastMuscleGroup);
+  // Legacy lowerBack last-day returns -1 here, wrapping gracefully to abs.
   const nextIndex = (currentIndex + 1) % rotationSequence.length;
   const nextMuscleGroup = rotationSequence[nextIndex];
 
   console.log(`[ROTATION] Last: ${lastMuscleGroup}, Next: ${nextMuscleGroup}`);
 
   return nextMuscleGroup;
+}
+
+type VerticalSlot = 'vertical-pull' | 'vertical-push';
+
+/**
+ * Determine which vertical slot (Slot 3) the next upper body session should use.
+ *
+ * Alternates across sessions by inspecting the most recent upper body daily
+ * rotation workout and flipping whichever vertical slot it actually contained.
+ * Reading the slot from the prior workout's real exercises (rather than a stored
+ * intent) keeps alternation correct even after equipment-driven fallbacks.
+ *
+ * Defaults to 'vertical-push' for the first-ever upper body session, since its
+ * starter (pike push-ups) needs no equipment whereas vertical-pull is band-only.
+ *
+ * @param workoutHistory - Workout history ordered newest-first
+ */
+export function getNextUpperBodyVerticalSlot(workoutHistory: WorkoutHistoryEntry[]): VerticalSlot {
+  for (const entry of workoutHistory) {
+    if (entry.workoutMode !== 'daily-rotation' || entry.targetMuscleGroup !== 'upperBody') {
+      continue;
+    }
+
+    // Most recent upper body session found — flip whichever vertical slot it used.
+    for (const ex of entry.exercises) {
+      const slot = getExerciseById(ex.exerciseId)?.upperBodySlot;
+      if (slot === 'vertical-pull') return 'vertical-push';
+      if (slot === 'vertical-push') return 'vertical-pull';
+    }
+
+    // The most recent upper body session had no vertical exercise (e.g. both
+    // pools were empty); fall through to the default rather than scanning older ones.
+    break;
+  }
+
+  return 'vertical-push';
+}
+
+/**
+ * Select the 3 upper body exercises by role for a daily rotation session.
+ *
+ * - Slot 1: least-recently-used horizontal-pull
+ * - Slot 2: least-recently-used horizontal-push
+ * - Slot 3: least-recently-used exercise from the alternating vertical slot,
+ *   falling back to the other vertical slot if the chosen one is empty.
+ *
+ * Slots with no available exercise are dropped, yielding a shorter workout
+ * rather than erroring.
+ *
+ * @param availableExercises - Already unlock/retirement/equipment/exclusion filtered
+ * @param exerciseLastUsed - Map of exercise id → last used workout number
+ * @param workoutHistory - Workout history ordered newest-first (for Slot 3 alternation)
+ */
+function selectUpperBodyExercises(
+  availableExercises: Exercise[],
+  exerciseLastUsed: Map<string, number>,
+  workoutHistory: WorkoutHistoryEntry[]
+): Exercise[] {
+  const pickLeastRecentlyUsed = (slot: NonNullable<Exercise['upperBodySlot']>): Exercise | undefined => {
+    return availableExercises
+      .filter(ex => ex.upperBodySlot === slot)
+      .sort((a, b) => (exerciseLastUsed.get(a.id) ?? -1) - (exerciseLastUsed.get(b.id) ?? -1))[0];
+  };
+
+  const horizontalPull = pickLeastRecentlyUsed('horizontal-pull');
+  const horizontalPush = pickLeastRecentlyUsed('horizontal-push');
+
+  const verticalSlot = getNextUpperBodyVerticalSlot(workoutHistory);
+  let vertical = pickLeastRecentlyUsed(verticalSlot);
+  if (!vertical) {
+    const fallbackSlot: VerticalSlot = verticalSlot === 'vertical-pull' ? 'vertical-push' : 'vertical-pull';
+    console.log(`[DAILY ROTATION] No ${verticalSlot} exercise available, falling back to ${fallbackSlot}`);
+    vertical = pickLeastRecentlyUsed(fallbackSlot);
+  }
+
+  console.log(`[DAILY ROTATION] Upper body slots → pull: ${horizontalPull?.name ?? 'none'}, push: ${horizontalPush?.name ?? 'none'}, vertical (${verticalSlot}): ${vertical?.name ?? 'none'}`);
+
+  return [horizontalPull, horizontalPush, vertical].filter((ex): ex is Exercise => ex !== undefined);
 }
