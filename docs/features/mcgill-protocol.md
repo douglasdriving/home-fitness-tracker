@@ -12,6 +12,8 @@ Currently converted exercises:
 |----------|------------------|---------------|------------|
 | Side Plank (`side-plank-001`) | `per-side` | 30 (default) | bilateral (left → transition → right) |
 | Plank (`plank-001`) | total | 30 | single-sided (one continuous sequence) |
+| Hollow Body Hold (`hollow-body-hold-001`) | total | 30 | single-sided (one continuous sequence) |
+| Back Extension Hold (`back-extension-hold-001`) | total | 30 | single-sided (one continuous sequence) |
 
 Dynamic timed exercises (Flutter Kicks, Mountain Climbers) and stretching/mobility holds are intentionally **not** converted — the ceiling model only fits static strength holds.
 
@@ -38,7 +40,7 @@ Dynamic timed exercises (Flutter Kicks, Mountain Climbers) and stretching/mobili
 
 | File | Role |
 |------|------|
-| `src/data/exercises.json` | Side Plank and Plank entries with `structure: "mcgill"` and `mcgillDefaults` (incl. `holdCeiling`) config |
+| `src/data/exercises.json` | Side Plank, Plank, Hollow Body Hold, and Back Extension Hold entries with `structure: "mcgill"` and `mcgillDefaults` (incl. `holdCeiling`) config |
 | `src/types/exercise.ts` | `McgillProtocolConfig` interface (incl. optional `holdCeiling`), `structure` and `mcgillDefaults` on `Exercise` |
 | `src/types/workout.ts` | `mcgillRounds` and `mcgillHoldDuration` on `Set` and `CompletedSet` |
 | `src/lib/progression-calculator.ts` | `calculateMcgillProgression()` and `convertLegacyToMcgill()` |

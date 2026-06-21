@@ -185,14 +185,15 @@
     "emoji": "🍌",
     "primaryMuscleGroup": "abs",
     "muscleGroups": ["abs"],
-    "description": "Lie on your back with arms extended overhead and legs straight. Press your lower back into the floor and lift your shoulders and legs off the ground, creating a banana shape. Hold this position, keeping your core tight and lower back pressed down.",
+    "description": "Lie on your back with arms extended overhead and legs straight. Press your lower back into the floor and lift your shoulders and legs off the ground, creating a banana shape. Hold this position, keeping your core tight and lower back pressed down. This exercise uses the McGill protocol: multiple short holds in descending sets (3 rounds, 2 rounds, 1 round) with brief rest between rounds, rather than one long grinding hold. The short-hold structure is a safety win here — resetting between holds keeps your lower back pressed to the floor instead of letting form break down across one long hold.",
     "videoUrl": "https://www.youtube.com/watch?v=LlDNef_Ztsc",
     "source": "Gymnastics Training",
     "heavinessScore": { "abs": 9, "glutes": 0, "lowerBack": 0 },
     "type": "timed",
     "defaultDuration": 20,
+    "structure": "mcgill",
+    "mcgillDefaults": { "rounds": [3, 2, 1], "holdDuration": 10, "restBetweenRounds": 5, "holdCeiling": 30 },
     "unlockRequirement": { "exerciseId": "side-plank-001", "type": "timed", "value": 30 },
-    "retirementThreshold": { "type": "timed", "value": 90 },
     "coachingTip": "⚠️ SAFETY: Lower back MUST stay on floor at all times. Stop set immediately when back lifts. Regress by: (1) bending knees more, (2) bringing arms to sides, (3) reducing hold time."
   },
   {
@@ -428,13 +429,14 @@
     "emoji": "🔙",
     "primaryMuscleGroup": "lowerBack",
     "muscleGroups": ["lowerBack", "glutes"],
-    "description": "Lie face down with hands by your temples or extended in front. Lift your chest and legs off the ground simultaneously, like a Superman but with focus on holding the position. Keep your neck neutral and squeeze your lower back and glutes throughout the hold.",
+    "description": "Lie face down with hands by your temples or extended in front. Lift your chest and legs off the ground simultaneously, like a Superman but with focus on holding the position. Keep your neck neutral and squeeze your lower back and glutes throughout the hold. This exercise uses the McGill protocol: multiple short holds in descending sets (3 rounds, 2 rounds, 1 round) with brief rest between rounds, rather than one long grinding hold, so your lower back and glutes stay engaged with fresh form on each rep.",
     "videoUrl": "https://www.youtube.com/watch?v=ph3pddpKzzw",
     "source": "Physical Therapy",
     "heavinessScore": { "abs": 0, "glutes": 5, "lowerBack": 7 },
     "type": "timed",
     "defaultDuration": 20,
-    "retirementThreshold": { "type": "timed", "value": 90 }
+    "structure": "mcgill",
+    "mcgillDefaults": { "rounds": [3, 2, 1], "holdDuration": 10, "restBetweenRounds": 5, "holdCeiling": 30 }
   },
   {
     "id": "superman-001",
