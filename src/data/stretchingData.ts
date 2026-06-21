@@ -98,6 +98,19 @@ export const stretchingRoutine: StretchExercise[] = [
     videoUrl: 'https://www.youtube.com/watch?v=XVgd8aktKTE'
   },
   {
+    id: 'stretch-side-bend',
+    name: 'Side-Bend Stretch',
+    duration: 30,
+    instructions: [
+      'Stand or kneel upright',
+      'Raise one arm overhead and bend laterally toward the opposite side',
+      'Keep hips square and feel the stretch along your side/obliques',
+      'Hold for 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Abs'],
+    bilateral: true
+  },
+  {
     id: 'stretch-hip-flexor',
     name: 'Hip Flexor Stretch',
     duration: 30,
@@ -173,14 +186,19 @@ export const totalStretchingDuration = stretchingRoutine.reduce(
 
 // Muscle-group-specific stretching for daily rotation mode
 export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
-  abs: ['stretch-cat-cow', 'stretch-cobra', 'stretch-lying-twist'],
-  glutes: ['stretch-figure-four', 'stretch-hip-flexor', 'stretch-lying-twist'],
-  lowerBack: ['stretch-child-pose', 'stretch-cat-cow', 'stretch-cobra'],
+  abs: ['stretch-cobra', 'stretch-lying-twist', 'stretch-side-bend'],
+  glutes: ['stretch-figure-four', 'stretch-lying-twist', 'stretch-hip-flexor'],
+  lowerBack: ['stretch-child-pose', 'stretch-lying-twist', 'stretch-figure-four'],
   upperBody: ['stretch-doorway-pec', 'stretch-overhead-lat', 'stretch-overhead-triceps'],
 };
 
-// Helper function to get stretches for a specific muscle group
+// Helper function to get stretches for a specific muscle group.
+// Returns stretches in the order declared in muscleGroupStretches (not the
+// order they appear in stretchingRoutine), so the displayed sequence matches
+// the intended release progression for each muscle group.
 export function getStretchesForMuscleGroup(muscleGroup: MuscleGroup): StretchExercise[] {
   const stretchIds = muscleGroupStretches[muscleGroup];
-  return stretchingRoutine.filter(stretch => stretchIds.includes(stretch.id));
+  return stretchIds
+    .map(id => stretchingRoutine.find(stretch => stretch.id === id))
+    .filter((stretch): stretch is StretchExercise => stretch !== undefined);
 }
