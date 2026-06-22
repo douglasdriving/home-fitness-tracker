@@ -35,6 +35,21 @@ interface WarmupState {
   targetMuscleGroup?: MuscleGroup;
 }
 
+// Read the persisted warmup stage for a given workout, if one is still in
+// progress. Used to resume the workout at the warmup stage where the user
+// left off (the warmup is part of the workout, not a separate session).
+function getActiveWarmupState(workoutId: string): WarmupState | null {
+  try {
+    const savedState = localStorage.getItem(WARMUP_STATE_KEY);
+    if (!savedState) return null;
+    const state: WarmupState = JSON.parse(savedState);
+    return state.workoutId === workoutId ? state : null;
+  } catch (error) {
+    console.error('Failed to read warmup state:', error);
+    return null;
+  }
+}
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { profile } = useUserStore();
@@ -43,7 +58,6 @@ export default function Dashboard() {
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
   const [timeConstraint, setTimeConstraint] = useState<string>('');
   const [activeStretchSession, setActiveStretchSession] = useState<StretchState | null>(null);
-  const [activeWarmupSession, setActiveWarmupSession] = useState<WarmupState | null>(null);
   const [nextDailyRotationGroup, setNextDailyRotationGroup] = useState<MuscleGroup>('abs');
 
   useEffect(() => {
@@ -73,22 +87,6 @@ export default function Dashboard() {
     } catch (error) {
       console.error('Failed to check stretch session:', error);
       setActiveStretchSession(null);
-    }
-  }, []);
-
-  // Check for active warmup session
-  useEffect(() => {
-    try {
-      const savedState = localStorage.getItem(WARMUP_STATE_KEY);
-      if (savedState) {
-        const state: WarmupState = JSON.parse(savedState);
-        setActiveWarmupSession(state);
-      } else {
-        setActiveWarmupSession(null);
-      }
-    } catch (error) {
-      console.error('Failed to check warmup session:', error);
-      setActiveWarmupSession(null);
     }
   }, []);
 
@@ -142,18 +140,29 @@ export default function Dashboard() {
     if (!currentWorkout) return;
 
     try {
-      // Only run the warmup when starting a fresh workout — resuming an
-      // in-progress session goes straight back into the workout.
       const isResuming = currentWorkout.status === 'in-progress';
       const autoShowWarmup = profile?.preferences?.autoShowWarmup ?? true;
 
       await startWorkout(currentWorkout.id);
+
+      // The warmup is the first stage of the workout, not a separate session.
+      // When starting fresh, begin at the warmup stage. When resuming, return
+      // the user to whichever stage they left off on — if a warmup for this
+      // workout is still in progress, resume it; otherwise go to the exercises.
+      const resumeWarmupState = isResuming ? getActiveWarmupState(currentWorkout.id) : null;
 
       if (autoShowWarmup && !isResuming) {
         navigate('/warmup', {
           state: {
             workoutId: currentWorkout.id,
             targetMuscleGroup: currentWorkout.targetMuscleGroup,
+          },
+        });
+      } else if (resumeWarmupState) {
+        navigate('/warmup', {
+          state: {
+            workoutId: resumeWarmupState.workoutId,
+            targetMuscleGroup: resumeWarmupState.targetMuscleGroup,
           },
         });
       } else {
@@ -193,28 +202,6 @@ export default function Dashboard() {
     }
   };
 
-  const handleResumeWarmup = () => {
-    if (activeWarmupSession) {
-      navigate('/warmup', {
-        state: {
-          workoutId: activeWarmupSession.workoutId,
-          targetMuscleGroup: activeWarmupSession.targetMuscleGroup,
-        },
-      });
-    }
-  };
-
-  const handleDismissWarmup = () => {
-    if (confirm('Are you sure you want to abandon the warmup? Your progress will be lost.')) {
-      try {
-        localStorage.removeItem(WARMUP_STATE_KEY);
-        setActiveWarmupSession(null);
-      } catch (error) {
-        console.error('Failed to clear warmup session:', error);
-      }
-    }
-  };
-
   if (!profile) {
     return (
       <div className="bg-gray-50 flex items-center justify-center">
@@ -234,37 +221,6 @@ export default function Dashboard() {
 
         {/* Streak Tracker */}
         <StreakTracker />
-
-        {/* Resume Warmup Banner */}
-        {activeWarmupSession && (
-          <div className="bg-orange-50 border-l-4 border-orange-500 rounded-lg p-4 shadow-lg">
-            <div className="flex items-start justify-between mb-3">
-              <div className="flex items-center gap-2">
-                <span className="text-2xl">🔥</span>
-                <div>
-                  <h3 className="font-semibold text-orange-900">Warmup In Progress</h3>
-                  <p className="text-sm text-orange-700">
-                    You have an active warmup (move {activeWarmupSession.currentWarmupIndex + 1})
-                  </p>
-                </div>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <button
-                onClick={handleResumeWarmup}
-                className="flex-1 bg-orange-500 text-white py-2 px-4 rounded-lg hover:bg-orange-600 transition-colors font-medium"
-              >
-                Resume Warmup
-              </button>
-              <button
-                onClick={handleDismissWarmup}
-                className="bg-orange-100 text-orange-700 py-2 px-4 rounded-lg hover:bg-orange-200 transition-colors font-medium"
-              >
-                Dismiss
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Resume Stretching Banner */}
         {activeStretchSession && (

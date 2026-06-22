@@ -13,8 +13,11 @@ block delivers movement rehearsal and joint priming instead.
 1. **Start branch**: On the Dashboard, `handleStartWorkout` reads the
    `autoShowWarmup` preference (default on). When starting a *fresh* workout it
    navigates to `/warmup` with `{ workoutId, targetMuscleGroup }` in location
-   state; otherwise it goes straight to `/workout`. Resuming an already
-   in-progress workout always bypasses the warmup.
+   state; otherwise it goes straight to `/workout`. The warmup is the first
+   *stage* of the workout, not a separate session — so resuming an in-progress
+   workout returns the user to wherever they left off: if a warmup for that
+   workout is still persisted, `Continue` re-enters `/warmup`; otherwise it goes
+   to `/workout`.
 2. **Move selection**: `WarmupRoutine` calls `getWarmupForMuscleGroup(targetMuscleGroup)`.
    Each group maps to an ordered set of moves (regional mobility → activation →
    pattern rehearsal); a `genericWarmup` full-body primer is returned when no
@@ -26,8 +29,11 @@ block delivers movement rehearsal and joint priming instead.
    not started yet.
 4. **Persistence**: In-progress state (current index, completed set, `workoutId`,
    `targetMuscleGroup`) is saved to localStorage under `warmupRoutineState`,
-   parallel to `stretchRoutineState`. The Dashboard shows a "Warmup In Progress"
-   banner to resume or dismiss; restore is gated on matching `workoutId` **and**
+   parallel to `stretchRoutineState`. There is **no** separate "warmup in
+   progress" surface on the Dashboard — because the warmup is part of the
+   workout, the in-progress *workout* card is the single resume point. Resuming
+   reads the persisted warmup state (matched on `workoutId`) and re-enters the
+   warmup stage; `WarmupRoutine`'s own restore is additionally gated on matching
    `targetMuscleGroup`. State is cleared on completion and Skip All.
 
 ## Key files
@@ -35,7 +41,7 @@ block delivers movement rehearsal and joint priming instead.
 - `src/data/warmupData.ts` — `WarmupExercise` type, per-group warmup arrays,
   `muscleGroupWarmups` map, `genericWarmup`, and `getWarmupForMuscleGroup()` helper
 - `src/pages/WarmupRoutine.tsx` — the `/warmup` page (timer, progress, skip, persistence)
-- `src/pages/Dashboard.tsx` — Start branching + "Warmup In Progress" resume banner
+- `src/pages/Dashboard.tsx` — Start branching + resuming the warmup stage of an in-progress workout (`getActiveWarmupState`)
 - `src/pages/Settings.tsx` — "Pre-Workout Warmup" preference toggle
 - `src/types/user.ts` / `src/store/user-store.ts` — `autoShowWarmup` preference plumbing
 - `src/App.tsx` — `/warmup` route registration

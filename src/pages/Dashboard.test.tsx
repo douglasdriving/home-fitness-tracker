@@ -90,7 +90,7 @@ describe('Dashboard - warmup branching on Start', () => {
     expect(mockNavigate).not.toHaveBeenCalledWith('/warmup', expect.anything());
   });
 
-  it('does not re-route through warmup when resuming an in-progress workout', async () => {
+  it('goes straight to /workout when resuming an in-progress workout with no warmup left', async () => {
     mockCurrentWorkout = { ...mockCurrentWorkout!, status: 'in-progress' };
     renderDashboard();
     fireEvent.click(screen.getByText('Continue'));
@@ -101,7 +101,7 @@ describe('Dashboard - warmup branching on Start', () => {
     expect(mockNavigate).not.toHaveBeenCalledWith('/warmup', expect.anything());
   });
 
-  it('shows a Resume Warmup banner when a warmup session is persisted', async () => {
+  it('does not show a separate "Warmup In Progress" banner', async () => {
     localStorage.setItem(
       'warmupRoutineState',
       JSON.stringify({
@@ -113,12 +113,31 @@ describe('Dashboard - warmup branching on Start', () => {
     );
     renderDashboard();
 
-    expect(await screen.findByText('Warmup In Progress')).toBeInTheDocument();
+    await waitFor(() => expect(screen.getByText('Start')).toBeInTheDocument());
+    expect(screen.queryByText('Warmup In Progress')).not.toBeInTheDocument();
+    expect(screen.queryByText('Resume Warmup')).not.toBeInTheDocument();
+  });
 
-    fireEvent.click(screen.getByText('Resume Warmup'));
-    expect(mockNavigate).toHaveBeenCalledWith('/warmup', {
-      state: { workoutId: 'workout-abc', targetMuscleGroup: 'abs' },
+  it('resumes into the warmup stage when an in-progress workout left off mid-warmup', async () => {
+    mockCurrentWorkout = { ...mockCurrentWorkout!, status: 'in-progress' };
+    localStorage.setItem(
+      'warmupRoutineState',
+      JSON.stringify({
+        workoutId: 'workout-abc',
+        currentWarmupIndex: 2,
+        completedWarmups: [0, 1],
+        targetMuscleGroup: 'abs',
+      })
+    );
+    renderDashboard();
+    fireEvent.click(screen.getByText('Continue'));
+
+    await waitFor(() => {
+      expect(mockNavigate).toHaveBeenCalledWith('/warmup', {
+        state: { workoutId: 'workout-abc', targetMuscleGroup: 'abs' },
+      });
     });
+    expect(mockNavigate).not.toHaveBeenCalledWith('/workout');
   });
 
   it('passes undefined targetMuscleGroup for full-body workouts', async () => {
