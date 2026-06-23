@@ -132,8 +132,9 @@ test.describe('Plank Shoulder Taps Reps-Based Exercise', () => {
     const shoulderTapsCard = page.locator('.bg-background-light').filter({ hasText: 'Plank Shoulder Taps' });
     await expect(shoulderTapsCard).toBeVisible({ timeout: 5000 });
 
-    // Check that it shows the unlock requirement (45s plank)
-    await expect(shoulderTapsCard.locator('text=/Plank.*45.*seconds/i')).toBeVisible();
+    // Check that it shows the unlock requirement: 30s plank (the McGill hold ceiling).
+    // ExerciseStatus renders this as "{current}/30 s Plank".
+    await expect(shoulderTapsCard.locator('text=/\\/\\s*30\\s*s\\s*Plank/i')).toBeVisible();
   });
 
   test('shoulder taps can be completed with reps in workout', async ({ page }) => {

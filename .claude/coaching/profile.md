@@ -7,12 +7,14 @@ Douglas, 31 y.o (born 95), male, skinny, 184cm tall, ~60kg, swedish. I have a li
 Have worked out on and off in my adult life, mainly doing cardio. Sometimes I have been running regularly, and sometimes I have been doing sports including squash and muay thai. I have worked out my core for the past 5 months.
 
 ## Current Routine
-Transitioning from 2x/week full-body 60-minute sessions to daily (weekday) 20-minute focused sessions with rolling muscle group rotation (Abs → Glutes → Lower Back). Floor is 3 sessions/week. Works out in the morning, about 1h after waking up with coffee, before heading to coworking space.
+Daily (weekday) ~20-minute focused sessions, one muscle group per day, rolling rotation. The switch (made 2026-05-29) went fully live and adherence is excellent — running ~5 sessions/week, well above the 3/week floor. Works out in the morning, about 1h after waking up with coffee, before heading to coworking space.
+
+**Routine is evolving (as of 2026-06-18):** the dedicated Lower Back day is folded into glutes day as a "Posterior-Chain Day," and the freed slot now holds **Upper Body**. New rotation: **Abs → Posterior Chain → Upper Body**. Upper body is a full push+pull session with pull prioritized (desk-job posture); started without a pull-up bar. See decisions.md / action-items.md.
 
 Also bikes to work every day, about 30-40 minutes each way.
 
 ## Current Performance Level
-After 5 months of training, performance has increased steadily without major plateaus. Current benchmarks include 4x65s side planks and 4x35s hollow body holds. Has progressed into intermediate/advanced exercises.
+After ~6 months of training, performance has increased steadily without major plateaus. Sample benchmarks: side planks restructured to McGill short-hold protocol; plank at ~75s/set (now being converted to interval holds); bird dog mastered at 28 reps/side (being retired). Has progressed into intermediate/advanced exercises.
 
 ## Back Pain & Scoliosis Status
 The back pain and scoliosis symptoms are basically gone now. Before starting training, felt "twisted" pretty much all the time, with actual back pain episodes a few times a month. Was worried it would get worse with age, which was the primary motivation to start. After 5 months of consistent core training, the twisting sensation and pain episodes have essentially stopped.
@@ -51,7 +53,9 @@ The back pain and scoliosis symptoms are basically gone now. Before starting tra
 - Workouts feeling mechanical, solitary, and goalless
 
 ## How the Current Routine Feels
-The routine achieved its original purpose (back pain is gone), but boredom is growing. Described it as "brushing teeth but way more cumbersome." Lacks skill development, social element, and a compelling forward goal. Switching to shorter daily focused sessions is partly to address this.
+The routine achieved its original purpose (back pain is gone). The 2026-05-29 switch to shorter daily focused sessions noticeably improved the boredom — the sessions feel more dynamic, and dedicated-muscle-group days stop everything from blending into one. Douglas is self-aware that some of the improvement may be novelty (which will fade), but the focused-day structure is a durable benefit. Forward motivation now comes from wanting to expand into a new muscle group (upper body or legs) and continue building.
+
+(Historical: before the switch, described the old 2x/week full-body routine as "brushing teeth but way more cumbersome" — mechanical, solitary, goalless.)
 
 ## Sleep
 Mostly good. Averages about 7.5 hours. Occasionally wakes up early and can't get back to sleep, but this is rare now (about once a month).

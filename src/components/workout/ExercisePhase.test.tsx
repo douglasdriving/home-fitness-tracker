@@ -28,7 +28,7 @@ describe('ExercisePhase - Coaching Tips', () => {
     muscleGroups: ['abs'],
     description: 'Test description',
     source: 'Test Source',
-    heavinessScore: { abs: 5, glutes: 0, lowerBack: 0 },
+    heavinessScore: { abs: 5, glutes: 0, lowerBack: 0, upperBody: 0 },
     type: 'reps',
     defaultReps: 15,
   };

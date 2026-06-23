@@ -1,6 +1,6 @@
 /**
  * Stretching Routine Data
- * 5-minute post-workout stretching routine targeting abs, glutes, and lower back
+ * 5-minute post-workout stretching routine targeting abs, glutes, lower back, and upper body
  */
 
 import { MuscleGroup } from '../types/exercise';
@@ -98,6 +98,19 @@ export const stretchingRoutine: StretchExercise[] = [
     videoUrl: 'https://www.youtube.com/watch?v=XVgd8aktKTE'
   },
   {
+    id: 'stretch-side-bend',
+    name: 'Side-Bend Stretch',
+    duration: 30,
+    instructions: [
+      'Stand or kneel upright',
+      'Raise one arm overhead and bend laterally toward the opposite side',
+      'Keep hips square and feel the stretch along your side/obliques',
+      'Hold for 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Abs'],
+    bilateral: true
+  },
+  {
     id: 'stretch-hip-flexor',
     name: 'Hip Flexor Stretch',
     duration: 30,
@@ -109,6 +122,45 @@ export const stretchingRoutine: StretchExercise[] = [
     ],
     targetMuscles: ['Glutes', 'Abs'],
     videoUrl: 'https://www.youtube.com/watch?v=YQmpO9VT2X4',
+    bilateral: true
+  },
+  {
+    id: 'stretch-doorway-pec',
+    name: 'Doorway Pec Stretch',
+    duration: 30,
+    instructions: [
+      'Stand in a doorway',
+      'Place one forearm on the frame, elbow at shoulder height, upper arm parallel to the floor',
+      'Step forward gently until you feel a stretch across the chest',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Chest', 'Shoulders'],
+    bilateral: true
+  },
+  {
+    id: 'stretch-overhead-lat',
+    name: 'Overhead Lat Stretch',
+    duration: 30,
+    instructions: [
+      'Stand tall and reach one arm straight overhead',
+      'Grab that wrist with the opposite hand and gently pull it across your body while leaning slightly to the opposite side',
+      'Feel the stretch along the side of your back',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Lats', 'Upper Back'],
+    bilateral: true
+  },
+  {
+    id: 'stretch-overhead-triceps',
+    name: 'Overhead Triceps Stretch',
+    duration: 30,
+    instructions: [
+      'Raise one arm overhead and bend the elbow so your hand reaches down your upper back',
+      'Use the opposite hand to gently press the elbow back',
+      'Keep the torso upright',
+      'Hold 15 seconds, then switch sides'
+    ],
+    targetMuscles: ['Triceps'],
     bilateral: true
   },
   {
@@ -134,13 +186,19 @@ export const totalStretchingDuration = stretchingRoutine.reduce(
 
 // Muscle-group-specific stretching for daily rotation mode
 export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
-  abs: ['stretch-cat-cow', 'stretch-cobra', 'stretch-lying-twist'],
-  glutes: ['stretch-figure-four', 'stretch-hip-flexor', 'stretch-lying-twist'],
-  lowerBack: ['stretch-child-pose', 'stretch-cat-cow', 'stretch-cobra'],
+  abs: ['stretch-cobra', 'stretch-lying-twist', 'stretch-side-bend'],
+  glutes: ['stretch-figure-four', 'stretch-lying-twist', 'stretch-hip-flexor'],
+  lowerBack: ['stretch-child-pose', 'stretch-lying-twist', 'stretch-figure-four'],
+  upperBody: ['stretch-doorway-pec', 'stretch-overhead-lat', 'stretch-overhead-triceps'],
 };
 
-// Helper function to get stretches for a specific muscle group
+// Helper function to get stretches for a specific muscle group.
+// Returns stretches in the order declared in muscleGroupStretches (not the
+// order they appear in stretchingRoutine), so the displayed sequence matches
+// the intended release progression for each muscle group.
 export function getStretchesForMuscleGroup(muscleGroup: MuscleGroup): StretchExercise[] {
   const stretchIds = muscleGroupStretches[muscleGroup];
-  return stretchingRoutine.filter(stretch => stretchIds.includes(stretch.id));
+  return stretchIds
+    .map(id => stretchingRoutine.find(stretch => stretch.id === id))
+    .filter((stretch): stretch is StretchExercise => stretch !== undefined);
 }

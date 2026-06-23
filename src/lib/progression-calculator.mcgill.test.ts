@@ -187,4 +187,96 @@ describe('calculateMcgillProgression', () => {
       });
     });
   });
+
+  describe('configurable holdCeiling (ceiling-based interval protocol)', () => {
+    it('defaults to a 30s ceiling when not provided (Side Plank behaviour)', () => {
+      // At 25s the default ceiling (30) is not yet reached, so add seconds
+      expect(calculateMcgillProgression([3, 2, 1], 25, 1)).toEqual({
+        rounds: [3, 2, 1],
+        holdDuration: 30,
+      });
+      // At 30s the default ceiling is reached, so add a rep instead
+      expect(calculateMcgillProgression([3, 2, 1], 30, 1)).toEqual({
+        rounds: [4, 2, 1],
+        holdDuration: 30,
+      });
+    });
+
+    it('adds a rep instead of seconds once a custom ceiling is reached (too easy)', () => {
+      // Ceiling 25: at 25s "too easy" should add a rep, not seconds
+      const result = calculateMcgillProgression([3, 2, 1], 25, 1, 25);
+      expect(result).toEqual({
+        rounds: [4, 2, 1],
+        holdDuration: 25,
+      });
+    });
+
+    it('still adds seconds below a custom ceiling (too easy)', () => {
+      const result = calculateMcgillProgression([3, 2, 1], 15, 2, 25);
+      expect(result).toEqual({
+        rounds: [3, 2, 1],
+        holdDuration: 20, // 15 + 5, still below ceiling 25
+      });
+    });
+
+    it('holds at ceiling when feedback is "just right" (custom ceiling)', () => {
+      // Ceiling 25: "just right" increases only while below ceiling - 5 (i.e. < 20)
+      expect(calculateMcgillProgression([3, 2, 1], 20, 3, 25)).toEqual({
+        rounds: [3, 2, 1],
+        holdDuration: 20, // 20 is not < 20, so hold
+      });
+      expect(calculateMcgillProgression([3, 2, 1], 15, 3, 25)).toEqual({
+        rounds: [3, 2, 1],
+        holdDuration: 20, // 15 < 20, so increase
+      });
+    });
+
+    it('decreases reps under "too hard" feedback regardless of ceiling', () => {
+      // At 5s with a custom ceiling, "too hard" still drops a rep
+      const result = calculateMcgillProgression([3, 2, 1], 5, 5, 40);
+      expect(result).toEqual({
+        rounds: [2, 2, 1],
+        holdDuration: 5,
+      });
+    });
+
+    it('decreases seconds first under "too hard" before touching reps', () => {
+      const result = calculateMcgillProgression([3, 2, 1], 20, 4, 40);
+      expect(result).toEqual({
+        rounds: [3, 2, 1],
+        holdDuration: 15, // 20 - 5
+      });
+    });
+  });
+});
+
+describe('convertLegacyToMcgill with configurable holdCeiling', () => {
+  it('defaults to clamping at 30s when no ceiling is passed', () => {
+    const result = convertLegacyToMcgill(240); // 240 / 6 = 40
+    expect(result).toEqual({ rounds: [3, 2, 1], holdDuration: 30 });
+  });
+
+  it('clamps to a custom ceiling for Plank-style conversions', () => {
+    // 240 / 6 = 40, clamped to ceiling 30
+    expect(convertLegacyToMcgill(240, 30)).toEqual({
+      rounds: [3, 2, 1],
+      holdDuration: 30,
+    });
+  });
+
+  it('clamps a long legacy plank hold (75s) below the 30s ceiling', () => {
+    // 75 / 6 = 12.5 → rounds to 15 (under ceiling, no clamp needed)
+    expect(convertLegacyToMcgill(75, 30)).toEqual({
+      rounds: [3, 2, 1],
+      holdDuration: 15,
+    });
+  });
+
+  it('respects a lower custom ceiling', () => {
+    // 90 / 6 = 15, clamped down to ceiling 10
+    expect(convertLegacyToMcgill(90, 10)).toEqual({
+      rounds: [3, 2, 1],
+      holdDuration: 10,
+    });
+  });
 });

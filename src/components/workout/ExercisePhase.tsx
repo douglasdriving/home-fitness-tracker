@@ -177,6 +177,7 @@ export default function ExercisePhase({
                 rounds={currentSet.mcgillRounds}
                 holdDuration={currentSet.mcgillHoldDuration}
                 restBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
+                perSide={exercise.countingMethod === 'per-side'}
               />
             ) : (
               <Timer

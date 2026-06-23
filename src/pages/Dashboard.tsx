@@ -11,12 +11,43 @@ import { getNextDailyRotationGroup } from '../lib/workout-generator';
 import { MuscleGroup } from '../types/exercise';
 
 const STRETCH_STATE_KEY = 'stretchRoutineState';
+const WARMUP_STATE_KEY = 'warmupRoutineState';
+
+// Display labels for the daily rotation muscle groups (handles multiword names)
+const ROTATION_GROUP_LABELS: Record<MuscleGroup, string> = {
+  abs: 'Abs',
+  glutes: 'Glutes',
+  lowerBack: 'Lower Back',
+  upperBody: 'Upper Body',
+};
 
 interface StretchState {
   workoutId: string;
   currentStretchIndex: number;
   isResting: boolean;
   completedStretches: number[];
+}
+
+interface WarmupState {
+  workoutId: string;
+  currentWarmupIndex: number;
+  completedWarmups: number[];
+  targetMuscleGroup?: MuscleGroup;
+}
+
+// Read the persisted warmup stage for a given workout, if one is still in
+// progress. Used to resume the workout at the warmup stage where the user
+// left off (the warmup is part of the workout, not a separate session).
+function getActiveWarmupState(workoutId: string): WarmupState | null {
+  try {
+    const savedState = localStorage.getItem(WARMUP_STATE_KEY);
+    if (!savedState) return null;
+    const state: WarmupState = JSON.parse(savedState);
+    return state.workoutId === workoutId ? state : null;
+  } catch (error) {
+    console.error('Failed to read warmup state:', error);
+    return null;
+  }
 }
 
 export default function Dashboard() {
@@ -109,8 +140,34 @@ export default function Dashboard() {
     if (!currentWorkout) return;
 
     try {
+      const isResuming = currentWorkout.status === 'in-progress';
+      const autoShowWarmup = profile?.preferences?.autoShowWarmup ?? true;
+
       await startWorkout(currentWorkout.id);
-      navigate('/workout');
+
+      // The warmup is the first stage of the workout, not a separate session.
+      // When starting fresh, begin at the warmup stage. When resuming, return
+      // the user to whichever stage they left off on — if a warmup for this
+      // workout is still in progress, resume it; otherwise go to the exercises.
+      const resumeWarmupState = isResuming ? getActiveWarmupState(currentWorkout.id) : null;
+
+      if (autoShowWarmup && !isResuming) {
+        navigate('/warmup', {
+          state: {
+            workoutId: currentWorkout.id,
+            targetMuscleGroup: currentWorkout.targetMuscleGroup,
+          },
+        });
+      } else if (resumeWarmupState) {
+        navigate('/warmup', {
+          state: {
+            workoutId: resumeWarmupState.workoutId,
+            targetMuscleGroup: resumeWarmupState.targetMuscleGroup,
+          },
+        });
+      } else {
+        navigate('/workout');
+      }
     } catch (error) {
       console.error('Error starting workout:', error);
       alert('Failed to start workout. Please try again.');
@@ -292,7 +349,7 @@ export default function Dashboard() {
                     ~18-20 min
                   </span>
                   <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded font-medium">
-                    Next: {nextDailyRotationGroup.charAt(0).toUpperCase() + nextDailyRotationGroup.slice(1)}
+                    Next: {ROTATION_GROUP_LABELS[nextDailyRotationGroup]}
                   </span>
                 </div>
               </div>

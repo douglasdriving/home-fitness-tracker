@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateWorkout, generateDailyRotationWorkout, findLastPerformanceWithFeedback, getNextDailyRotationGroup } from './workout-generator';
+import { generateWorkout, generateDailyRotationWorkout, findLastPerformanceWithFeedback, getNextDailyRotationGroup, getNextUpperBodyVerticalSlot } from './workout-generator';
 import { getExerciseById } from '../data/exerciseData';
 import { getAvailableExercises } from './achievement-tracker';
 import { StrengthLevels } from '../types/user';
@@ -11,6 +11,7 @@ describe('generateWorkout', () => {
     abs: 50,
     glutes: 50,
     lowerBack: 50,
+    upperBody: 50,
     lastUpdated: Date.now(),
   };
 
@@ -60,14 +61,14 @@ describe('generateWorkout', () => {
       // Test with low strength level
       const lowStrengthWorkout = generateWorkout({
         workoutNumber: 1,
-        strengthLevels: { abs: 20, glutes: 20, lowerBack: 20, lastUpdated: Date.now() },
+        strengthLevels: { abs: 20, glutes: 20, lowerBack: 20, upperBody: 20, lastUpdated: Date.now() },
         hasElasticBands: true,
       });
 
       // Test with high strength level
       const highStrengthWorkout = generateWorkout({
         workoutNumber: 2,
-        strengthLevels: { abs: 80, glutes: 80, lowerBack: 80, lastUpdated: Date.now() },
+        strengthLevels: { abs: 80, glutes: 80, lowerBack: 80, upperBody: 80, lastUpdated: Date.now() },
         hasElasticBands: true,
       });
 
@@ -343,6 +344,7 @@ describe('generateDailyRotationWorkout', () => {
     abs: 50,
     glutes: 50,
     lowerBack: 50,
+    upperBody: 50,
     lastUpdated: Date.now(),
   };
 
@@ -603,6 +605,202 @@ describe('generateDailyRotationWorkout', () => {
       expect(workout.exercises.length).toBe(3);
     });
   });
+
+  describe('upper body role-based selection', () => {
+    const slotOf = (exerciseId: string) => getExerciseById(exerciseId)?.upperBodySlot;
+
+    function upperBodyHistoryEntry(workoutNumber: number, exerciseIds: string[]): WorkoutHistoryEntry {
+      return {
+        id: `history-ub-${workoutNumber}`,
+        workoutId: `workout-ub-${workoutNumber}`,
+        workoutNumber,
+        completedDate: Date.now() - (100 - workoutNumber) * 86400000,
+        totalDuration: 18,
+        workoutMode: 'daily-rotation',
+        targetMuscleGroup: 'upperBody',
+        exercises: exerciseIds.map(exerciseId => ({
+          exerciseId,
+          exerciseName: exerciseId,
+          muscleGroups: ['upperBody'] as MuscleGroup[],
+          completedSets: [{ setNumber: 1, actualReps: 10 }],
+        })),
+      };
+    }
+
+    it('generates exactly one horizontal-pull, one horizontal-push, and one vertical exercise', () => {
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 1,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: true,
+      });
+
+      expect(workout.exercises.length).toBe(3);
+
+      const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
+      expect(slots.filter(s => s === 'horizontal-pull').length).toBe(1);
+      expect(slots.filter(s => s === 'horizontal-push').length).toBe(1);
+      expect(slots.filter(s => s === 'vertical-pull' || s === 'vertical-push').length).toBe(1);
+    });
+
+    it('defaults the first session Slot 3 to vertical-push (no-equipment starter)', () => {
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 1,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: true,
+      });
+
+      const verticalExercise = workout.exercises.find(ex => {
+        const slot = slotOf(ex.exerciseId);
+        return slot === 'vertical-pull' || slot === 'vertical-push';
+      });
+      expect(verticalExercise).toBeDefined();
+      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
+    });
+
+    it('alternates Slot 3 to vertical-pull after a vertical-push session', () => {
+      // Previous upper body session used pike push-ups (vertical-push)
+      const history: WorkoutHistoryEntry[] = [
+        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
+      ];
+
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: true, // band needed for the only vertical-pull exercise
+        workoutHistory: history,
+      });
+
+      const verticalExercise = workout.exercises.find(ex => {
+        const slot = slotOf(ex.exerciseId);
+        return slot === 'vertical-pull' || slot === 'vertical-push';
+      });
+      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-pull');
+    });
+
+    it('alternates Slot 3 back to vertical-push after a vertical-pull session', () => {
+      const history: WorkoutHistoryEntry[] = [
+        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001']),
+      ];
+
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: true,
+        workoutHistory: history,
+      });
+
+      const verticalExercise = workout.exercises.find(ex => {
+        const slot = slotOf(ex.exerciseId);
+        return slot === 'vertical-pull' || slot === 'vertical-push';
+      });
+      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
+    });
+
+    it('falls back to vertical-push when alternation calls for vertical-pull but no band is available', () => {
+      // Last session was vertical-push, so alternation wants vertical-pull,
+      // but band-less users have no vertical-pull exercise available.
+      const history: WorkoutHistoryEntry[] = [
+        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
+      ];
+
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: false,
+        workoutHistory: history,
+      });
+
+      expect(workout.exercises.length).toBe(3);
+      const verticalExercise = workout.exercises.find(ex => {
+        const slot = slotOf(ex.exerciseId);
+        return slot === 'vertical-pull' || slot === 'vertical-push';
+      });
+      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
+    });
+
+    it('selects the least recently used exercise within a slot', () => {
+      // inverted-rows used most recently; doorway-rows never used → doorway-rows wins horizontal-pull.
+      const history: WorkoutHistoryEntry[] = [
+        upperBodyHistoryEntry(5, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
+      ];
+
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 6,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        hasElasticBands: false,
+        workoutHistory: history,
+      });
+
+      const pullExercise = workout.exercises.find(ex => slotOf(ex.exerciseId) === 'horizontal-pull');
+      expect(pullExercise).toBeDefined();
+      expect(pullExercise!.exerciseId).not.toBe('inverted-rows-001');
+    });
+
+    it('never generates lower back exercises on the upper body rotation day', () => {
+      for (let i = 0; i < 10; i++) {
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: i + 1,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+          hasElasticBands: true,
+        });
+
+        workout.exercises.forEach(ex => {
+          const exercise = getExerciseById(ex.exerciseId);
+          expect(exercise!.primaryMuscleGroup).toBe('upperBody');
+        });
+      }
+    });
+  });
+});
+
+describe('getNextUpperBodyVerticalSlot', () => {
+  function upperBodyEntry(workoutNumber: number, exerciseIds: string[], workoutMode: 'full-body' | 'daily-rotation' = 'daily-rotation', targetMuscleGroup: MuscleGroup = 'upperBody'): WorkoutHistoryEntry {
+    return {
+      id: `history-ubv-${workoutNumber}`,
+      workoutId: `workout-ubv-${workoutNumber}`,
+      workoutNumber,
+      completedDate: Date.now() - (100 - workoutNumber) * 86400000,
+      totalDuration: 18,
+      workoutMode,
+      targetMuscleGroup,
+      exercises: exerciseIds.map(exerciseId => ({
+        exerciseId,
+        exerciseName: exerciseId,
+        muscleGroups: ['upperBody'] as MuscleGroup[],
+        completedSets: [{ setNumber: 1, actualReps: 10 }],
+      })),
+    };
+  }
+
+  it('defaults to vertical-push with no history', () => {
+    expect(getNextUpperBodyVerticalSlot([])).toBe('vertical-push');
+  });
+
+  it('flips vertical-push → vertical-pull', () => {
+    const history = [upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001'])];
+    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-pull');
+  });
+
+  it('flips vertical-pull → vertical-push', () => {
+    const history = [upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001'])];
+    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-push');
+  });
+
+  it('uses the most recent upper body session, ignoring older ones and other rotation days', () => {
+    const history = [
+      upperBodyEntry(3, ['crunches-001'], 'daily-rotation', 'abs'), // most recent, not upper body
+      upperBodyEntry(2, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001']), // most recent upper body
+      upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
+    ];
+    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-push');
+  });
 });
 
 describe('getNextDailyRotationGroup', () => {
@@ -650,7 +848,7 @@ describe('getNextDailyRotationGroup', () => {
     expect(nextGroup).toBe('glutes');
   });
 
-  it('should return lowerBack after glutes', () => {
+  it('should return upperBody after glutes', () => {
     const history: WorkoutHistoryEntry[] = [
       createHistoryEntry({
         workoutNumber: 1,
@@ -659,10 +857,22 @@ describe('getNextDailyRotationGroup', () => {
       }),
     ];
     const nextGroup = getNextDailyRotationGroup(history);
-    expect(nextGroup).toBe('lowerBack');
+    expect(nextGroup).toBe('upperBody');
   });
 
-  it('should return abs after lowerBack (rotation wraps)', () => {
+  it('should return abs after upperBody (rotation wraps)', () => {
+    const history: WorkoutHistoryEntry[] = [
+      createHistoryEntry({
+        workoutNumber: 1,
+        workoutMode: 'daily-rotation',
+        targetMuscleGroup: 'upperBody',
+      }),
+    ];
+    const nextGroup = getNextDailyRotationGroup(history);
+    expect(nextGroup).toBe('abs');
+  });
+
+  it('should wrap to abs for a legacy lowerBack last-day (no longer in rotation)', () => {
     const history: WorkoutHistoryEntry[] = [
       createHistoryEntry({
         workoutNumber: 1,
@@ -695,7 +905,7 @@ describe('getNextDailyRotationGroup', () => {
       }),
     ];
     const nextGroup = getNextDailyRotationGroup(history);
-    expect(nextGroup).toBe('lowerBack');
+    expect(nextGroup).toBe('upperBody');
   });
 
   it('should ignore full-body workouts mixed with daily rotation workouts', () => {

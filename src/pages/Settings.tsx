@@ -180,6 +180,7 @@ export default function Settings() {
           abs: DEFAULT_STRENGTH_LEVEL,
           glutes: DEFAULT_STRENGTH_LEVEL,
           lowerBack: DEFAULT_STRENGTH_LEVEL,
+          upperBody: DEFAULT_STRENGTH_LEVEL,
           lastUpdated: Date.now(),
         },
       };
@@ -461,6 +462,21 @@ export default function Settings() {
         <div className="border-b border-background-lighter pb-6">
           <h2 className="text-lg font-semibold text-text mb-4">Preferences</h2>
           <div className="space-y-3">
+            <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
+              <input
+                type="checkbox"
+                checked={profile?.preferences?.autoShowWarmup ?? true}
+                onChange={(e) => updatePreferences({ autoShowWarmup: e.target.checked })}
+                className="w-5 h-5 text-orange-500 rounded focus:ring-2 focus:ring-orange-500"
+              />
+              <div>
+                <div className="font-medium text-text">Pre-Workout Warmup</div>
+                <div className="text-xs text-text-muted">
+                  Automatically show a short dynamic warmup before starting workouts.
+                </div>
+              </div>
+            </label>
+
             <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
               <input
                 type="checkbox"

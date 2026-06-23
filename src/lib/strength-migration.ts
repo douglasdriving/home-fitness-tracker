@@ -65,6 +65,7 @@ export async function backfillStrengthHistory(): Promise<MigrationResult> {
       abs: userProfile.strengthLevels.abs || 0,
       glutes: userProfile.strengthLevels.glutes || 0,
       lowerBack: userProfile.strengthLevels.lowerBack || 0,
+      upperBody: userProfile.strengthLevels.upperBody || 0,
       lastUpdated: userProfile.strengthLevels.lastUpdated,
     };
 

@@ -1,4 +1,4 @@
-export type MuscleGroup = 'abs' | 'glutes' | 'lowerBack';
+export type MuscleGroup = 'abs' | 'glutes' | 'lowerBack' | 'upperBody';
 export type Equipment = 'none' | 'elastic-band';
 export type CountingMethod = 'total' | 'per-side';
 
@@ -19,6 +19,7 @@ export interface McgillProtocolConfig {
   rounds: number[]; // Number of rounds per set (e.g., [3, 2, 1])
   holdDuration: number; // Default hold duration in seconds per round
   restBetweenRounds: number; // Rest duration in seconds between rounds within a set
+  holdCeiling?: number; // Per-hold duration ceiling (seconds); once reached, progression adds rounds instead of seconds. Defaults to 30.
 }
 
 export interface Exercise {
@@ -27,6 +28,10 @@ export interface Exercise {
   emoji: string;
   primaryMuscleGroup: MuscleGroup; // Main muscle group used for daily rotation selection
   muscleGroups: MuscleGroup[]; // All targeted muscle groups (primary + secondary)
+  // Slot identity for the Upper Body rotation day (horizontal/vertical push/pull).
+  // Only upper body exercises populate this; used by the generator's slot-based
+  // selection (wired in the follow-on rotation issue).
+  upperBodySlot?: 'horizontal-pull' | 'horizontal-push' | 'vertical-pull' | 'vertical-push';
   description: string;
   videoUrl?: string;
   imageUrl?: string;
