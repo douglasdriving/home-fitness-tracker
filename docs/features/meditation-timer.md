@@ -39,9 +39,9 @@ WorkoutExecution → WorkoutComplete
 ### Completion vs Skip
 
 **Completing meditation (timer finishes naturally):**
-- Increments `completionCount` by 1
+- Increments `completionCount` by 1 (recorded immediately)
 - Recalculates `currentDurationSeconds` for next session
-- Navigates to WorkoutComplete with `completionState`
+- Navigates to WorkoutComplete with `completionState` after a ~1s delay so the completion bell can ring fully before the screen transitions
 
 **Skipping meditation:**
 - Does NOT increment `completionCount`
@@ -155,6 +155,10 @@ The Timer component uses countdown mode with Start/Pause and Skip buttons. The p
 ### 6. Wake Lock
 
 The page uses `useWakeLock()` to keep the screen awake during meditation, preventing the screen from dimming/sleeping mid-session.
+
+### 7. Delayed Navigation After Completion
+
+When the timer finishes, `Timer.tsx` plays the completion bell (`playCompletionSound()`, ~0.5s play + 600ms AudioContext cleanup) and synchronously calls `onComplete()`. `handleComplete()` calls `completeMeditation()` immediately (so progression is never lost) but defers `navigate('/workout-complete')` by ~1s (`COMPLETION_NAV_DELAY_MS`) via a `setTimeout` tracked in `navTimeoutRef`, otherwise the component unmounts and cuts the bell off. The header Skip path (`handleSkip()`) clears that pending timeout before navigating immediately, preventing a complete-then-skip double-navigation, and an unmount cleanup effect clears it to avoid navigate-after-unmount. The delay lives only in `MeditationTimer`, not in the shared `Timer` component (so stretching/exercise timers stay immediate).
 
 ## Edge Cases Tested
 

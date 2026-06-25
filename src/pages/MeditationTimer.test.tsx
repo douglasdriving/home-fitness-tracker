@@ -1,5 +1,5 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { act, render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { BrowserRouter, useNavigate, useLocation } from 'react-router-dom';
 import MeditationTimer from './MeditationTimer';
 import { useUserStore } from '../store/user-store';
@@ -111,11 +111,126 @@ describe('MeditationTimer', () => {
     const completeButton = screen.getByText('Complete Timer');
     fireEvent.click(completeButton);
 
-    await waitFor(() => {
+    // Completion is recorded immediately; navigation is delayed ~1s so the
+    // completion bell can ring fully before the screen transitions.
+    expect(mockCompleteMeditation).toHaveBeenCalledTimes(1);
+
+    await waitFor(
+      () => {
+        expect(mockNavigate).toHaveBeenCalledWith('/workout-complete', {
+          state: defaultCompletionState,
+        });
+      },
+      { timeout: 2000 }
+    );
+  });
+
+  describe('delayed navigation after completion', () => {
+    beforeEach(() => {
+      vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+      vi.runOnlyPendingTimers();
+      vi.useRealTimers();
+    });
+
+    it('should record completion immediately but NOT navigate right away', () => {
+      render(
+        <BrowserRouter>
+          <MeditationTimer />
+        </BrowserRouter>
+      );
+
+      fireEvent.click(screen.getByText('Complete Timer'));
+
+      // Completion is recorded synchronously so progression isn't lost
       expect(mockCompleteMeditation).toHaveBeenCalledTimes(1);
+      // ...but navigation is deferred to let the bell ring fully
+      expect(mockNavigate).not.toHaveBeenCalled();
+    });
+
+    it('should navigate to workout-complete after ~1 second delay', () => {
+      render(
+        <BrowserRouter>
+          <MeditationTimer />
+        </BrowserRouter>
+      );
+
+      fireEvent.click(screen.getByText('Complete Timer'));
+
+      // Just before the delay elapses, still no navigation
+      act(() => {
+        vi.advanceTimersByTime(999);
+      });
+      expect(mockNavigate).not.toHaveBeenCalled();
+
+      // After the full delay, navigation fires once with the passthrough state
+      act(() => {
+        vi.advanceTimersByTime(1);
+      });
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/workout-complete', {
         state: defaultCompletionState,
       });
+    });
+
+    it('should navigate only once even if more time passes', () => {
+      render(
+        <BrowserRouter>
+          <MeditationTimer />
+        </BrowserRouter>
+      );
+
+      fireEvent.click(screen.getByText('Complete Timer'));
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should navigate immediately on Skip and not double-navigate after completion', () => {
+      render(
+        <BrowserRouter>
+          <MeditationTimer />
+        </BrowserRouter>
+      );
+
+      // Complete first (schedules delayed navigation)...
+      fireEvent.click(screen.getByText('Complete Timer'));
+      // ...then hit the header Skip before the delay elapses
+      fireEvent.click(screen.getByText(/Skip/));
+
+      // Skip navigates immediately
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/workout-complete', {
+        state: defaultCompletionState,
+      });
+
+      // The pending completion timeout must have been cancelled
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+      expect(mockNavigate).toHaveBeenCalledTimes(1);
+    });
+
+    it('should not navigate after unmount during the delay window', () => {
+      const { unmount } = render(
+        <BrowserRouter>
+          <MeditationTimer />
+        </BrowserRouter>
+      );
+
+      fireEvent.click(screen.getByText('Complete Timer'));
+      unmount();
+
+      act(() => {
+        vi.advanceTimersByTime(5000);
+      });
+
+      expect(mockNavigate).not.toHaveBeenCalled();
     });
   });
 
