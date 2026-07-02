@@ -390,8 +390,8 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
 
   if (targetMuscleGroup === 'upperBody') {
     // Upper body uses a fixed 3-slot role structure instead of generic LRU:
-    // Slot 1 = horizontal pull, Slot 2 = horizontal push, Slot 3 = alternating vertical.
-    selectedExercises = selectUpperBodyExercises(availableExercises, exerciseLastUsed, workoutHistory);
+    // Slot 1 = horizontal pull, Slot 2 = horizontal push, Slot 3 = vertical push.
+    selectedExercises = selectUpperBodyExercises(availableExercises, exerciseLastUsed);
   } else {
     // Sort by least recently used
     availableExercises.sort((a, b) => {
@@ -482,6 +482,38 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
       }));
 
       console.log(`[DAILY ROTATION] - Created ${sets.length} McGill sets\n`);
+    } else if (exercise.ladder) {
+      // Ladder exercise (double progression, coaching 2026-07-01):
+      // build reps within the current rung; on entering a new rung, reset to startReps.
+      const currentRung = exerciseAchievements.ladderLevels?.[exercise.id] ?? 0;
+      const isTopRung = currentRung >= exercise.ladder.rungs.length - 1;
+
+      let targetValue: number;
+      if (lastPerformanceData === null || (lastPerformanceData.ladderRung ?? 0) !== currentRung) {
+        // First time on this rung (or ever) — start at the rung's entry reps
+        targetValue = exercise.ladder.startReps;
+        console.log(`[DAILY ROTATION] - LADDER rung ${currentRung} (${exercise.ladder.rungs[currentRung].name}): starting at ${targetValue} reps`);
+      } else {
+        const feedback = lastPerformanceData.feedback ?? 3;
+        targetValue = calculateProgressionWithFeedback(
+          lastPerformanceData.performance,
+          exercise.type,
+          feedback
+        );
+        // Below the top rung there's no point past advanceReps — hitting it
+        // on all sets advances the rung instead. The top rung is uncapped.
+        if (!isTopRung) {
+          targetValue = Math.min(targetValue, exercise.ladder.advanceReps);
+        }
+        console.log(`[DAILY ROTATION] - LADDER rung ${currentRung} progression: ${lastPerformanceData.performance} (feedback: ${feedback}) → ${targetValue}`);
+      }
+
+      const numSets = exercise.countingMethod === 'per-side' ? 2 : 3;
+      sets = Array.from({ length: numSets }, (_, index) => ({
+        setNumber: index + 1,
+        targetReps: targetValue,
+        completed: false,
+      }));
     } else {
       // Standard (non-McGill) exercise progression
       let targetValue: number;
@@ -529,6 +561,9 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
       muscleGroups: exercise.muscleGroups,
       sets,
       restTime,
+      ...(exercise.ladder
+        ? { ladderRung: exerciseAchievements.ladderLevels?.[exercise.id] ?? 0 }
+        : {}),
     };
   });
 
@@ -650,6 +685,7 @@ export function findLastPerformanceWithFeedback(
   feedback: IntensityRating | undefined;
   mcgillRounds?: number[];
   mcgillHoldDuration?: number;
+  ladderRung?: number;
 } | null {
   console.log(`[FIND LAST PERF] Searching for exercise: ${exerciseId}`);
   console.log(`[FIND LAST PERF] Total history entries: ${workoutHistory.length}`);
@@ -685,7 +721,7 @@ export function findLastPerformanceWithFeedback(
 
       console.log(`[FIND LAST PERF] Found in workout #${historyEntry.workoutNumber}: ${performance} ${firstSet.actualReps ? 'reps' : 'seconds'}, feedback: ${feedback ?? 'none'}`);
 
-      return { performance, feedback };
+      return { performance, feedback, ladderRung: exercise.ladderRung };
     }
   }
 
@@ -725,61 +761,24 @@ export function getNextDailyRotationGroup(workoutHistory: WorkoutHistoryEntry[])
   return nextMuscleGroup;
 }
 
-type VerticalSlot = 'vertical-pull' | 'vertical-push';
-
-/**
- * Determine which vertical slot (Slot 3) the next upper body session should use.
- *
- * Alternates across sessions by inspecting the most recent upper body daily
- * rotation workout and flipping whichever vertical slot it actually contained.
- * Reading the slot from the prior workout's real exercises (rather than a stored
- * intent) keeps alternation correct even after equipment-driven fallbacks.
- *
- * Defaults to 'vertical-push' for the first-ever upper body session, since its
- * starter (pike push-ups) needs no equipment whereas vertical-pull is band-only.
- *
- * @param workoutHistory - Workout history ordered newest-first
- */
-export function getNextUpperBodyVerticalSlot(workoutHistory: WorkoutHistoryEntry[]): VerticalSlot {
-  for (const entry of workoutHistory) {
-    if (entry.workoutMode !== 'daily-rotation' || entry.targetMuscleGroup !== 'upperBody') {
-      continue;
-    }
-
-    // Most recent upper body session found — flip whichever vertical slot it used.
-    for (const ex of entry.exercises) {
-      const slot = getExerciseById(ex.exerciseId)?.upperBodySlot;
-      if (slot === 'vertical-pull') return 'vertical-push';
-      if (slot === 'vertical-push') return 'vertical-pull';
-    }
-
-    // The most recent upper body session had no vertical exercise (e.g. both
-    // pools were empty); fall through to the default rather than scanning older ones.
-    break;
-  }
-
-  return 'vertical-push';
-}
-
 /**
  * Select the 3 upper body exercises by role for a daily rotation session.
  *
- * - Slot 1: least-recently-used horizontal-pull
- * - Slot 2: least-recently-used horizontal-push
- * - Slot 3: least-recently-used exercise from the alternating vertical slot,
- *   falling back to the other vertical slot if the chosen one is empty.
+ * - Slot 1: horizontal-pull (every session — pull is the posture priority)
+ * - Slot 2: horizontal-push (every session)
+ * - Slot 3: vertical-push (every session — vertical pull is PARKED per
+ *   coaching session 2026-07-01: no equipment for it at home, so Slot 3 does
+ *   not alternate until that changes)
  *
- * Slots with no available exercise are dropped, yielding a shorter workout
- * rather than erroring.
+ * Each slot picks its least-recently-used available exercise. Slots with no
+ * available exercise are dropped, yielding a shorter workout rather than erroring.
  *
  * @param availableExercises - Already unlock/retirement/equipment/exclusion filtered
  * @param exerciseLastUsed - Map of exercise id → last used workout number
- * @param workoutHistory - Workout history ordered newest-first (for Slot 3 alternation)
  */
 function selectUpperBodyExercises(
   availableExercises: Exercise[],
-  exerciseLastUsed: Map<string, number>,
-  workoutHistory: WorkoutHistoryEntry[]
+  exerciseLastUsed: Map<string, number>
 ): Exercise[] {
   const pickLeastRecentlyUsed = (slot: NonNullable<Exercise['upperBodySlot']>): Exercise | undefined => {
     return availableExercises
@@ -789,16 +788,9 @@ function selectUpperBodyExercises(
 
   const horizontalPull = pickLeastRecentlyUsed('horizontal-pull');
   const horizontalPush = pickLeastRecentlyUsed('horizontal-push');
+  const verticalPush = pickLeastRecentlyUsed('vertical-push');
 
-  const verticalSlot = getNextUpperBodyVerticalSlot(workoutHistory);
-  let vertical = pickLeastRecentlyUsed(verticalSlot);
-  if (!vertical) {
-    const fallbackSlot: VerticalSlot = verticalSlot === 'vertical-pull' ? 'vertical-push' : 'vertical-pull';
-    console.log(`[DAILY ROTATION] No ${verticalSlot} exercise available, falling back to ${fallbackSlot}`);
-    vertical = pickLeastRecentlyUsed(fallbackSlot);
-  }
+  console.log(`[DAILY ROTATION] Upper body slots → pull: ${horizontalPull?.name ?? 'none'}, push: ${horizontalPush?.name ?? 'none'}, vertical push: ${verticalPush?.name ?? 'none'}`);
 
-  console.log(`[DAILY ROTATION] Upper body slots → pull: ${horizontalPull?.name ?? 'none'}, push: ${horizontalPush?.name ?? 'none'}, vertical (${verticalSlot}): ${vertical?.name ?? 'none'}`);
-
-  return [horizontalPull, horizontalPush, vertical].filter((ex): ex is Exercise => ex !== undefined);
+  return [horizontalPull, horizontalPush, verticalPush].filter((ex): ex is Exercise => ex !== undefined);
 }

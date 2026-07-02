@@ -133,19 +133,6 @@ export const warmupRoutine: WarmupExercise[] = [
     bilateral: true,
   },
   {
-    id: 'warmup-scap-pushups',
-    name: 'Scapular Push-ups',
-    duration: 40,
-    reps: 10,
-    instructions: [
-      'Start in a high plank (or incline against a wall/bench) with arms straight',
-      'Keep your elbows locked the whole time',
-      'Let your chest sink slightly as your shoulder blades pinch together',
-      'Push the floor away to spread the blades apart — ~10 small reps',
-    ],
-    targetMuscles: ['Shoulders', 'Upper Back', 'Chest'],
-  },
-  {
     id: 'warmup-incline-pushups',
     name: 'Easy Incline Push-ups',
     duration: 40,
@@ -158,19 +145,14 @@ export const warmupRoutine: WarmupExercise[] = [
     ],
     targetMuscles: ['Chest', 'Shoulders', 'Triceps'],
   },
-  {
-    id: 'warmup-band-pull-aparts',
-    name: 'Band Pull-Aparts',
-    duration: 60,
-    instructions: [
-      'Hold a band (or towel) in front of you at shoulder height, arms straight',
-      'Pull the band apart by squeezing your shoulder blades together',
-      'Keep your arms straight and wrists neutral',
-      'Return slowly with control — doubles as a posture warmup',
-    ],
-    targetMuscles: ['Upper Back', 'Shoulders'],
-  },
 ];
+
+// NOTE (coaching session 2026-07-01): band pull-aparts and scapular push-ups
+// were removed from the upper-body warmup pending a live test — no exercise
+// enters the app untested. Band pull-aparts in particular share the failure
+// mode that killed band rows (the short ~62 cm loop bands spike violently at
+// full arm extension), and scapular push-ups still need the movement taught.
+// Re-add them here once the next session vets them.
 
 // Muscle-group-specific warmups for daily rotation mode. Order is the intended
 // movement sequence (regional mobility → activation → pattern rehearsal).
@@ -178,12 +160,7 @@ export const muscleGroupWarmups: Record<MuscleGroup, string[]> = {
   abs: ['warmup-cat-cow', 'warmup-trunk-rotations', 'warmup-hip-circles', 'warmup-bird-dogs'],
   glutes: ['warmup-leg-swings', 'warmup-hip-circles', 'warmup-glute-bridges', 'warmup-hinges'],
   lowerBack: ['warmup-cat-cow', 'warmup-hip-circles', 'warmup-hinges'],
-  upperBody: [
-    'warmup-arm-circles',
-    'warmup-scap-pushups',
-    'warmup-incline-pushups',
-    'warmup-band-pull-aparts',
-  ],
+  upperBody: ['warmup-arm-circles', 'warmup-incline-pushups'],
 };
 
 // Generic full-body movement primer used when no targetMuscleGroup exists

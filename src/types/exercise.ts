@@ -15,6 +15,21 @@ export interface RetirementThreshold {
   value: number;         // e.g., 50 reps or 120 seconds
 }
 
+// One rung of a difficulty ladder (e.g. a real surface height for incline push-ups).
+export interface LadderRung {
+  name: string;        // Short label, e.g. "Kitchen counter (waist height)"
+  description: string; // Setup notes for this rung
+}
+
+// Double-progression ladder (coaching session 2026-07-01): work at a rung from
+// ~startReps, build reps session to session, and once ALL working sets reach
+// advanceReps the exercise advances to the next rung and resets to startReps.
+export interface LadderConfig {
+  rungs: LadderRung[];
+  startReps: number;   // Target when entering a rung (~8)
+  advanceReps: number; // All working sets at/above this → next rung (~15)
+}
+
 export interface McgillProtocolConfig {
   rounds: number[]; // Number of rounds per set (e.g., [3, 2, 1])
   holdDuration: number; // Default hold duration in seconds per round
@@ -47,4 +62,5 @@ export interface Exercise {
   coachingTip?: string; // persistent coaching tip displayed during workout execution
   structure?: 'mcgill'; // Special structure for exercises using McGill protocol
   mcgillDefaults?: McgillProtocolConfig; // McGill protocol configuration
+  ladder?: LadderConfig; // Difficulty ladder with double progression (upper body bodyweight exercises)
 }

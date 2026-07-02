@@ -31,6 +31,7 @@ interface UserStore {
   addUnlockedExercises: (exerciseIds: string[]) => void;
   addRetiredExercises: (exerciseIds: string[]) => void;
   restoreRetiredExercise: (exerciseId: string) => void;
+  setLadderLevels: (levels: Record<string, number>) => void;
   // Meditation actions
   completeMeditation: () => void;
 }
@@ -323,6 +324,30 @@ export const useUserStore = create<UserStore>((set, get) => ({
       exerciseAchievements: {
         ...profile.exerciseAchievements,
         retiredExercises: updatedRetired,
+      },
+    };
+
+    saveUserProfile(updatedProfile);
+    set({ profile: updatedProfile });
+  },
+
+  setLadderLevels: (levels: Record<string, number>) => {
+    const profile = get().profile;
+    if (!profile || Object.keys(levels).length === 0) return;
+
+    const currentAchievements: ExerciseAchievements = profile.exerciseAchievements ?? {
+      unlockedExercises: [],
+      retiredExercises: [],
+    };
+
+    const updatedProfile: UserProfile = {
+      ...profile,
+      exerciseAchievements: {
+        ...currentAchievements,
+        ladderLevels: {
+          ...currentAchievements.ladderLevels,
+          ...levels,
+        },
       },
     };
 

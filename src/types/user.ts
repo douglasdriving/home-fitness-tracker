@@ -5,6 +5,7 @@ import { UserChallengeState } from './challenge';
 export interface ExerciseAchievements {
   unlockedExercises: string[];   // IDs of exercises unlocked via achievements
   retiredExercises: string[];    // IDs of exercises auto-retired (mastered)
+  ladderLevels?: Record<string, number>; // Current ladder rung index per exercise (defaults to 0)
 }
 
 // Tracks post-workout meditation progress

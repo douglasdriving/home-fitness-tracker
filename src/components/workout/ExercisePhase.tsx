@@ -121,6 +121,22 @@ export default function ExercisePhase({
               ))}
             </div>
 
+            {/* Current Ladder Rung */}
+            {exercise.ladder && (
+              <div className="mt-3 p-3 rounded-lg bg-primary/10 border border-primary/30">
+                <p className="text-sm text-text">
+                  <span className="font-semibold">
+                    📶 Rung {(currentExercise.ladderRung ?? 0) + 1}/{exercise.ladder.rungs.length}:{' '}
+                    {exercise.ladder.rungs[currentExercise.ladderRung ?? 0].name}
+                  </span>
+                  <span className="block text-xs text-text-muted mt-0.5">
+                    {exercise.ladder.rungs[currentExercise.ladderRung ?? 0].description}{' '}
+                    Reach {exercise.ladder.advanceReps} reps on all sets to advance.
+                  </span>
+                </p>
+              </div>
+            )}
+
             {/* Coaching Tip */}
             {exercise.coachingTip && (
               <div
@@ -259,7 +275,11 @@ export default function ExercisePhase({
 
       {/* Exercise Modal */}
       {showExerciseModal && (
-        <ExerciseModal exercise={exercise} onClose={() => setShowExerciseModal(false)} />
+        <ExerciseModal
+          exercise={exercise}
+          currentLadderRung={currentExercise.ladderRung}
+          onClose={() => setShowExerciseModal(false)}
+        />
       )}
     </div>
   );

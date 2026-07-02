@@ -1,11 +1,13 @@
 import { Exercise } from '../../types/exercise';
+import LadderProgress from './LadderProgress';
 
 interface ExerciseModalProps {
   exercise: Exercise;
+  currentLadderRung?: number; // Current rung index for ladder exercises
   onClose: () => void;
 }
 
-export default function ExerciseModal({ exercise, onClose }: ExerciseModalProps) {
+export default function ExerciseModal({ exercise, currentLadderRung, onClose }: ExerciseModalProps) {
   // Extract YouTube video ID from URL
   const getYouTubeEmbedUrl = (url: string): string | null => {
     if (!url) return null;
@@ -76,6 +78,11 @@ export default function ExerciseModal({ exercise, onClose }: ExerciseModalProps)
               <h3 className="text-sm font-semibold text-text mb-2">How to perform:</h3>
               <p className="text-sm text-text leading-relaxed">{exercise.description}</p>
             </div>
+          )}
+
+          {/* Difficulty Ladder */}
+          {exercise.ladder && (
+            <LadderProgress ladder={exercise.ladder} currentRung={currentLadderRung ?? 0} />
           )}
 
           {/* Exercise Type */}

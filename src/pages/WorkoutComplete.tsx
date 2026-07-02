@@ -8,6 +8,7 @@ import {
   getExerciseStatuses,
   UnlockReason,
   RetirementReason,
+  LadderAdvancement,
 } from '../lib/achievement-tracker';
 import { allExercises, getExerciseEmoji } from '../data/exerciseData';
 import { formatMcgillSet } from '../utils/mcgill-formatter';
@@ -16,6 +17,7 @@ interface WorkoutCompleteState {
   workout: WorkoutHistoryEntry;
   unlockReasons?: UnlockReason[];
   retirementReasons?: RetirementReason[];
+  ladderAdvancements?: LadderAdvancement[];
 }
 
 export default function WorkoutComplete() {
@@ -25,6 +27,7 @@ export default function WorkoutComplete() {
   const workout = state?.workout;
   const unlockReasons = state?.unlockReasons ?? [];
   const retirementReasons = state?.retirementReasons ?? [];
+  const ladderAdvancements = state?.ladderAdvancements ?? [];
   const { loadWorkouts, workoutHistory } = useWorkoutStore();
   const { profile } = useUserStore();
 
@@ -100,6 +103,29 @@ export default function WorkoutComplete() {
           <h2 className="text-3xl font-display font-bold mb-1 tracking-wide">WORKOUT COMPLETE!</h2>
           <p className="text-white/80 text-sm">Workout #{workout.workoutNumber}</p>
         </div>
+
+        {/* Milestones: Ladder Advancements */}
+        {ladderAdvancements.length > 0 && (
+          <div className="bg-background-light rounded-lg p-4 shadow-lg border border-background-lighter">
+            <h3 className="text-sm font-semibold text-primary mb-3 flex items-center gap-2">
+              <span>📶</span> Ladder Advanced
+            </h3>
+            <div className="space-y-2">
+              {ladderAdvancements.map(adv => (
+                <div key={adv.exerciseId} className="bg-background rounded px-3 py-2">
+                  <div className="text-text font-medium">
+                    {getExerciseEmoji(adv.exerciseId)} {adv.exerciseName}
+                  </div>
+                  <div className="text-text-muted text-sm">
+                    You cleared "{adv.fromRungName}" — next session moves up to{' '}
+                    <span className="text-text font-medium">"{adv.toRungName}"</span> (rung{' '}
+                    {adv.toRung + 1})
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Milestones: Unlocked Exercises */}
         {unlockReasons.length > 0 && (

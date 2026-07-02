@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import { allExercises } from '../data/exerciseData';
 import { MuscleGroup, Exercise } from '../types/exercise';
 import { useUserStore } from '../store/user-store';
+import LadderProgress from '../components/workout/LadderProgress';
 
 type FilterOption = 'all' | MuscleGroup;
 
@@ -124,6 +125,15 @@ export default function ExerciseLibrary() {
                 </div>
 
                 <p className="text-sm text-text mb-3">{exercise.description}</p>
+
+                {exercise.ladder && (
+                  <div className="mb-3">
+                    <LadderProgress
+                      ladder={exercise.ladder}
+                      currentRung={profile?.exerciseAchievements?.ladderLevels?.[exercise.id] ?? 0}
+                    />
+                  </div>
+                )}
 
                 <div className="flex items-center justify-between">
                   {exercise.videoUrl && (

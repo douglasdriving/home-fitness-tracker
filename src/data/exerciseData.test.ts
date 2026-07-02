@@ -204,29 +204,86 @@ describe('exerciseData', () => {
     });
   });
 
-  describe('Upper body exercises (issue #26)', () => {
+  describe('Tested upper body pool (coaching session 2026-07-01)', () => {
     const upperBodyExercises = () =>
       allExercises.filter(ex => ex.primaryMuscleGroup === 'upperBody');
 
-    // The issue summary says "10" but its slot tables enumerate 11 fully-specified
-    // exercises (3 horizontal-pull + 5 horizontal-push + 1 vertical-pull + 2
-    // vertical-push). We implement all 11 as enumerated; "10" is an issue miscount.
-    it('should add exactly 11 upper body exercises', () => {
-      expect(upperBodyExercises()).toHaveLength(11);
+    it('contains exactly the three live-tested exercises', () => {
+      expect(upperBodyExercises().map(ex => ex.id).sort()).toEqual([
+        'incline-pushups-001',
+        'inverted-rows-001',
+        'pike-pushups-001',
+      ]);
     });
 
-    it('every upper body exercise carries upperBody scope and a positive heaviness', () => {
-      upperBodyExercises().forEach(ex => {
-        expect(ex.muscleGroups[0]).toBe('upperBody');
-        expect(ex.heavinessScore.upperBody).toBeGreaterThan(0);
+    it('does not contain any of the rejected/superseded paper exercises', () => {
+      const rejected = [
+        'doorway-rows-001',
+        'band-rows-001',
+        'band-lat-pulldown-001',
+        'chair-dips-001',
+        'band-overhead-press-001',
+        'pushups-001',
+        'feet-elevated-pushups-001',
+        'archer-pushups-001',
+      ];
+      rejected.forEach(id => {
+        expect(getExerciseById(id)).toBeUndefined();
       });
     });
 
-    it('every upper body exercise has a valid upperBodySlot', () => {
-      const validSlots = ['horizontal-pull', 'horizontal-push', 'vertical-pull', 'vertical-push'];
+    it('fills the three session slots: horizontal-pull, horizontal-push, vertical-push', () => {
+      const bySlot = Object.fromEntries(
+        upperBodyExercises().map(ex => [ex.upperBodySlot, ex.id])
+      );
+      expect(bySlot['horizontal-pull']).toBe('inverted-rows-001');
+      expect(bySlot['horizontal-push']).toBe('incline-pushups-001');
+      expect(bySlot['vertical-push']).toBe('pike-pushups-001');
+    });
+
+    it('has no vertical-pull exercise (parked until equipment changes)', () => {
+      expect(upperBodyExercises().filter(ex => ex.upperBodySlot === 'vertical-pull')).toHaveLength(0);
+    });
+
+    it('every exercise counts reps with both arms together and needs no equipment', () => {
       upperBodyExercises().forEach(ex => {
-        expect(validSlots).toContain(ex.upperBodySlot);
+        expect(ex.type).toBe('reps');
+        expect(ex.countingMethod).toBeUndefined(); // defaults to 'total'
+        expect(ex.equipment).toBeUndefined(); // furniture only, no bands
       });
+    });
+
+    it('every exercise has a difficulty ladder with the unified 8→15 double progression', () => {
+      upperBodyExercises().forEach(ex => {
+        expect(ex.ladder).toBeDefined();
+        expect(ex.ladder!.startReps).toBe(8);
+        expect(ex.ladder!.advanceReps).toBe(15);
+        expect(ex.ladder!.rungs.length).toBeGreaterThanOrEqual(4);
+        ex.ladder!.rungs.forEach(rung => {
+          expect(rung.name).toBeTruthy();
+          expect(rung.description).toBeTruthy();
+        });
+        expect(ex.defaultReps).toBe(8);
+      });
+    });
+
+    it('ladder exercises progress by rung, not by unlock/retire thresholds', () => {
+      upperBodyExercises().forEach(ex => {
+        expect(ex.unlockRequirement).toBeUndefined();
+        expect(ex.retirementThreshold).toBeUndefined();
+      });
+    });
+
+    it('table row keeps the scapular-retraction posture cue from the session', () => {
+      const tableRow = getExerciseById('inverted-rows-001');
+      expect(tableRow?.name).toBe('Table Row');
+      expect(tableRow?.coachingTip).toMatch(/shoulder blades/i);
+    });
+
+    it('ladders start at the tested rung 1 surfaces', () => {
+      expect(getExerciseById('inverted-rows-001')?.ladder?.rungs[0].name).toMatch(/knees bent/i);
+      expect(getExerciseById('incline-pushups-001')?.ladder?.rungs[0].name).toMatch(/kitchen counter/i);
+      expect(getExerciseById('pike-pushups-001')?.ladder?.rungs[0].name).toMatch(/couch table/i);
     });
 
     it('no non-upper-body exercise has an upperBodySlot', () => {
@@ -234,38 +291,6 @@ describe('exerciseData', () => {
         ex => ex.primaryMuscleGroup !== 'upperBody' && ex.upperBodySlot !== undefined
       );
       expect(leaked).toHaveLength(0);
-    });
-
-    it('covers all four slots, each with at least one exercise', () => {
-      const slots = upperBodyExercises().map(ex => ex.upperBodySlot);
-      expect(slots).toContain('horizontal-pull');
-      expect(slots).toContain('horizontal-push');
-      expect(slots).toContain('vertical-pull');
-      expect(slots).toContain('vertical-push');
-    });
-
-    it('vertical-pull slot has only the band-dependent Band Lat Pulldown (known pre-bar gap)', () => {
-      const verticalPull = upperBodyExercises().filter(ex => ex.upperBodySlot === 'vertical-pull');
-      expect(verticalPull.map(ex => ex.id)).toEqual(['band-lat-pulldown-001']);
-      expect(verticalPull[0].equipment).toBe('elastic-band');
-    });
-
-    it('has a complete horizontal-push progression chain', () => {
-      const chairDips = getExerciseById('chair-dips-001');
-      const feetElevated = getExerciseById('feet-elevated-pushups-001');
-      const archer = getExerciseById('archer-pushups-001');
-
-      expect(chairDips?.unlockRequirement).toEqual({ exerciseId: 'pushups-001', type: 'reps', value: 15 });
-      expect(feetElevated?.unlockRequirement).toEqual({ exerciseId: 'pushups-001', type: 'reps', value: 20 });
-      expect(archer?.unlockRequirement).toEqual({ exerciseId: 'feet-elevated-pushups-001', type: 'reps', value: 12 });
-    });
-
-    it('every unlockRequirement on an upper body exercise references an existing exercise', () => {
-      upperBodyExercises().forEach(ex => {
-        if (ex.unlockRequirement) {
-          expect(getExerciseById(ex.unlockRequirement.exerciseId)).toBeDefined();
-        }
-      });
     });
 
     it('migrates every existing (non-upper-body) exercise with upperBody: 0', () => {

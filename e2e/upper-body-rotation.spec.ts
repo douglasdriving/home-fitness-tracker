@@ -1,20 +1,14 @@
 import { test, expect, Page } from '@playwright/test';
 
-// Issue #27: Upper body is wired as the 3rd daily rotation slot, replacing lower
-// back. Rotation is abs → glutes → upperBody. The upper body day fills 3 role
-// slots: horizontal-pull, horizontal-push, and an alternating vertical slot.
-
-// Known upper body slot membership (mirrors src/data/exercises.json upperBodySlot).
-const HORIZONTAL_PULL = ['doorway-rows-001', 'inverted-rows-001', 'band-rows-001'];
-const HORIZONTAL_PUSH = [
+// Upper body is the 3rd daily rotation slot (abs → glutes → upperBody).
+// Coaching session 2026-07-01: the pool is exactly the three live-tested
+// exercises — Table Row (horizontal-pull), Incline Push-Up (horizontal-push),
+// and Pike Push-Up (vertical-push, every session — vertical pull is parked).
+const TESTED_UPPER_BODY_POOL = [
+  'inverted-rows-001',
   'incline-pushups-001',
-  'pushups-001',
-  'chair-dips-001',
-  'feet-elevated-pushups-001',
-  'archer-pushups-001',
+  'pike-pushups-001',
 ];
-const VERTICAL_PULL = ['band-lat-pulldown-001'];
-const VERTICAL_PUSH = ['pike-pushups-001', 'band-overhead-press-001'];
 
 interface SeedEntry {
   id: string;
@@ -88,7 +82,7 @@ test.describe('Upper Body Daily Rotation', () => {
     await page.reload();
   });
 
-  test('after a glutes rotation day, the next group is Upper Body and generates the 3 slot roles', async ({ page }) => {
+  test('after a glutes rotation day, the next group is Upper Body and generates the 3 tested exercises', async ({ page }) => {
     await seedHistory(page, [
       rotationEntry({ id: 'glutes-1', workoutNumber: 1, targetMuscleGroup: 'glutes' }),
     ]);
@@ -103,20 +97,13 @@ test.describe('Upper Body Daily Rotation', () => {
     await page.waitForTimeout(500);
 
     const ids = await getCurrentWorkoutExercises(page);
-    expect(ids.length).toBe(3);
-
-    const pulls = ids.filter((id) => HORIZONTAL_PULL.includes(id));
-    const pushes = ids.filter((id) => HORIZONTAL_PUSH.includes(id));
-    const verticals = ids.filter((id) => VERTICAL_PULL.includes(id) || VERTICAL_PUSH.includes(id));
-
-    expect(pulls.length).toBe(1);
-    expect(pushes.length).toBe(1);
-    expect(verticals.length).toBe(1);
+    expect(ids.slice().sort()).toEqual(TESTED_UPPER_BODY_POOL.slice().sort());
   });
 
-  test('Slot 3 alternates to vertical-pull after a prior vertical-push session', async ({ page }) => {
-    // Newest rotation day = glutes (so next is upperBody); a prior upper body
-    // session used pike push-ups (vertical-push) so Slot 3 should flip to vertical-pull.
+  test('Slot 3 stays pike push-up even directly after a pike push-up session (no alternation)', async ({ page }) => {
+    // Newest rotation day = glutes (so next is upperBody); the prior upper body
+    // session already used pike push-ups. Vertical pull is parked (no equipment),
+    // so Slot 3 must be pike push-up again — the same three exercises every time.
     await seedHistory(page, [
       rotationEntry({ id: 'glutes-2', workoutNumber: 3, targetMuscleGroup: 'glutes' }),
       rotationEntry({
@@ -124,9 +111,9 @@ test.describe('Upper Body Daily Rotation', () => {
         workoutNumber: 2,
         targetMuscleGroup: 'upperBody',
         exercises: [
-          { exerciseId: 'inverted-rows-001', exerciseName: 'Inverted Rows', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
-          { exerciseId: 'pushups-001', exerciseName: 'Push-Ups', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
-          { exerciseId: 'pike-pushups-001', exerciseName: 'Pike Push-Ups', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
+          { exerciseId: 'inverted-rows-001', exerciseName: 'Table Row', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
+          { exerciseId: 'incline-pushups-001', exerciseName: 'Incline Push-Up', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
+          { exerciseId: 'pike-pushups-001', exerciseName: 'Pike Push-Up', muscleGroups: ['upperBody'], completedSets: [{ setNumber: 1, actualReps: 10 }] },
         ],
       }),
     ]);
@@ -139,11 +126,6 @@ test.describe('Upper Body Daily Rotation', () => {
     await page.waitForTimeout(500);
 
     const ids = await getCurrentWorkoutExercises(page);
-    expect(ids.length).toBe(3);
-
-    const verticalPull = ids.filter((id) => VERTICAL_PULL.includes(id));
-    const verticalPush = ids.filter((id) => VERTICAL_PUSH.includes(id));
-    expect(verticalPull.length).toBe(1);
-    expect(verticalPush.length).toBe(0);
+    expect(ids.slice().sort()).toEqual(TESTED_UPPER_BODY_POOL.slice().sort());
   });
 });
