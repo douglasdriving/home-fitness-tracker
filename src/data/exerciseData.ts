@@ -1,11 +1,17 @@
 import { Exercise } from '../types/exercise';
 import exercisesJson from './exercises.json';
 
-// NOTE (upper body rotation, issue #26): the 'vertical-pull' slot (3a) has NO
-// no-equipment starter without a pull-up bar. `band-lat-pulldown-001`
-// (requires elastic-band) is the only pre-bar vertical-pull exercise, so a
-// brand-new user with no band has no starter for that slot. The follow-on
-// rotation generator must handle this gap (e.g. fall back / skip slot 3a).
+// NOTE (upper body pool, coaching session 2026-07-01): every upper-body
+// exercise must be physically tested in a coaching session before entering
+// this file. The current pool is exactly the three tested exercises
+// (table row / incline push-up / pike push-up), each with a difficulty ladder.
+// REJECTED — do NOT re-add without new equipment or a re-test:
+//   - doorway rows (no sturdy doorway with a clean grip angle)
+//   - band rows & band lat pulldown (loop bands are too short, ~62 cm —
+//     tension spikes at full extension; pulldown also needs an overhead anchor)
+//   - pull-ups/chin-ups (no compatible doorframe for a bar; pressure bars unsafe)
+// Vertical pull is PARKED until the equipment situation changes, so Slot 3
+// runs pike push-up (vertical push) every upper-body session.
 
 // Load exercises from JSON
 export const allExercises: Exercise[] = exercisesJson as Exercise[];

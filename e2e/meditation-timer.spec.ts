@@ -211,6 +211,35 @@ test.describe('Meditation Timer', () => {
     await expect(page.locator('input[type="checkbox"]').nth(1)).not.toBeChecked();
   });
 
+  test('completing meditation lands on workout complete after the bell delay and increments count', async ({ page }) => {
+    // Use a short meditation duration so the countdown finishes quickly.
+    await setupCalibratedUser(page, {
+      meditationState: { completionCount: 0, currentDurationSeconds: 2 },
+    });
+    await completeWorkout(page);
+
+    // Skip stretching to reach meditation
+    page.on('dialog', dialog => dialog.accept());
+    await page.getByText(/skip all/i).click();
+
+    // On the meditation page
+    await expect(page.locator('h1').filter({ hasText: /meditation/i })).toBeVisible({ timeout: 10000 });
+
+    // Start the (2s) countdown
+    await page.getByRole('button', { name: /start/i }).click();
+
+    // The timer should reach completion before navigating away. After the
+    // ~1s post-completion delay the screen transitions to workout complete.
+    await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
+
+    // Completing (not skipping) increments the meditation completion count.
+    const profile = await page.evaluate(() => {
+      const data = localStorage.getItem('fitness-tracker-user-profile');
+      return data ? JSON.parse(data) : null;
+    });
+    expect(profile.meditationState?.completionCount).toBe(1);
+  });
+
   test('direct URL access to /meditation redirects to home', async ({ page }) => {
     await setupCalibratedUser(page);
 

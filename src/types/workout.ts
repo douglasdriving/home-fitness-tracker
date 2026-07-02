@@ -23,6 +23,7 @@ export interface WorkoutExercise {
   muscleGroups: MuscleGroup[];
   sets: Set[];
   restTime: number; // seconds between sets
+  ladderRung?: number; // Ladder rung index this workout was generated at (ladder exercises only)
 }
 
 export interface Set {
@@ -60,6 +61,7 @@ export interface CompletedExercise {
   muscleGroups: MuscleGroup[];
   completedSets: CompletedSet[];
   intensityFeedback?: IntensityRating; // User's feedback on exercise difficulty
+  ladderRung?: number; // Ladder rung index the exercise was performed at (ladder exercises only)
 }
 
 export interface CompletedSet {

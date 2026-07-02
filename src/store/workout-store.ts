@@ -283,6 +283,8 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
       ...(intensityFeedbackMap && intensityFeedbackMap[ex.exerciseId] !== undefined
         ? { intensityFeedback: intensityFeedbackMap[ex.exerciseId] }
         : {}),
+      // Preserve the ladder rung the workout was generated at (ladder exercises only)
+      ...(ex.ladderRung !== undefined ? { ladderRung: ex.ladderRung } : {}),
     }));
 
     // Calculate intensity score for this workout

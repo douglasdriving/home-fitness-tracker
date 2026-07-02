@@ -7,6 +7,20 @@ Items to implement in the app or routine, arising from coaching sessions.
 - [ ] Action item description
 -->
 
+## 2026-07-01 — Tested Upper Body Day (SUPERSEDES the 2026-06-18 upper-body paper pool)
+
+> These three exercises were physically tested in Douglas's apartment and are the ONLY upper-body exercises to implement. The broader 2026-06-18 "Upper Body Day — 3rd Rotation Slot" pool below is superseded — do NOT add the rejected/untested ones.
+
+- [x] **Slot 1 — Horizontal pull: Table (inverted) row.** Counting: **reps, both arms together** (bilateral simultaneous, single count). Difficulty ladder (body angle): knees-bent + feet-planted → legs straight, heels down → feet elevated → archer/one-arm. Start at rung 1. Form note in instructions: initiate the pull from shoulder-blade retraction (not the hands) to bias mid-back. *(Implemented 2026-07-02: `inverted-rows-001` renamed "Table Row", 4-rung ladder + scap-retraction coaching tip.)*
+- [x] **Slot 2 — Horizontal push: Incline push-up.** Counting: **reps, both arms**. Surface ladder (his real surfaces): kitchen counter (waist) → low bookcase (mid-thigh) → couch table (knee) → ankle step → floor (standard push-up). Start: kitchen counter. *(Implemented 2026-07-02: 5-rung surface ladder, book-stack tip.)*
+- [x] **Slot 3 — Vertical push: Pike push-up.** Counting: **reps, both arms**. Surface ladder: couch table (knee) → ankle step → floor pike → feet-elevated → wall handstand push-up. Start: couch table. *(Implemented 2026-07-02: 5-rung ladder, pike-angle/book-stack tip.)*
+- [x] **Unified advance rule for all three (double progression):** work at each rung until ~15 clean reps on all working sets is reached (starting from ~8), then move to the next harder rung. Consider modeling each ladder rung as a variation the app auto-advances (similar to the existing unlock/retire mechanism), tracking reps within the current rung. *(Implemented 2026-07-02 as a `ladder` mechanism: rungs live on the exercise, current rung tracked per exercise, auto-advance when all sets hit 15, target resets to 8 on the new rung, capped at 15 below the top rung. Rung shown during workouts + in the exercise library; advancement celebrated on the completion screen.)*
+- [x] **Vertical pull: NONE for now.** Remove band lat pulldown / any pull-up-bar exercise from the upper-body pool. Slot 3 runs pike push-up every session (not alternating) until Douglas has equipment for a vertical pull. *(Implemented 2026-07-02: Slot 3 alternation removed from the generator.)*
+- [x] **REJECTED — do not add:** doorway row, band row, band lat pulldown, pull-up/chin-up (no bar). (Reasons logged in 2026-07-01 session notes + profile.md equipment section.) *(Implemented 2026-07-02: all removed from exercises.json, including the untested paper pool — chair dips, band overhead press, standalone floor/feet-elevated/archer push-ups, which now exist only as ladder rungs. Do-not-re-add note added to exerciseData.ts.)*
+
+### Warmups — STILL TO TEST (deferred to next session)
+- [ ] Warmup exercises (abs / posterior chain / upper body) were NOT tested yet. Do NOT implement warmups until tested next session — especially **band pull-aparts** (verify short loops don't spike) and **scapular push-ups**. *(App aligned 2026-07-02: band pull-aparts and scapular push-ups removed from the shipped upper-body warmup pending the live test; it now runs arm circles + easy incline push-ups only. The other warmup moves, already live since 2026-06-18, were left in place.)*
+
 ## 2026-06-17
 
 ### McGill Interval Holds as Default

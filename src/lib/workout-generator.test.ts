@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { generateWorkout, generateDailyRotationWorkout, findLastPerformanceWithFeedback, getNextDailyRotationGroup, getNextUpperBodyVerticalSlot } from './workout-generator';
+import { generateWorkout, generateDailyRotationWorkout, findLastPerformanceWithFeedback, getNextDailyRotationGroup } from './workout-generator';
 import { getExerciseById } from '../data/exerciseData';
 import { getAvailableExercises } from './achievement-tracker';
 import { StrengthLevels } from '../types/user';
@@ -606,10 +606,13 @@ describe('generateDailyRotationWorkout', () => {
     });
   });
 
-  describe('upper body role-based selection', () => {
+  describe('upper body role-based selection (tested pool, coaching 2026-07-01)', () => {
     const slotOf = (exerciseId: string) => getExerciseById(exerciseId)?.upperBodySlot;
 
-    function upperBodyHistoryEntry(workoutNumber: number, exerciseIds: string[]): WorkoutHistoryEntry {
+    function upperBodyHistoryEntry(
+      workoutNumber: number,
+      exercises: Array<{ exerciseId: string; reps: number[]; feedback?: 1 | 2 | 3 | 4 | 5; ladderRung?: number }>
+    ): WorkoutHistoryEntry {
       return {
         id: `history-ub-${workoutNumber}`,
         workoutId: `workout-ub-${workoutNumber}`,
@@ -618,128 +621,69 @@ describe('generateDailyRotationWorkout', () => {
         totalDuration: 18,
         workoutMode: 'daily-rotation',
         targetMuscleGroup: 'upperBody',
-        exercises: exerciseIds.map(exerciseId => ({
-          exerciseId,
-          exerciseName: exerciseId,
+        exercises: exercises.map(ex => ({
+          exerciseId: ex.exerciseId,
+          exerciseName: ex.exerciseId,
           muscleGroups: ['upperBody'] as MuscleGroup[],
-          completedSets: [{ setNumber: 1, actualReps: 10 }],
+          completedSets: ex.reps.map((r, i) => ({ setNumber: i + 1, actualReps: r })),
+          intensityFeedback: ex.feedback,
+          ladderRung: ex.ladderRung,
         })),
       };
     }
 
-    it('generates exactly one horizontal-pull, one horizontal-push, and one vertical exercise', () => {
+    it('generates the three tested exercises, one per slot', () => {
       const workout = generateDailyRotationWorkout({
         workoutNumber: 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'upperBody',
-        hasElasticBands: true,
       });
 
-      expect(workout.exercises.length).toBe(3);
+      expect(workout.exercises.map(ex => ex.exerciseId)).toEqual([
+        'inverted-rows-001',
+        'incline-pushups-001',
+        'pike-pushups-001',
+      ]);
+      expect(workout.exercises.map(ex => slotOf(ex.exerciseId))).toEqual([
+        'horizontal-pull',
+        'horizontal-push',
+        'vertical-push',
+      ]);
+    });
+
+    it('runs pike push-up (vertical-push) every session — Slot 3 does not alternate', () => {
+      // Even directly after a pike push-up session, Slot 3 is pike push-up again
+      const history: WorkoutHistoryEntry[] = [
+        upperBodyHistoryEntry(1, [
+          { exerciseId: 'inverted-rows-001', reps: [8, 8, 8], ladderRung: 0 },
+          { exerciseId: 'incline-pushups-001', reps: [8, 8, 8], ladderRung: 0 },
+          { exerciseId: 'pike-pushups-001', reps: [8, 8, 8], ladderRung: 0 },
+        ]),
+      ];
+
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'upperBody',
+        workoutHistory: history,
+        hasElasticBands: true,
+      });
 
       const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
-      expect(slots.filter(s => s === 'horizontal-pull').length).toBe(1);
-      expect(slots.filter(s => s === 'horizontal-push').length).toBe(1);
-      expect(slots.filter(s => s === 'vertical-pull' || s === 'vertical-push').length).toBe(1);
+      expect(slots).toContain('vertical-push');
+      expect(slots).not.toContain('vertical-pull');
     });
 
-    it('defaults the first session Slot 3 to vertical-push (no-equipment starter)', () => {
+    it('gives every upper body exercise 3 sets', () => {
       const workout = generateDailyRotationWorkout({
         workoutNumber: 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'upperBody',
-        hasElasticBands: true,
       });
 
-      const verticalExercise = workout.exercises.find(ex => {
-        const slot = slotOf(ex.exerciseId);
-        return slot === 'vertical-pull' || slot === 'vertical-push';
+      workout.exercises.forEach(ex => {
+        expect(ex.sets.length).toBe(3);
       });
-      expect(verticalExercise).toBeDefined();
-      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
-    });
-
-    it('alternates Slot 3 to vertical-pull after a vertical-push session', () => {
-      // Previous upper body session used pike push-ups (vertical-push)
-      const history: WorkoutHistoryEntry[] = [
-        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
-      ];
-
-      const workout = generateDailyRotationWorkout({
-        workoutNumber: 2,
-        strengthLevels: defaultStrengthLevels,
-        targetMuscleGroup: 'upperBody',
-        hasElasticBands: true, // band needed for the only vertical-pull exercise
-        workoutHistory: history,
-      });
-
-      const verticalExercise = workout.exercises.find(ex => {
-        const slot = slotOf(ex.exerciseId);
-        return slot === 'vertical-pull' || slot === 'vertical-push';
-      });
-      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-pull');
-    });
-
-    it('alternates Slot 3 back to vertical-push after a vertical-pull session', () => {
-      const history: WorkoutHistoryEntry[] = [
-        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001']),
-      ];
-
-      const workout = generateDailyRotationWorkout({
-        workoutNumber: 2,
-        strengthLevels: defaultStrengthLevels,
-        targetMuscleGroup: 'upperBody',
-        hasElasticBands: true,
-        workoutHistory: history,
-      });
-
-      const verticalExercise = workout.exercises.find(ex => {
-        const slot = slotOf(ex.exerciseId);
-        return slot === 'vertical-pull' || slot === 'vertical-push';
-      });
-      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
-    });
-
-    it('falls back to vertical-push when alternation calls for vertical-pull but no band is available', () => {
-      // Last session was vertical-push, so alternation wants vertical-pull,
-      // but band-less users have no vertical-pull exercise available.
-      const history: WorkoutHistoryEntry[] = [
-        upperBodyHistoryEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
-      ];
-
-      const workout = generateDailyRotationWorkout({
-        workoutNumber: 2,
-        strengthLevels: defaultStrengthLevels,
-        targetMuscleGroup: 'upperBody',
-        hasElasticBands: false,
-        workoutHistory: history,
-      });
-
-      expect(workout.exercises.length).toBe(3);
-      const verticalExercise = workout.exercises.find(ex => {
-        const slot = slotOf(ex.exerciseId);
-        return slot === 'vertical-pull' || slot === 'vertical-push';
-      });
-      expect(slotOf(verticalExercise!.exerciseId)).toBe('vertical-push');
-    });
-
-    it('selects the least recently used exercise within a slot', () => {
-      // inverted-rows used most recently; doorway-rows never used → doorway-rows wins horizontal-pull.
-      const history: WorkoutHistoryEntry[] = [
-        upperBodyHistoryEntry(5, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
-      ];
-
-      const workout = generateDailyRotationWorkout({
-        workoutNumber: 6,
-        strengthLevels: defaultStrengthLevels,
-        targetMuscleGroup: 'upperBody',
-        hasElasticBands: false,
-        workoutHistory: history,
-      });
-
-      const pullExercise = workout.exercises.find(ex => slotOf(ex.exerciseId) === 'horizontal-pull');
-      expect(pullExercise).toBeDefined();
-      expect(pullExercise!.exerciseId).not.toBe('inverted-rows-001');
     });
 
     it('never generates lower back exercises on the upper body rotation day', () => {
@@ -757,49 +701,112 @@ describe('generateDailyRotationWorkout', () => {
         });
       }
     });
-  });
-});
 
-describe('getNextUpperBodyVerticalSlot', () => {
-  function upperBodyEntry(workoutNumber: number, exerciseIds: string[], workoutMode: 'full-body' | 'daily-rotation' = 'daily-rotation', targetMuscleGroup: MuscleGroup = 'upperBody'): WorkoutHistoryEntry {
-    return {
-      id: `history-ubv-${workoutNumber}`,
-      workoutId: `workout-ubv-${workoutNumber}`,
-      workoutNumber,
-      completedDate: Date.now() - (100 - workoutNumber) * 86400000,
-      totalDuration: 18,
-      workoutMode,
-      targetMuscleGroup,
-      exercises: exerciseIds.map(exerciseId => ({
-        exerciseId,
-        exerciseName: exerciseId,
-        muscleGroups: ['upperBody'] as MuscleGroup[],
-        completedSets: [{ setNumber: 1, actualReps: 10 }],
-      })),
-    };
-  }
+    describe('ladder double progression', () => {
+      it('starts a first-ever session at the ladder startReps with rung 0 stamped', () => {
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: 1,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+        });
 
-  it('defaults to vertical-push with no history', () => {
-    expect(getNextUpperBodyVerticalSlot([])).toBe('vertical-push');
-  });
+        workout.exercises.forEach(ex => {
+          expect(ex.ladderRung).toBe(0);
+          ex.sets.forEach(set => {
+            expect(set.targetReps).toBe(8);
+          });
+        });
+      });
 
-  it('flips vertical-push → vertical-pull', () => {
-    const history = [upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001'])];
-    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-pull');
-  });
+      it('progresses reps within the current rung using intensity feedback', () => {
+        // 10 reps at rung 0, feedback 2 (a bit too easy, +10%) → 11 reps
+        const history = [
+          upperBodyHistoryEntry(1, [
+            { exerciseId: 'inverted-rows-001', reps: [10, 10, 10], feedback: 2, ladderRung: 0 },
+          ]),
+        ];
 
-  it('flips vertical-pull → vertical-push', () => {
-    const history = [upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001'])];
-    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-push');
-  });
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: 2,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+          workoutHistory: history,
+        });
 
-  it('uses the most recent upper body session, ignoring older ones and other rotation days', () => {
-    const history = [
-      upperBodyEntry(3, ['crunches-001'], 'daily-rotation', 'abs'), // most recent, not upper body
-      upperBodyEntry(2, ['inverted-rows-001', 'pushups-001', 'band-lat-pulldown-001']), // most recent upper body
-      upperBodyEntry(1, ['inverted-rows-001', 'pushups-001', 'pike-pushups-001']),
-    ];
-    expect(getNextUpperBodyVerticalSlot(history)).toBe('vertical-push');
+        const tableRow = workout.exercises.find(ex => ex.exerciseId === 'inverted-rows-001');
+        expect(tableRow!.sets[0].targetReps).toBe(11);
+        expect(tableRow!.ladderRung).toBe(0);
+      });
+
+      it('caps the target at advanceReps below the top rung', () => {
+        // 14 reps, feedback 1 (+20%) would give 17, but 15 triggers the rung advance instead
+        const history = [
+          upperBodyHistoryEntry(1, [
+            { exerciseId: 'incline-pushups-001', reps: [14, 14, 14], feedback: 1, ladderRung: 0 },
+          ]),
+        ];
+
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: 2,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+          workoutHistory: history,
+        });
+
+        const inclinePushup = workout.exercises.find(ex => ex.exerciseId === 'incline-pushups-001');
+        expect(inclinePushup!.sets[0].targetReps).toBe(15);
+      });
+
+      it('resets to startReps when the user has advanced to a new rung', () => {
+        // User cleared rung 0 (15s across the board) and their ladder level is now 1
+        const history = [
+          upperBodyHistoryEntry(1, [
+            { exerciseId: 'incline-pushups-001', reps: [15, 15, 15], feedback: 3, ladderRung: 0 },
+          ]),
+        ];
+
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: 2,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+          workoutHistory: history,
+          exerciseAchievements: {
+            unlockedExercises: [],
+            retiredExercises: [],
+            ladderLevels: { 'incline-pushups-001': 1 },
+          },
+        });
+
+        const inclinePushup = workout.exercises.find(ex => ex.exerciseId === 'incline-pushups-001');
+        expect(inclinePushup!.sets[0].targetReps).toBe(8);
+        expect(inclinePushup!.ladderRung).toBe(1);
+      });
+
+      it('does not cap the target on the top rung', () => {
+        const topRung = getExerciseById('inverted-rows-001')!.ladder!.rungs.length - 1;
+        const history = [
+          upperBodyHistoryEntry(1, [
+            { exerciseId: 'inverted-rows-001', reps: [15, 15, 15], feedback: 1, ladderRung: topRung },
+          ]),
+        ];
+
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: 2,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'upperBody',
+          workoutHistory: history,
+          exerciseAchievements: {
+            unlockedExercises: [],
+            retiredExercises: [],
+            ladderLevels: { 'inverted-rows-001': topRung },
+          },
+        });
+
+        const tableRow = workout.exercises.find(ex => ex.exerciseId === 'inverted-rows-001');
+        // 15 + 20% = 18 — allowed to keep climbing at the top of the ladder
+        expect(tableRow!.sets[0].targetReps).toBe(18);
+      });
+    });
   });
 });
 

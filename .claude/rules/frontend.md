@@ -24,6 +24,7 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 - Workout targets use **75% of estimated capacity** (sustainable for multiple sets, since calibration tests single-set max)
 - Progressive overload: +7.5% from last performance (minimum: 1 rep or 5 seconds)
 - Strength level formula for timed exercises: `(achievedDuration / heaviness) * (10/6)`
+- **Ladder exercises** (upper body, coaching 2026-07-01): exercises with a `ladder` config progress by double progression — build reps within the current rung from `startReps` (8), target capped at `advanceReps` (15) below the top rung; when ALL completed sets reach `advanceReps`, `checkLadderAdvancements` (achievement-tracker) bumps the rung stored in `profile.exerciseAchievements.ladderLevels` and the generator resets the target to `startReps`. The rung used is stamped on workout + history entries as `ladderRung`.
 
 ### Exercise Data
 All exercises defined in `src/data/exerciseData.ts` with:

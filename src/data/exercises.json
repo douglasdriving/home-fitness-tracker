@@ -469,164 +469,77 @@
     "retirementThreshold": { "type": "reps", "value": 35 }
   },
   {
-    "id": "doorway-rows-001",
-    "name": "Doorway Rows",
-    "emoji": "🚪",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-pull",
-    "description": "Stand in a doorway gripping the frame at chest height. Lean back with feet under the doorway and arms extended. Pull your chest toward the frame, driving elbows back and squeezing your shoulder blades together. Walk your feet forward to make it easier, back to make it harder.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 4 },
-    "type": "reps",
-    "defaultReps": 10,
-    "retirementThreshold": { "type": "reps", "value": 25 }
-  },
-  {
     "id": "inverted-rows-001",
-    "name": "Inverted Rows",
+    "name": "Table Row",
     "emoji": "🪑",
     "primaryMuscleGroup": "upperBody",
     "muscleGroups": ["upperBody"],
     "upperBodySlot": "horizontal-pull",
-    "description": "Lie on your back under a sturdy table, gripping the edge with hands shoulder-width apart, body straight from head to heels. Pull your chest up to the table by driving your elbows back and squeezing your shoulder blades together at the top. Lower with control. Bend your knees to make it easier, extend your legs for harder.",
-    "source": "Coaching Session 2026-06-18",
+    "description": "Clear off the desk, then lie on your back under it, gripping the edge with hands shoulder-width apart. Pull your chest up to the desk by driving your elbows back and squeezing your shoulder blades together at the top. Lower with control. Count reps with both arms pulling together. Your current ladder rung sets the leg position (body angle).",
+    "source": "Coaching Session 2026-07-01 (tested live)",
     "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 6 },
     "type": "reps",
     "defaultReps": 8,
-    "retirementThreshold": { "type": "reps", "value": 20 }
-  },
-  {
-    "id": "band-rows-001",
-    "name": "Resistance Band Rows",
-    "emoji": "🎗️",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-pull",
-    "description": "Anchor a loop band at waist height (door knob or similar). Hold the band with both hands, arms extended, with a slight backward lean. Pull the band toward your lower ribs, driving your elbows back and squeezing your shoulder blades together. Return slowly.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 5 },
-    "type": "reps",
-    "defaultReps": 12,
-    "equipment": "elastic-band",
-    "retirementThreshold": { "type": "reps", "value": 35 }
+    "coachingTip": "Start each pull from your shoulder blades, not your hands — squeeze them together first to bias the mid-back (posture work).",
+    "ladder": {
+      "startReps": 8,
+      "advanceReps": 15,
+      "rungs": [
+        { "name": "Knees bent, feet planted", "description": "Bend your knees and keep your feet flat on the floor." },
+        { "name": "Legs straight, heels down", "description": "Straighten your legs so only your heels rest on the floor." },
+        { "name": "Feet elevated", "description": "Rest your heels on a low chair or step to steepen the pull." },
+        { "name": "Archer / one-arm row", "description": "Shift the work toward one arm per rep, building toward a full one-arm row." }
+      ]
+    }
   },
   {
     "id": "incline-pushups-001",
-    "name": "Incline Push-Ups",
+    "name": "Incline Push-Up",
     "emoji": "📐",
     "primaryMuscleGroup": "upperBody",
     "muscleGroups": ["upperBody"],
     "upperBodySlot": "horizontal-push",
-    "description": "Place your hands on an elevated surface (couch arm, chair seat, counter) slightly wider than your shoulders. Walk your feet back until your body forms a straight line from head to heels. Lower your chest toward the surface with elbows at about 45 degrees, then press back up. A higher surface makes it easier.",
-    "source": "Coaching Session 2026-06-18",
+    "description": "Place your hands on an elevated surface slightly wider than your shoulders. Walk your feet back until your body forms a straight line from head to heels. Lower your chest toward the surface with elbows at about 45 degrees, then press back up. Count reps with both arms pressing together. Your current ladder rung sets the surface height — lower surface, harder push-up.",
+    "source": "Coaching Session 2026-07-01 (tested live)",
     "heavinessScore": { "abs": 2, "glutes": 0, "lowerBack": 0, "upperBody": 3 },
     "type": "reps",
-    "defaultReps": 12,
-    "retirementThreshold": { "type": "reps", "value": 25 }
-  },
-  {
-    "id": "pushups-001",
-    "name": "Push-Ups",
-    "emoji": "💪",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-push",
-    "description": "Standard push-ups. Place your hands slightly wider than your shoulders and keep your body rigid. Lower until your chest nearly touches the floor with elbows about 45 degrees from your body, then press up.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 2, "glutes": 0, "lowerBack": 0, "upperBody": 5 },
-    "type": "reps",
-    "defaultReps": 10,
-    "retirementThreshold": { "type": "reps", "value": 30 }
-  },
-  {
-    "id": "chair-dips-001",
-    "name": "Chair Dips",
-    "emoji": "🪑",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-push",
-    "description": "Sit on the edge of a sturdy chair, hands gripping the edge beside your hips, fingers pointing forward. Slide forward off the seat. Lower your body by bending your elbows to about 90 degrees, keeping your elbows pointing straight back, then press back up.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 6 },
-    "type": "reps",
     "defaultReps": 8,
-    "unlockRequirement": { "exerciseId": "pushups-001", "type": "reps", "value": 15 },
-    "retirementThreshold": { "type": "reps", "value": 25 }
-  },
-  {
-    "id": "feet-elevated-pushups-001",
-    "name": "Feet-Elevated Push-Ups",
-    "emoji": "🦶",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-push",
-    "description": "Place your feet on a chair or couch and your hands on the floor in standard push-up position so your body forms a decline angle. Lower your chest toward the floor and press back up. This shifts more load to the upper chest and shoulders versus flat push-ups.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 3, "glutes": 0, "lowerBack": 0, "upperBody": 7 },
-    "type": "reps",
-    "defaultReps": 8,
-    "unlockRequirement": { "exerciseId": "pushups-001", "type": "reps", "value": 20 },
-    "retirementThreshold": { "type": "reps", "value": 20 }
-  },
-  {
-    "id": "archer-pushups-001",
-    "name": "Archer Push-Ups",
-    "emoji": "🏹",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "horizontal-push",
-    "description": "Take a wide push-up stance with your hands much wider than your shoulders. Lower sideways toward one hand while keeping the opposite arm nearly straight, then push back to center. Alternate sides each rep. This trains toward a one-arm push-up.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 3, "glutes": 0, "lowerBack": 0, "upperBody": 9 },
-    "type": "reps",
-    "defaultReps": 6,
-    "countingMethod": "per-side",
-    "unlockRequirement": { "exerciseId": "feet-elevated-pushups-001", "type": "reps", "value": 12 }
-  },
-  {
-    "id": "band-lat-pulldown-001",
-    "name": "Band Lat Pulldown",
-    "emoji": "🎗️",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "vertical-pull",
-    "description": "Anchor a loop band overhead (top of a door or similar high point). Grip the band and sit or kneel below it. Pull the band down toward your chest, driving your elbows down and back, squeezing your shoulder blades down and together. Return with control.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 5 },
-    "type": "reps",
-    "defaultReps": 12,
-    "equipment": "elastic-band",
-    "retirementThreshold": { "type": "reps", "value": 30 },
-    "coachingTip": "Needs a high anchor point (top of door). Drive your elbows down — think about putting them in your back pockets."
+    "coachingTip": "Stuck between two surfaces? A stack of thick books or a sturdy box makes a perfect in-between height.",
+    "ladder": {
+      "startReps": 8,
+      "advanceReps": 15,
+      "rungs": [
+        { "name": "Kitchen counter (waist height)", "description": "Hands on the kitchen counter." },
+        { "name": "Low bookcase (mid-thigh height)", "description": "Hands on the low bookcase." },
+        { "name": "Couch table (knee height)", "description": "Hands on the couch table." },
+        { "name": "Ankle-height step", "description": "Hands on an ankle-height step or a low stack of books." },
+        { "name": "Floor (standard push-up)", "description": "Hands on the floor — the full push-up." }
+      ]
+    }
   },
   {
     "id": "pike-pushups-001",
-    "name": "Pike Push-Ups",
+    "name": "Pike Push-Up",
     "emoji": "🔺",
     "primaryMuscleGroup": "upperBody",
     "muscleGroups": ["upperBody"],
     "upperBodySlot": "vertical-push",
-    "description": "Start in a high plank, then walk your feet toward your hands until your hips are high and your body forms an inverted V. Lower your head toward the floor by bending your elbows out to the sides, then press back up. This trains the deltoids in a vertical-pressing pattern.",
-    "source": "Coaching Session 2026-06-18",
+    "description": "Place your hands on the surface for your current ladder rung, walk your feet toward your hands and lift your hips high so your body forms an inverted V. Lower the top of your head toward your hands by bending your elbows, then press back up. Count reps with both arms pressing together. This trains the shoulders in a vertical-pressing pattern.",
+    "source": "Coaching Session 2026-07-01 (tested live)",
     "heavinessScore": { "abs": 2, "glutes": 0, "lowerBack": 0, "upperBody": 6 },
     "type": "reps",
     "defaultReps": 8,
-    "retirementThreshold": { "type": "reps", "value": 20 }
-  },
-  {
-    "id": "band-overhead-press-001",
-    "name": "Resistance Band Overhead Press",
-    "emoji": "🎗️",
-    "primaryMuscleGroup": "upperBody",
-    "muscleGroups": ["upperBody"],
-    "upperBodySlot": "vertical-push",
-    "description": "Stand on a loop band with your feet shoulder-width apart. Hold the loop at shoulder height in each hand, palms forward. Press overhead until your arms fully extend, then lower with control. Brace your core to avoid arching your lower back.",
-    "source": "Coaching Session 2026-06-18",
-    "heavinessScore": { "abs": 0, "glutes": 0, "lowerBack": 0, "upperBody": 5 },
-    "type": "reps",
-    "defaultReps": 12,
-    "equipment": "elastic-band",
-    "retirementThreshold": { "type": "reps", "value": 30 }
+    "coachingTip": "Next rung too big a jump? Use a book stack for an in-between height, or make the current rung harder by walking your feet in and lifting your hips higher.",
+    "ladder": {
+      "startReps": 8,
+      "advanceReps": 15,
+      "rungs": [
+        { "name": "Couch table (knee height)", "description": "Hands on the couch table." },
+        { "name": "Ankle-height step", "description": "Hands on an ankle-height step or a low stack of books." },
+        { "name": "Floor pike", "description": "Hands on the floor in a full pike position." },
+        { "name": "Feet elevated", "description": "Feet up on the couch or a chair, hips stacked over shoulders." },
+        { "name": "Wall handstand push-up", "description": "Kick up against the wall — the top of the ladder." }
+      ]
+    }
   }
 ]

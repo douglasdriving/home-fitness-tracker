@@ -12,7 +12,7 @@ import { getExerciseById } from '../data/exerciseData';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { IntensityRating } from '../types/workout';
-import { checkWorkoutAchievements } from '../lib/achievement-tracker';
+import { checkWorkoutAchievements, checkLadderAdvancements } from '../lib/achievement-tracker';
 import WorkoutHeader from '../components/workout/WorkoutHeader';
 import RestPhase from '../components/workout/RestPhase';
 import ExercisePhase from '../components/workout/ExercisePhase';
@@ -210,7 +210,7 @@ export default function WorkoutExecution() {
       const historyEntry = await completeWorkout(feedbackMap);
 
       // Check for new achievements (unlocks/retirements)
-      const { profile, addUnlockedExercises, addRetiredExercises } = useUserStore.getState();
+      const { profile, addUnlockedExercises, addRetiredExercises, setLadderLevels } = useUserStore.getState();
       const achievements = profile?.exerciseAchievements ?? {
         unlockedExercises: [],
         retiredExercises: [],
@@ -236,11 +236,20 @@ export default function WorkoutExecution() {
         addRetiredExercises(newRetirements);
       }
 
+      // Check ladder exercises for rung advancements (all sets at advanceReps)
+      const ladderAdvancements = checkLadderAdvancements(historyEntry, achievements);
+      if (ladderAdvancements.length > 0) {
+        setLadderLevels(
+          Object.fromEntries(ladderAdvancements.map(adv => [adv.exerciseId, adv.toRung]))
+        );
+      }
+
       // Build state to pass through the completion flow
       const completionState = {
         workout: historyEntry,
         unlockReasons: unlockReasons.length > 0 ? unlockReasons : undefined,
         retirementReasons: retirementReasons.length > 0 ? retirementReasons : undefined,
+        ladderAdvancements: ladderAdvancements.length > 0 ? ladderAdvancements : undefined,
       };
 
       // New flow: stretching first (if enabled), then meditation (if enabled), then workout complete

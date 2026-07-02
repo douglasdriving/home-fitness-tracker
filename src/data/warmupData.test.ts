@@ -87,14 +87,17 @@ describe('getWarmupForMuscleGroup', () => {
     expect(ids).toEqual(['warmup-cat-cow', 'warmup-hip-circles', 'warmup-hinges']);
   });
 
-  it('returns upper body warmup moves including band pull-aparts', () => {
+  it('returns only tested upper body warmup moves (coaching 2026-07-01)', () => {
     const ids = getWarmupForMuscleGroup('upperBody').map(w => w.id);
-    expect(ids).toEqual([
-      'warmup-arm-circles',
-      'warmup-scap-pushups',
-      'warmup-incline-pushups',
-      'warmup-band-pull-aparts',
-    ]);
+    expect(ids).toEqual(['warmup-arm-circles', 'warmup-incline-pushups']);
+  });
+
+  it('excludes untested moves: band pull-aparts and scapular push-ups', () => {
+    // Removed pending a live test — band pull-aparts share the short-loop-band
+    // failure mode that rejected band rows; scapular push-ups need teaching first.
+    const allIds = warmupRoutine.map(w => w.id);
+    expect(allIds).not.toContain('warmup-band-pull-aparts');
+    expect(allIds).not.toContain('warmup-scap-pushups');
   });
 
   it('returns muscle-group-specific moves that differ between groups', () => {

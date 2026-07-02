@@ -4,11 +4,15 @@
  * Duration increases every 5 completions, from 1 min to 15 min cap.
  */
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useUserStore } from '../store/user-store';
 import Timer from '../components/workout/Timer';
 import { useWakeLock } from '../hooks/useWakeLock';
+
+// Delay before navigating away after the meditation timer completes, so the
+// Timer's completion bell can ring fully before the screen transitions.
+const COMPLETION_NAV_DELAY_MS = 1000;
 
 export default function MeditationTimer() {
   const navigate = useNavigate();
@@ -16,6 +20,10 @@ export default function MeditationTimer() {
   const { profile, completeMeditation } = useUserStore();
 
   const completionState = location.state?.completionState;
+
+  // Tracks the pending post-completion navigation timeout so it can be
+  // cancelled (e.g. on Skip or unmount) to avoid double / late navigation.
+  const navTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Keep screen awake during meditation
   useWakeLock();
@@ -27,6 +35,16 @@ export default function MeditationTimer() {
     }
   }, [completionState, navigate]);
 
+  // Clear any pending navigation timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (navTimeoutRef.current) {
+        clearTimeout(navTimeoutRef.current);
+        navTimeoutRef.current = null;
+      }
+    };
+  }, []);
+
   // Get meditation state with defaults
   const meditationState = profile?.meditationState ?? {
     completionCount: 0,
@@ -36,14 +54,25 @@ export default function MeditationTimer() {
   const duration = meditationState.currentDurationSeconds;
 
   const handleComplete = () => {
-    // Increment completion count and update duration for next session
+    // Increment completion count and update duration for next session.
+    // Done immediately so progression is recorded regardless of nav timing.
     completeMeditation();
 
-    // Navigate to workout complete with completion state
-    navigate('/workout-complete', { state: completionState });
+    // Delay navigation so the Timer's completion bell can ring fully before
+    // the screen transitions and the component unmounts.
+    navTimeoutRef.current = setTimeout(() => {
+      navTimeoutRef.current = null;
+      navigate('/workout-complete', { state: completionState });
+    }, COMPLETION_NAV_DELAY_MS);
   };
 
   const handleSkip = () => {
+    // Cancel any pending post-completion navigation to avoid double-navigation.
+    if (navTimeoutRef.current) {
+      clearTimeout(navTimeoutRef.current);
+      navTimeoutRef.current = null;
+    }
+
     // Skip directly to workout complete without incrementing count
     navigate('/workout-complete', { state: completionState });
   };
