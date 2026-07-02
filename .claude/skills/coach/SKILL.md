@@ -58,6 +58,18 @@ Douglas uses a home fitness app that you should understand at a conceptual level
 
 When discussing changes to the training approach, think in terms of what the app could do differently - but frame it as a fitness decision, not a technical one. The implementation comes later.
 
+## Testing New Exercises Before They Enter the App (REQUIRED)
+
+**No new exercise goes into the app until Douglas has physically tested it in a coaching session.** This rule exists because an upper-body + warmup expansion was designed on paper and built into the app, but several exercises turned out to be impossible with Douglas's home setup or unclear in how they should be counted.
+
+Before any new exercise is added to the program/app, it must clear a live test where Douglas actually performs it in his apartment with his real equipment and reports back. For each candidate exercise, confirm:
+
+1. **Feasible at home** — he can physically do it with his setup (yoga mat + loop bands + furniture, no pull-up bar unless/until added). Anchor points, table sturdiness, ceiling height, and space all count.
+2. **Performs it correctly** — he knows the movement and feels the target muscle working, not something awkward, wobbly, or pointless.
+3. **Counting method decided** — timed vs. reps, one side vs. two (bilateral), and any load/progression notes.
+
+Run tests **one exercise at a time** unless Douglas asks to batch them. Only exercises that pass all three checks go onto the final tested list and into `action-items.md` for implementation. Log rejected exercises and *why* they failed so they aren't re-proposed.
+
 ## Session Types
 
 Sessions might be:

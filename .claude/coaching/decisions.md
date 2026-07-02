@@ -10,6 +10,29 @@ A running log of fitness decisions made during coaching sessions, with rationale
 **Impact on app:** What should change in the app (if anything)
 -->
 
+## 2026-07-01 - Test Every New Exercise Live Before It Enters the App
+
+**Decision:** No new exercise goes into the app/program until Douglas has physically performed it in a coaching session, in his apartment, with his real equipment. Each candidate must pass three checks: (1) feasible at home, (2) performed correctly / feels right in the target muscle, (3) counting method decided (timed vs reps, one side vs two, load/progression notes). Rejected exercises get logged with *why* so they aren't re-proposed. Documented as a required step in the coach SKILL.md.
+
+**Rationale:** The 2026-06-18 upper-body + warmup expansion was designed entirely on paper and built into the app, but several exercises turned out to be undoable with Douglas's setup or unclear in how to count them. Designing movements in the abstract, without hands on them in the actual space, produces exercises that are biomechanically fine but practically impossible at home.
+
+**Impact on app:** Only vetted exercises enter `action-items.md` / the exercise library. Process-level, not a code change.
+
+## 2026-07-01 - Finalized (Tested) Upper Body Day
+
+**Decision:** Replace the paper upper-body pool from 2026-06-18 with the three exercises that actually passed live testing:
+- **Slot 1 — Horizontal pull: Table (inverted) row** under his desk. Counting: reps, both arms together. Cue: initiate from shoulder-blade retraction (bias mid-back for posture). Surface/angle ladder: knees-bent+feet-planted → legs straight → feet elevated → archer/one-arm.
+- **Slot 2 — Horizontal push: Incline push-up.** Counting: reps, both arms. Scouted ladder (real surfaces): kitchen counter (waist) → low bookcase (mid-thigh) → couch table (knee) → ankle step → floor (standard push-up). Start: kitchen counter.
+- **Slot 3 — Vertical push: Pike push-up.** Counting: reps, both arms. Ladder: couch table (knee) → ankle step → floor pike → feet-elevated → wall handstand push-up. Start: couch table.
+
+**Unified advance rule (double progression):** start at a height allowing ~8 clean reps → build reps → at ~15 clean reps on all working sets, drop to the next harder rung. A book/box stack = an infinitely tunable in-between rung.
+
+**REJECTED (don't re-propose):** doorway row (no sturdy doorway w/ clean grip angle); band row & band lat pulldown (his loops are short ~62 cm → tension spikes; lat pulldown also needs an overhead anchor he lacks); pull-up bar (doorframes don't fit a leverage bar, pressure bars unsafe, drilling declined). **Vertical pull is PARKED** — no feasible option without new equipment; upper day runs 2 push : 1 pull, accepted since the table row covers posture-critical pulling every session.
+
+**Rationale:** These are what he can actually do at home with a yoga mat + short loops + furniture, no pull-up bar. See 2026-07-01 session notes for the full test log.
+
+**Impact on app:** The upper-body exercise library should contain exactly these three (plus surface-ladder + counting metadata), NOT the broader 2026-06-18 paper pool. Vertical-pull exercises stay out until equipment changes.
+
 ## 2026-06-17 - Make McGill-Style Interval Holds the Default for All Strength Holds
 
 **Decision:** Extend the McGill short-repeated-hold structure (already used for side plank) to ALL strength/endurance timed holds — plank, hollow body hold, back extension hold, etc. Stretching/mobility holds are explicitly excluded and stay as long continuous holds.

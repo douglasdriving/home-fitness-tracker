@@ -11,7 +11,11 @@ Daily (weekday) ~20-minute focused sessions, one muscle group per day, rolling r
 
 **Routine is evolving (as of 2026-06-18):** the dedicated Lower Back day is folded into glutes day as a "Posterior-Chain Day," and the freed slot now holds **Upper Body**. New rotation: **Abs → Posterior Chain → Upper Body**. Upper body is a full push+pull session with pull prioritized (desk-job posture); started without a pull-up bar. See decisions.md / action-items.md.
 
-Also bikes to work every day, about 30-40 minutes each way.
+Also bikes to work every day, about 30-40 minutes each way (to Impact Hub coworking space in Meguro, Tokyo).
+
+**Upper body day finalized (2026-07-01):** after live-testing, the three upper-body exercises are table row (horizontal pull), incline push-up (horizontal push), pike push-up (vertical push). Vertical pull parked (no equipment). See decisions.md / 2026-07-01 session.
+
+**Travel:** Leaves Japan for the summer ~2026-07-21, returns **2026-09-03**. **Gym membership under consideration** (parked until return) — a JoyFit sits right next to his Meguro cowork space, which suits a bike→lift→shower→cowork flow; likely a hybrid with the home routine. Revisit Sept 3rd.
 
 ## Current Performance Level
 After ~6 months of training, performance has increased steadily without major plateaus. Sample benchmarks: side planks restructured to McGill short-hold protocol; plank at ~75s/set (now being converted to interval holds); bird dog mastered at 28 reps/side (being retired). Has progressed into intermediate/advanced exercises.
@@ -34,8 +38,9 @@ The back pain and scoliosis symptoms are basically gone now. Before starting tra
 
 ## Equipment
 - Yoga mat
-- Elastic loop bands
-- Considering a doorframe pull-up bar (~200-400 SEK) - needs to check if doorframes allow it
+- **Loop bands: 3× short flat wide rubber resistance loops** (the "booty band" type), in 3 strengths. ~31 cm flat = **~62 cm loop circumference**. SHORT loops — great for short-ROM lower-body work (clamshells, lateral walks, glute bridges) and band pull-aparts, but too short for full-ROM horizontal rows (tension spikes violently near full arm extension — tested & confirmed 2026-07-01). Does NOT have a long loop band or a tube/handle band.
+- **NO pull-up bar, and a leverage-type doorframe bar is NOT an option** — his doorframes lack a protruding/solid top trim and/or the right width, so a hook-over-the-top leverage bar can't mount (checked 2026-07-01). Pure-pressure/telescoping bars are ruled out on safety grounds (friction-only, slip risk). A screw-mounted bar would work but requires drilling (rental — declined). **Do NOT re-suggest a doorframe pull-up bar** unless his living situation changes (moves, willing to drill, or a free-standing unit that fits a small apartment). This also means **no vertical-pull exercise is currently feasible** (no overhead anchor either).
+- (Possible future buys discussed: a long loop band or tube-with-handles for upper-body rows/pulldowns; backpack-as-weight for loading hinges is the free interim option)
 
 ## What Motivates Me
 - The feeling of a stronger back and absence of pain
