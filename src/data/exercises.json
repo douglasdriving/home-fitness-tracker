@@ -299,7 +299,7 @@
     "heavinessScore": { "abs": 0, "glutes": 5, "lowerBack": 2, "upperBody": 0 },
     "type": "reps",
     "defaultReps": 15,
-    "retirementThreshold": { "type": "reps", "value": 50 }
+    "retirementThreshold": { "type": "reps", "value": 30 }
   },
   {
     "id": "curtsy-lunge-001",
