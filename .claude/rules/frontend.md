@@ -25,6 +25,11 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 - `src/lib/workout-duration.ts` - `calculateEstimatedDuration`: estimated workout length in minutes
 - `src/lib/workout-history-helpers.ts` - History lookups (`getExerciseLastUsed`, `findLastPerformanceWithFeedback`)
 - `src/lib/progression-calculator.ts` - Handles strength calculations and progressive overload
+- `src/lib/achievement-tracker.ts` - Thin public barrel re-exporting the achievement API (`getBestPerformance`, `getWorkoutPerformance`, `isExerciseUnlocked`, `shouldRetireExercise`, `checkWorkoutAchievements`, `getExerciseStatuses`, `getAvailableExercises`, `checkLadderAdvancements`, plus their types)
+- `src/lib/exercise-performance.ts` - `getBestPerformance` / `getWorkoutPerformance`: best single-set performance queries over workout history (McGill hold-duration aware)
+- `src/lib/exercise-unlock-tracker.ts` - `isExerciseUnlocked`, `shouldRetireExercise`, `checkWorkoutAchievements`: unlock/retirement threshold evaluation for a completed workout
+- `src/lib/exercise-status.ts` - `getExerciseStatuses` / `getAvailableExercises`: derives active/locked/retired status and the available-exercise field whitelist for generation
+- `src/lib/ladder-advancement.ts` - `checkLadderAdvancements`: ladder-rung double-progression advancement for a completed workout
 
 **Key formulas:**
 - Workout targets use **75% of estimated capacity** (sustainable for multiple sets, since calibration tests single-set max)
