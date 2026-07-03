@@ -26,7 +26,7 @@ A development-only tool in the Settings page that allows developers to manually 
 | File | Role |
 |---|---|
 | `src/pages/Settings.tsx` | Custom workout builder UI and `handleCreateCustomWorkout` handler |
-| `src/lib/workout-generator.ts` | Exports `calculateEstimatedDuration` and `findLastPerformanceWithFeedback` |
+| `src/lib/workout-generator.ts` | Barrel re-exporting `calculateEstimatedDuration` (from `workout-duration.ts`) and `findLastPerformanceWithFeedback` (from `workout-history-helpers.ts`) |
 | `src/lib/progression-calculator.ts` | `calculateProgressionWithFeedback`, `calculateMcgillProgression`, `convertLegacyToMcgill` for progressive overload |
 | `src/data/exerciseData.ts` | `allExercises` array and `getExerciseById` for exercise lookup |
 | `src/types/workout.ts` | `Workout`, `WorkoutExercise`, and `Set` type definitions |

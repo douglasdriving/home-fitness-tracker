@@ -32,7 +32,8 @@ For timed: rounds to nearest 5 seconds, minimum change of +/-5s, floor of 10s.
 - `src/pages/WorkoutExecution.tsx` — Collects feedback via `handleIntensityFeedback`, passes ID-keyed map to store
 - `src/components/workout/IntensityFeedback.tsx` — Rating UI component (1-5 scale)
 - `src/store/workout-store.ts` — `completeWorkout()` saves feedback to history entries by exercise ID
-- `src/lib/workout-generator.ts` — `findLastPerformanceWithFeedback()` retrieves feedback from history; `generateWorkout()` applies it
+- `src/lib/workout-history-helpers.ts` — `findLastPerformanceWithFeedback()` retrieves feedback from history
+- `src/lib/exercise-set-builder.ts` — `buildExerciseSets()` applies the feedback-based progression (both re-exported/consumed via the `src/lib/workout-generator.ts` barrel and its generators)
 - `src/lib/progression-calculator.ts` — `calculateProgressionWithFeedback()` computes adjusted targets
 - `src/components/history/WorkoutDetailModal.tsx` — Displays saved feedback per exercise in history detail view
 - `src/types/workout.ts` — `IntensityRating` type (1-5), `CompletedExercise.intensityFeedback` field

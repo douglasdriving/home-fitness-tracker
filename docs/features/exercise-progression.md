@@ -21,7 +21,7 @@ Unlocked and retired exercise IDs are persisted in the user profile's `exerciseA
 - `src/data/exercises.json` — Exercise definitions with unlock requirements and retirement thresholds
 - `src/data/exerciseData.ts` — Exports `allExercises`, `getExerciseById`, `getExerciseEmoji`
 - `src/lib/achievement-tracker.ts` — `checkWorkoutAchievements`, `isExerciseUnlocked`, `shouldRetireExercise`, `getExerciseStatuses`, `getAvailableExercises`
-- `src/lib/workout-generator.ts` — Uses available exercises to build workouts
+- `src/lib/full-body-generator.ts` / `src/lib/daily-rotation-generator.ts` — Use available exercises to build workouts (both re-exported via the `src/lib/workout-generator.ts` barrel)
 - `src/store/user-store.ts` — Persists `exerciseAchievements` (unlocked/retired lists)
 - `docs/EXERCISE-PROGRESSION.md` — Full reference of all exercises, heaviness scores, and unlock chains
 

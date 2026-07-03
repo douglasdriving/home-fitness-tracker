@@ -17,7 +17,13 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 - `src/store/workout-store.ts` - Current workout, history (syncs to Dexie database)
 
 ### Core Algorithm Files
-- `src/lib/workout-generator.ts` - Generates personalized workouts
+- `src/lib/workout-generator.ts` - Thin public barrel re-exporting the generation API (`generateWorkout`, `generateDailyRotationWorkout`, `getNextDailyRotationGroup`, `calculateEstimatedDuration`, `getExerciseLastUsed`, `findLastPerformanceWithFeedback`)
+- `src/lib/full-body-generator.ts` - `generateWorkout`: the 3–4 exercise all-muscle-group generator (4th-exercise balancing, time-constraint trimming)
+- `src/lib/daily-rotation-generator.ts` - `generateDailyRotationWorkout` + `getNextDailyRotationGroup`: single-muscle-group rotation-day generation and rotation sequencing
+- `src/lib/rotation-day-slots.ts` - Role-slot selectors for rotation days (`selectUpperBodyExercises`, `selectPosteriorChainExercises`, `getNextPosteriorChainSlot3Category`)
+- `src/lib/exercise-set-builder.ts` - `buildExerciseSets`: shared per-exercise set construction (McGill → ladder → standard) used by both generators
+- `src/lib/workout-duration.ts` - `calculateEstimatedDuration`: estimated workout length in minutes
+- `src/lib/workout-history-helpers.ts` - History lookups (`getExerciseLastUsed`, `findLastPerformanceWithFeedback`)
 - `src/lib/progression-calculator.ts` - Handles strength calculations and progressive overload
 
 **Key formulas:**

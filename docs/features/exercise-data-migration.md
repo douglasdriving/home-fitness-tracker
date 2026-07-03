@@ -31,5 +31,5 @@ The migration is idempotent — sets that already have `actualReps` are skipped,
 
 - The migration only converts `actualDuration` → `actualReps` on CompletedSet (history). For active workouts, it converts `targetDuration` → `targetReps` on Set. These are different interfaces.
 - If the shoulder taps migration runs before the strength backfill (`backfillStrengthHistory`), the backfill will see `actualReps` and use the reps formula — this is correct behavior. If the backfill already ran, no interaction occurs.
-- The `findLastPerformanceWithFeedback` function in `workout-generator.ts` reads `firstSet.actualReps || firstSet.actualDuration`. After migration, it picks up reps values naturally, so no workout generator changes were needed.
+- The `findLastPerformanceWithFeedback` function in `workout-history-helpers.ts` (re-exported via the `workout-generator.ts` barrel) reads `firstSet.actualReps || firstSet.actualDuration`. After migration, it picks up reps values naturally, so no workout generator changes were needed.
 - Other exercises in the same workout entry are not affected — only `plank-shoulder-taps-001` sets are migrated.

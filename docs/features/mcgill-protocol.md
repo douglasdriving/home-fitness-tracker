@@ -44,7 +44,7 @@ Dynamic timed exercises (Flutter Kicks, Mountain Climbers) and stretching/mobili
 | `src/types/exercise.ts` | `McgillProtocolConfig` interface (incl. optional `holdCeiling`), `structure` and `mcgillDefaults` on `Exercise` |
 | `src/types/workout.ts` | `mcgillRounds` and `mcgillHoldDuration` on `Set` and `CompletedSet` |
 | `src/lib/progression-calculator.ts` | `calculateMcgillProgression()` and `convertLegacyToMcgill()` |
-| `src/lib/workout-generator.ts` | McGill-specific set generation branch in both `generateWorkout()` and `generateDailyRotationWorkout()` |
+| `src/lib/exercise-set-builder.ts` | McGill-specific set generation branch in the shared `buildExerciseSets()`, called by both `generateWorkout()` (full-body-generator.ts) and `generateDailyRotationWorkout()` (daily-rotation-generator.ts) |
 | `src/components/workout/McgillTimer.tsx` | Dedicated McGill timer; `perSide` prop selects bilateral (left/transition/right) vs single-sided (one continuous sequence) state machine |
 | `src/components/workout/ExercisePhase.tsx` | McGill target display; routes McGill exercises to `McgillTimer`, others to `Timer` |
 | `src/utils/mcgill-formatter.ts` | `formatMcgillSet()` helper for consistent "3x10s per side" formatting |
