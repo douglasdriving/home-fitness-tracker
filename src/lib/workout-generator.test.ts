@@ -350,7 +350,9 @@ describe('generateDailyRotationWorkout', () => {
 
   describe('exercise selection', () => {
     it('should select exactly 3 exercises from the specified muscle group', () => {
-      const muscleGroups: MuscleGroup[] = ['abs', 'glutes', 'lowerBack'];
+      // lowerBack was dropped as a rotation day in the 2026-06-17 posterior-chain
+      // consolidation; the live rotation is abs → glutes (posterior chain) → upperBody.
+      const muscleGroups: MuscleGroup[] = ['abs', 'glutes', 'upperBody'];
 
       muscleGroups.forEach(targetMuscleGroup => {
         const workout = generateDailyRotationWorkout({
@@ -805,6 +807,159 @@ describe('generateDailyRotationWorkout', () => {
         const tableRow = workout.exercises.find(ex => ex.exerciseId === 'inverted-rows-001');
         // 15 + 20% = 18 — allowed to keep climbing at the top of the ladder
         expect(tableRow!.sets[0].targetReps).toBe(18);
+      });
+    });
+  });
+
+  describe('posterior chain role-based selection (glutes day, 2026-06-17 consolidation)', () => {
+    const slotOf = (exerciseId: string) => getExerciseById(exerciseId)?.posteriorChainSlot;
+
+    // Build a completed posterior-chain (glutes) session from a list of exercise ids.
+    function posteriorChainHistoryEntry(
+      workoutNumber: number,
+      exerciseIds: string[]
+    ): WorkoutHistoryEntry {
+      return {
+        id: `history-pc-${workoutNumber}`,
+        workoutId: `workout-pc-${workoutNumber}`,
+        workoutNumber,
+        completedDate: Date.now() - (100 - workoutNumber) * 86400000,
+        totalDuration: 20,
+        workoutMode: 'daily-rotation',
+        targetMuscleGroup: 'glutes',
+        exercises: exerciseIds.map(id => ({
+          exerciseId: id,
+          exerciseName: id,
+          muscleGroups: getExerciseById(id)?.muscleGroups ?? (['glutes'] as MuscleGroup[]),
+          completedSets: [{ setNumber: 1, actualReps: 12 }],
+        })),
+      };
+    }
+
+    it('fills exactly one hinge, one glute-builder, and one accessory slot', () => {
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 1,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        hasElasticBands: true,
+      });
+
+      const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
+      expect(workout.exercises).toHaveLength(3);
+      expect(slots).toContain('hinge');
+      expect(slots).toContain('glute-builder');
+      // First-ever posterior-chain session: Slot 3 defaults to spinal-extension.
+      expect(slots).toContain('spinal-extension');
+      expect(slots).not.toContain('lateral-glute');
+    });
+
+    it('only ever selects glutes-primary exercises on the posterior-chain day', () => {
+      for (let i = 0; i < 10; i++) {
+        const workout = generateDailyRotationWorkout({
+          workoutNumber: i + 1,
+          strengthLevels: defaultStrengthLevels,
+          targetMuscleGroup: 'glutes',
+          hasElasticBands: true,
+        });
+        workout.exercises.forEach(ex => {
+          expect(getExerciseById(ex.exerciseId)?.primaryMuscleGroup).toBe('glutes');
+        });
+      }
+    });
+
+    it('always contains a hinge (Slot 1) for a banded user (safety rule)', () => {
+      // Even directly after a session that used the hinge, Slot 1 stays a hinge.
+      const history = [
+        posteriorChainHistoryEntry(1, ['good-morning-001', 'glute-bridge-001', 'back-extension-hold-001']),
+      ];
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        workoutHistory: history,
+        hasElasticBands: true,
+      });
+      expect(workout.exercises.map(ex => slotOf(ex.exerciseId))).toContain('hinge');
+    });
+
+    it('flips Slot 3 to lateral-glute after a spinal-extension session', () => {
+      const history = [
+        posteriorChainHistoryEntry(1, ['good-morning-001', 'glute-bridge-001', 'back-extension-hold-001']),
+      ];
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        workoutHistory: history,
+        hasElasticBands: true,
+      });
+      const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
+      expect(slots).toContain('lateral-glute');
+      expect(slots).not.toContain('spinal-extension');
+    });
+
+    it('flips Slot 3 back to spinal-extension after a lateral-glute session', () => {
+      const history = [
+        posteriorChainHistoryEntry(1, ['good-morning-001', 'glute-bridge-001', 'donkey-kicks-001']),
+      ];
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 2,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        workoutHistory: history,
+        hasElasticBands: true,
+      });
+      const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
+      expect(slots).toContain('spinal-extension');
+      expect(slots).not.toContain('lateral-glute');
+    });
+
+    it('reads the accessory from the most recent posterior-chain session only (ignores abs/upper-body days in between)', () => {
+      // Newest-first history: an abs day sits between now and the last glutes day.
+      const history = [
+        {
+          id: 'history-abs-9',
+          workoutId: 'workout-abs-9',
+          workoutNumber: 9,
+          completedDate: Date.now() - 86400000,
+          totalDuration: 20,
+          workoutMode: 'daily-rotation' as const,
+          targetMuscleGroup: 'abs' as MuscleGroup,
+          exercises: [
+            {
+              exerciseId: 'crunches-001',
+              exerciseName: 'Crunches',
+              muscleGroups: ['abs'] as MuscleGroup[],
+              completedSets: [{ setNumber: 1, actualReps: 15 }],
+            },
+          ],
+        },
+        posteriorChainHistoryEntry(8, ['good-morning-001', 'glute-bridge-001', 'donkey-kicks-001']),
+      ];
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 10,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        workoutHistory: history,
+        hasElasticBands: true,
+      });
+      // Last glutes accessory was lateral-glute → next must be spinal-extension.
+      const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
+      expect(slots).toContain('spinal-extension');
+      expect(slots).not.toContain('lateral-glute');
+    });
+
+    it('gives standard posterior-chain exercises 3 sets and per-side ones 2 sets', () => {
+      const workout = generateDailyRotationWorkout({
+        workoutNumber: 1,
+        strengthLevels: defaultStrengthLevels,
+        targetMuscleGroup: 'glutes',
+        hasElasticBands: true,
+      });
+      workout.exercises.forEach(ex => {
+        const exercise = getExerciseById(ex.exerciseId);
+        const expected = exercise?.countingMethod === 'per-side' ? 2 : 3;
+        expect(ex.sets.length).toBe(expected);
       });
     });
   });

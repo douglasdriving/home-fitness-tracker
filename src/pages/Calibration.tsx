@@ -11,7 +11,10 @@ import Timer from '../components/workout/Timer';
 const CALIBRATION_EXERCISES = [
   { exerciseId: 'plank-001', muscleGroup: 'abs' as const },
   { exerciseId: 'glute-bridge-001', muscleGroup: 'glutes' as const },
-  { exerciseId: 'bird-dog-001', muscleGroup: 'lowerBack' as const },
+  // Back Extension Hold is the lower-back calibration move (Bird Dog was retired
+  // in the 2026-06-17 posterior-chain consolidation). It still lists lowerBack in
+  // its muscleGroups, so it reads the erector/lower-back capacity for strength setup.
+  { exerciseId: 'back-extension-hold-001', muscleGroup: 'lowerBack' as const },
 ];
 
 type CalibrationStep = 'welcome' | 'exercise' | 'complete';

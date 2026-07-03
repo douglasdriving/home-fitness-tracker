@@ -50,8 +50,11 @@ Guiding principle: **stretch a muscle by moving opposite to its action.** Erecto
 - [ ] **Why it matters for Douglas specifically:** (1) trains in the morning when the spine is stiffest/least tolerant of loading (McGill back-science); (2) now adding load (hinges, push-ups) which raises the value of warming up. Injury-prevention evidence is modest for light bodyweight work, but the morning-spine + increasing-load angles make it worthwhile.
 
 ### Posterior-Chain Day Consolidation
-- [ ] **Merge glutes + lower back into one "Posterior-Chain Day."** Rotation becomes Abs → Posterior Chain → [3rd slot TBD]. Removes the dedicated lower-back isolation day.
-- [ ] **Selection by movement role, not random draw** (CONFIRMED 2026-06-18 — 3-slot structure approved; Slot 1 exercises pending Douglas's apartment testing). Fill 3 slots:
+
+> Implemented 2026-07-03 (issue #31): the `glutes` rotation slot is now the Posterior Chain day. `selectPosteriorChainExercises()` fills Slot 1 hinge / Slot 2 glute-builder / Slot 3 rotating accessory, with `getNextPosteriorChainSlot3Category()` alternating spinal-extension (3a) and lateral-glute (3b) from history. Bird Dog retired, Reverse Hyperextension removed, Good Morning band-gated, Reverse Superman + Swimmers added, and Superman / Back Extension Hold reclassified onto the posterior-chain (glutes) day. Calibration's lower-back move swapped Bird Dog → Back Extension Hold. See `docs/features/daily-rotation-mode.md`.
+
+- [x] **Merge glutes + lower back into one "Posterior-Chain Day."** Rotation becomes Abs → Posterior Chain → [3rd slot TBD]. Removes the dedicated lower-back isolation day.
+- [x] **Selection by movement role, not random draw** (CONFIRMED 2026-06-18 — 3-slot structure approved; Slot 1 exercises pending Douglas's apartment testing). Fill 3 slots:
   - Slot 1 — **Hinge** (every session). Pool, grouped by equipment:
     - *Loop-band (test fit):* banded single-leg RDL (confirmed working ✅), banded two-leg RDL/deadlift (stand on band, hold loop in both hands), banded good morning (needs a long loop), band pull-through (needs a low rear anchor)
     - *Household weight (bulletproof, adjustable by adding books/water):* backpack single-leg RDL, backpack good morning, backpack/suitcase deadlift
@@ -60,11 +63,11 @@ Guiding principle: **stretch a muscle by moving opposite to its action.** Erecto
     - **Testing note:** Douglas to trial multiple options against his actual bands + apartment (band length, low anchor availability, room) and keep whichever work. Hinge slot is already covered by banded single-leg RDL + backpack variants regardless of the uncertain band exercises.
   - Slot 2 — **Glute builder** (every session): hip thrust, glute bridge, single-leg glute bridge, frog pumps, banded glute bridge
   - Slot 3 — **Rotating accessory** (alternates): (a) erector extension — superman, reverse superman (leg-lift), back-extension hold, swimmers; (b) glute-med/lateral — clamshells, fire hydrants, lateral band walk, donkey kicks, curtsy lunge
-- [ ] **Safety rule:** every Posterior-Chain session must contain a hinge (Slot 1) AND, on alternating sessions, a direct spinal-extension move (Slot 3a). Don't let both drop out at once.
-- [ ] **Retire bird dog** — motor-control skill mastered at 28 reps/side; more reps just makes it an endurance drill.
-- [ ] **Remove reverse hyperextension** — room can't accommodate it. Floor substitute: reverse superman / leg-lift (added to Slot 3a pool).
-- [ ] **Good morning → banded only** — bodyweight version is too light to load the hinge.
-- [ ] **Add reverse superman (leg-lift) and swimmers** to the lower-back/extension exercise pool (no equipment needed).
+- [x] **Safety rule:** every Posterior-Chain session must contain a hinge (Slot 1) AND, on alternating sessions, a direct spinal-extension move (Slot 3a). Don't let both drop out at once. *(Enforced by the fixed slot structure + history-derived Slot-3 alternation. Known limitation: a band-less user has no hinge, since both hinges are band-only — documented in the feature doc; Douglas has bands.)*
+- [x] **Retire bird dog** — motor-control skill mastered at 28 reps/side; more reps just makes it an endurance drill. *(Deleted from the catalog; calibration's lower-back move is now Back Extension Hold.)*
+- [x] **Remove reverse hyperextension** — room can't accommodate it. Floor substitute: reverse superman / leg-lift (added to Slot 3a pool).
+- [x] **Good morning → banded only** — bodyweight version is too light to load the hinge.
+- [x] **Add reverse superman (leg-lift) and swimmers** to the lower-back/extension exercise pool (no equipment needed).
 
 ### Upper Body Day — 3rd Rotation Slot (CONFIRMED 2026-06-18)
 - [ ] **Rotation is now Abs → Posterior Chain → Upper Body.** Legs ruled out as redundant (Douglas bikes ~60–80 min/day + posterior chain hits hams/glutes).

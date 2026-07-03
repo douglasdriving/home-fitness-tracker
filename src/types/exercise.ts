@@ -47,6 +47,13 @@ export interface Exercise {
   // Only upper body exercises populate this; used by the generator's slot-based
   // selection (wired in the follow-on rotation issue).
   upperBodySlot?: 'horizontal-pull' | 'horizontal-push' | 'vertical-pull' | 'vertical-push';
+  // Movement-role slot for the Posterior Chain rotation day (the reconceived
+  // "glutes" day, coaching 2026-06-17). Only posterior-chain exercises populate
+  // this. Slot 1 = hinge, Slot 2 = glute-builder, Slot 3 alternates between
+  // spinal-extension (erector work) and lateral-glute accessories. Used by the
+  // generator's slot-based selection so lower-back/erector training is never
+  // silently dropped from the rotation.
+  posteriorChainSlot?: 'hinge' | 'glute-builder' | 'spinal-extension' | 'lateral-glute';
   description: string;
   videoUrl?: string;
   imageUrl?: string;

@@ -378,6 +378,7 @@ export function getAvailableExercises(
       primaryMuscleGroup: ex.primaryMuscleGroup,
       muscleGroups: ex.muscleGroups,
       upperBodySlot: ex.upperBodySlot,
+      posteriorChainSlot: ex.posteriorChainSlot,
       description: ex.description,
       videoUrl: ex.videoUrl,
       imageUrl: ex.imageUrl,

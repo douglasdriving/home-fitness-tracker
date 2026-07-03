@@ -45,19 +45,20 @@ describe('exerciseData', () => {
       expect(superman?.unlockRequirement?.value).toBe(16);
     });
 
-    it('should still have all other lower back base exercises', () => {
-      const lowerBackBaseExercises = allExercises.filter(
-        ex => ex.primaryMuscleGroup === 'lowerBack' && !ex.unlockRequirement
-      );
+    it('reclassifies the former lower-back spinal-extension moves onto the posterior-chain (glutes) day', () => {
+      // Posterior-chain consolidation (2026-06-17): lowerBack no longer owns a
+      // rotation day, so its spinal-extension exercises moved to primaryMuscleGroup
+      // 'glutes' (Slot 3a) and no exercise keeps primaryMuscleGroup 'lowerBack'.
+      const lowerBackPrimary = allExercises.filter(ex => ex.primaryMuscleGroup === 'lowerBack');
+      expect(lowerBackPrimary).toHaveLength(0);
 
-      // Bird Dog, Good Morning, and Back Extension Hold should be lower back starters
-      const birdDog = lowerBackBaseExercises.find(ex => ex.id === 'bird-dog-001');
-      const goodMorning = lowerBackBaseExercises.find(ex => ex.id === 'good-morning-001');
-      const backExtensionHold = lowerBackBaseExercises.find(ex => ex.id === 'back-extension-hold-001');
-      expect(birdDog).toBeDefined();
-      expect(goodMorning).toBeDefined();
-      expect(backExtensionHold).toBeDefined();
-      expect(lowerBackBaseExercises.length).toBeGreaterThanOrEqual(3);
+      const goodMorning = getExerciseById('good-morning-001');
+      const backExtensionHold = getExerciseById('back-extension-hold-001');
+      expect(goodMorning?.primaryMuscleGroup).toBe('glutes');
+      expect(backExtensionHold?.primaryMuscleGroup).toBe('glutes');
+      // They still train the lower back — it stays in their muscleGroups.
+      expect(goodMorning?.muscleGroups).toContain('lowerBack');
+      expect(backExtensionHold?.muscleGroups).toContain('lowerBack');
     });
   });
 
@@ -82,37 +83,95 @@ describe('exerciseData', () => {
     });
   });
 
-  describe('Lower back progression chain', () => {
-    it('should have a complete lower back progression chain', () => {
-      const birdDog = getExerciseById('bird-dog-001');
+  describe('Posterior-chain consolidation (coaching 2026-06-17)', () => {
+    it('retires Bird Dog — removed from the catalog and no longer unlocking anything', () => {
+      expect(getExerciseById('bird-dog-001')).toBeUndefined();
+      const unlockedByBirdDog = allExercises.filter(
+        ex => ex.unlockRequirement?.exerciseId === 'bird-dog-001'
+      );
+      expect(unlockedByBirdDog).toHaveLength(0);
+    });
+
+    it('removes Reverse Hyperextension — no room for it (floor substitutes added instead)', () => {
+      expect(getExerciseById('reverse-hyperextension-001')).toBeUndefined();
+      const unlockedByReverseHyper = allExercises.filter(
+        ex => ex.unlockRequirement?.exerciseId === 'reverse-hyperextension-001'
+      );
+      expect(unlockedByReverseHyper).toHaveLength(0);
+    });
+
+    it('band-gates Good Morning (bodyweight is too light to load the hinge)', () => {
       const goodMorning = getExerciseById('good-morning-001');
+      expect(goodMorning?.equipment).toBe('elastic-band');
+      expect(goodMorning?.posteriorChainSlot).toBe('hinge');
+    });
+
+    it('keeps Superman unlocked by Good Morning at 16 reps', () => {
       const superman = getExerciseById('superman-001');
-      const backExtensionHold = getExerciseById('back-extension-hold-001');
-      const reverseHyper = getExerciseById('reverse-hyperextension-001');
-
-      // Verify chain exists
-      expect(birdDog).toBeDefined();
-      expect(goodMorning).toBeDefined();
-      expect(superman).toBeDefined();
-      expect(backExtensionHold).toBeDefined();
-      expect(reverseHyper).toBeDefined();
-
-      // Bird Dog, Good Morning, and Back Extension Hold are starters (no unlock requirement)
-      expect(birdDog?.unlockRequirement).toBeUndefined();
-      expect(goodMorning?.unlockRequirement).toBeUndefined();
-      expect(backExtensionHold?.unlockRequirement).toBeUndefined();
-
-      // Verify locked exercises: Good Morning → Superman
       expect(superman?.unlockRequirement?.exerciseId).toBe('good-morning-001');
+      expect(superman?.unlockRequirement?.value).toBe(16);
+    });
 
-      // Verify continuation: Back Extension Hold → Reverse Hyperextension
-      expect(reverseHyper?.unlockRequirement?.exerciseId).toBe('back-extension-hold-001');
+    it('adds Reverse Superman (Leg-Lift) and Swimmers as no-equipment spinal-extension starters', () => {
+      const reverseSuperman = getExerciseById('reverse-superman-001');
+      const swimmers = getExerciseById('swimmers-001');
+
+      [reverseSuperman, swimmers].forEach(ex => {
+        expect(ex).toBeDefined();
+        expect(ex?.primaryMuscleGroup).toBe('glutes');
+        expect(ex?.posteriorChainSlot).toBe('spinal-extension');
+        expect(ex?.unlockRequirement).toBeUndefined(); // starters
+        expect(ex?.equipment).toBeUndefined(); // no bands needed
+        expect(ex?.muscleGroups).toContain('lowerBack');
+      });
+    });
+  });
+
+  describe('Posterior Chain day pool (3-slot role structure)', () => {
+    const posteriorChainExercises = () =>
+      allExercises.filter(ex => ex.posteriorChainSlot !== undefined);
+
+    it('tags only glutes-primary exercises with a posteriorChainSlot', () => {
+      posteriorChainExercises().forEach(ex => {
+        expect(ex.primaryMuscleGroup).toBe('glutes');
+      });
+    });
+
+    it('populates all four movement roles', () => {
+      const bySlot = new Map<string, string[]>();
+      posteriorChainExercises().forEach(ex => {
+        const slot = ex.posteriorChainSlot!;
+        bySlot.set(slot, [...(bySlot.get(slot) ?? []), ex.id]);
+      });
+
+      expect(bySlot.get('hinge')?.length).toBeGreaterThanOrEqual(1);
+      expect(bySlot.get('glute-builder')?.length).toBeGreaterThanOrEqual(1);
+      expect(bySlot.get('spinal-extension')?.length).toBeGreaterThanOrEqual(2);
+      expect(bySlot.get('lateral-glute')?.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('exposes at least one no-equipment spinal-extension starter (guarantees Slot 3a is always fillable)', () => {
+      const spinalStarters = posteriorChainExercises().filter(
+        ex => ex.posteriorChainSlot === 'spinal-extension'
+          && !ex.unlockRequirement
+          && ex.equipment !== 'elastic-band'
+      );
+      expect(spinalStarters.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it('uses only the four defined slot roles', () => {
+      const validSlots = ['hinge', 'glute-builder', 'spinal-extension', 'lateral-glute'];
+      posteriorChainExercises().forEach(ex => {
+        expect(validSlots).toContain(ex.posteriorChainSlot);
+      });
     });
   });
 
   describe('Starter exercises per muscle group', () => {
     it('should have at least 3 starter exercises per primary muscle group (without bands)', () => {
-      const muscleGroups = ['abs', 'glutes', 'lowerBack', 'upperBody'] as const;
+      // lowerBack is excluded: after the posterior-chain consolidation (2026-06-17)
+      // it no longer owns a rotation day, so no exercise keeps it as primaryMuscleGroup.
+      const muscleGroups = ['abs', 'glutes', 'upperBody'] as const;
 
       muscleGroups.forEach(group => {
         const starters = allExercises.filter(

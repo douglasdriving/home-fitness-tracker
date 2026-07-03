@@ -21,7 +21,7 @@
 |---|---|---|
 | Coaching Tips | Persistent form cues and safety notes displayed on workout screen during exercise execution | [coaching-tips.md](coaching-tips.md) |
 | Custom Workout Builder | Dev-only tool to manually select exercises and create custom workouts for testing | [custom-workout-builder.md](custom-workout-builder.md) |
-| Daily Rotation Mode | Shorter muscle-group-focused workouts rotating through abs, glutes, upper body with group-specific stretching; upper body day uses a 3-slot role structure (horizontal-pull, horizontal-push, alternating vertical) | [daily-rotation-mode.md](daily-rotation-mode.md) |
+| Daily Rotation Mode | Shorter muscle-group-focused workouts rotating through abs, glutes (Posterior Chain day), upper body with group-specific stretching. The Posterior Chain day uses a 3-slot role structure (hinge, glute-builder, accessory alternating spinal-extension/lateral-glute); the upper body day uses a 3-slot structure (horizontal-pull, horizontal-push, vertical-push) | [daily-rotation-mode.md](daily-rotation-mode.md) |
 | Exercise Emoji Icons | Visually representative emoji icons displayed before exercise names across all views | [exercise-emoji-icons.md](exercise-emoji-icons.md) |
 | Exercise Data Migration | Converts historical workout data when an exercise changes type (e.g., timed to reps) | [exercise-data-migration.md](exercise-data-migration.md) |
 | Exercise Progression | Unlock chains and retirement thresholds that advance users through harder exercises | [exercise-progression.md](exercise-progression.md) |
