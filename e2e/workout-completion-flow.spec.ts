@@ -30,10 +30,15 @@ test.describe('Workout Completion Flow', () => {
           lowerBack: 30,
           lastUpdated: Date.now(),
         },
-        preferences: { autoShowStretching: true },
       }));
     });
     await page.reload();
+  }
+
+  // Skip the meditation timer that follows stretching to reach workout complete.
+  async function skipMeditation(page: import('@playwright/test').Page) {
+    await expect(page.locator('h1').filter({ hasText: /meditation/i })).toBeVisible({ timeout: 10000 });
+    await page.locator('button:has-text("Skip")').first().click();
   }
 
   async function completeWorkout(page: import('@playwright/test').Page) {
@@ -75,7 +80,7 @@ test.describe('Workout Completion Flow', () => {
     }
   }
 
-  test('completing a workout navigates to stretching first, then workout complete', async ({ page }) => {
+  test('completing a workout navigates to stretching, then meditation, then workout complete', async ({ page }) => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
 
@@ -85,10 +90,13 @@ test.describe('Workout Completion Flow', () => {
     // Should see Skip All button on stretching page
     await expect(page.getByText(/skip all/i)).toBeVisible();
 
-    // Skip stretching to get to workout complete
+    // Skip stretching to chain into meditation
     // Use page.on('dialog') to auto-accept the confirm dialog
     page.on('dialog', dialog => dialog.accept());
     await page.getByText(/skip all/i).click();
+
+    // Skip meditation to reach workout complete
+    await skipMeditation(page);
 
     // Should now be on workout complete page
     await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
@@ -98,9 +106,10 @@ test.describe('Workout Completion Flow', () => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
 
-    // Skip stretching
+    // Skip stretching, then meditation
     page.on('dialog', dialog => dialog.accept());
     await page.getByText(/skip all/i).click();
+    await skipMeditation(page);
 
     // Should see workout complete
     await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
@@ -123,9 +132,10 @@ test.describe('Workout Completion Flow', () => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
 
-    // Skip stretching
+    // Skip stretching, then meditation
     page.on('dialog', dialog => dialog.accept());
     await page.getByText(/skip all/i).click();
+    await skipMeditation(page);
 
     // Wait for workout complete
     await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
@@ -135,33 +145,6 @@ test.describe('Workout Completion Flow', () => {
 
     // Should be back on dashboard
     await expect(page).toHaveURL('/');
-  });
-
-  test('workout complete with stretching disabled skips stretching page', async ({ page }) => {
-    // Setup user with stretching disabled
-    await page.evaluate(() => {
-      localStorage.setItem('fitness-tracker-user-profile', JSON.stringify({
-        userId: 'test-user',
-        createdDate: Date.now(),
-        calibrationCompleted: true,
-        strengthLevels: {
-          abs: 30,
-          glutes: 30,
-          lowerBack: 30,
-          lastUpdated: Date.now(),
-        },
-        preferences: { autoShowStretching: false },
-      }));
-    });
-    await page.reload();
-
-    await completeWorkout(page);
-
-    // Should go directly to workout complete (no stretching page)
-    await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
-
-    // Should show exercise performance
-    await expect(page.getByText(/exercise performance/i)).toBeVisible();
   });
 
   test('milestones route redirects to home (removed page)', async ({ page }) => {

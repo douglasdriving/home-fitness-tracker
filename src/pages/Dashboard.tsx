@@ -141,7 +141,6 @@ export default function Dashboard() {
 
     try {
       const isResuming = currentWorkout.status === 'in-progress';
-      const autoShowWarmup = profile?.preferences?.autoShowWarmup ?? true;
 
       await startWorkout(currentWorkout.id);
 
@@ -151,7 +150,7 @@ export default function Dashboard() {
       // workout is still in progress, resume it; otherwise go to the exercises.
       const resumeWarmupState = isResuming ? getActiveWarmupState(currentWorkout.id) : null;
 
-      if (autoShowWarmup && !isResuming) {
+      if (!isResuming) {
         navigate('/warmup', {
           state: {
             workoutId: currentWorkout.id,

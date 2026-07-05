@@ -347,7 +347,7 @@ test.describe('Week-Based Streak System', () => {
 
     // Other settings should still be visible
     await expect(page.getByText('Equipment')).toBeVisible();
-    await expect(page.getByText('Preferences')).toBeVisible();
+    await expect(page.getByText('Backup & Restore')).toBeVisible();
   });
 
   test('best streak is shown when higher than current streak', async ({ page }) => {

@@ -252,29 +252,14 @@ export default function WorkoutExecution() {
         ladderAdvancements: ladderAdvancements.length > 0 ? ladderAdvancements : undefined,
       };
 
-      // New flow: stretching first (if enabled), then meditation (if enabled), then workout complete
-      const autoShowStretching = profile?.preferences?.autoShowStretching ?? true;
-      const autoShowMeditation = profile?.preferences?.autoShowMeditation ?? true;
-
-      if (autoShowStretching) {
-        navigate('/stretching', {
-          state: {
-            workoutId: historyEntry.workoutId,
-            completionState,
-            targetMuscleGroup: currentWorkout.targetMuscleGroup,
-          },
-        });
-      } else if (autoShowMeditation) {
-        // Stretching disabled but meditation enabled - go directly to meditation
-        navigate('/meditation', {
-          state: {
-            completionState,
-            workoutId: historyEntry.workoutId,
-          },
-        });
-      } else {
-        navigate('/workout-complete', { state: completionState });
-      }
+      // New flow: stretching first, then meditation, then workout complete
+      navigate('/stretching', {
+        state: {
+          workoutId: historyEntry.workoutId,
+          completionState,
+          targetMuscleGroup: currentWorkout.targetMuscleGroup,
+        },
+      });
     } catch (error) {
       console.error('Error completing workout:', error);
       alert('Failed to complete workout. Please try again.');

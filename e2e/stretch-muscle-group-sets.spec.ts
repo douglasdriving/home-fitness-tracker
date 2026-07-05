@@ -35,7 +35,6 @@ test.describe('Daily Rotation Stretch Sets', () => {
           lastUpdated: Date.now(),
         },
         exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
-        preferences: { autoShowStretching: true, autoShowMeditation: false },
       }));
     });
     await page.reload();

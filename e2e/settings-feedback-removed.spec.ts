@@ -7,7 +7,6 @@ test.describe('Settings Page - Feedback Section Removed', () => {
 
     // Verify we're on the settings page by checking for known sections
     await expect(page.getByText('Equipment')).toBeVisible();
-    await expect(page.getByText('Preferences')).toBeVisible();
     await expect(page.getByText('Backup & Restore')).toBeVisible();
     await expect(page.getByText('Danger Zone')).toBeVisible();
 

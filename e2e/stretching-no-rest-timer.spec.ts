@@ -27,7 +27,6 @@ test.describe('Stretching Routine - No Rest Timer Between Stretches', () => {
           lowerBack: 30,
           lastUpdated: Date.now(),
         },
-        preferences: { autoShowStretching: true },
       }));
     });
     await page.reload();

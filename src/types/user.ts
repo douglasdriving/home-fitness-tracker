@@ -24,11 +24,6 @@ export interface UserProfile {
     hasElasticBands?: boolean;
   };
   excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
-  preferences?: {
-    autoShowWarmup?: boolean; // Auto-show dynamic warmup before workouts (default: true)
-    autoShowStretching?: boolean; // Auto-show stretching after workouts (default: true)
-    autoShowMeditation?: boolean; // Auto-show meditation after stretching (default: true)
-  };
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   hasMigratedShoulderTaps?: boolean; // Flag to track if plank shoulder taps migration has been completed
   weight?: number; // kg

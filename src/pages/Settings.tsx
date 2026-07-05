@@ -17,7 +17,7 @@ import type { Workout, WorkoutExercise, Set, WorkoutHistoryEntry } from '../type
 
 export default function Settings() {
   const navigate = useNavigate();
-  const { profile, initializeUser, updateEquipment, updatePreferences, includeExercise } = useUserStore();
+  const { profile, initializeUser, updateEquipment, includeExercise } = useUserStore();
   const { loadWorkouts } = useWorkoutStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
@@ -452,57 +452,6 @@ export default function Settings() {
                 <div className="font-medium text-text">Elastic Loop Bands</div>
                 <div className="text-xs text-text-muted">
                   Includes elastic loop band exercises like clamshells and fire hydrants.
-                </div>
-              </div>
-            </label>
-          </div>
-        </div>
-
-        {/* Preferences */}
-        <div className="border-b border-background-lighter pb-6">
-          <h2 className="text-lg font-semibold text-text mb-4">Preferences</h2>
-          <div className="space-y-3">
-            <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
-              <input
-                type="checkbox"
-                checked={profile?.preferences?.autoShowWarmup ?? true}
-                onChange={(e) => updatePreferences({ autoShowWarmup: e.target.checked })}
-                className="w-5 h-5 text-orange-500 rounded focus:ring-2 focus:ring-orange-500"
-              />
-              <div>
-                <div className="font-medium text-text">Pre-Workout Warmup</div>
-                <div className="text-xs text-text-muted">
-                  Automatically show a short dynamic warmup before starting workouts.
-                </div>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-3 p-3 bg-background-light rounded-lg cursor-pointer hover:bg-background-lighter transition-colors">
-              <input
-                type="checkbox"
-                checked={profile?.preferences?.autoShowStretching ?? true}
-                onChange={(e) => updatePreferences({ autoShowStretching: e.target.checked })}
-                className="w-5 h-5 text-purple-600 rounded focus:ring-2 focus:ring-purple-600"
-              />
-              <div>
-                <div className="font-medium text-text">Post-Workout Stretching</div>
-                <div className="text-xs text-text-muted">
-                  Automatically show stretching routine option after completing workouts.
-                </div>
-              </div>
-            </label>
-
-            <label className="flex items-center gap-3 cursor-pointer p-3 bg-background-light rounded-lg hover:bg-background-lighter transition-colors">
-              <input
-                type="checkbox"
-                checked={profile?.preferences?.autoShowMeditation ?? true}
-                onChange={(e) => updatePreferences({ autoShowMeditation: e.target.checked })}
-                className="w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary"
-              />
-              <div>
-                <div className="font-medium text-text">Post-Workout Meditation</div>
-                <div className="text-xs text-text-muted">
-                  Show a guided meditation timer after stretching to build a mindfulness habit.
                 </div>
               </div>
             </label>
