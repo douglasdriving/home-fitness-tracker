@@ -22,6 +22,7 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 - `src/lib/daily-rotation-generator.ts` - `generateDailyRotationWorkout` + `getNextDailyRotationGroup`: single-muscle-group rotation-day generation and rotation sequencing
 - `src/lib/rotation-day-slots.ts` - Role-slot selectors for rotation days (`selectUpperBodyExercises`, `selectPosteriorChainExercises`, `getNextPosteriorChainSlot3Category`)
 - `src/lib/exercise-set-builder.ts` - `buildExerciseSets`: shared per-exercise set construction (McGill → ladder → standard) used by both generators
+- `src/lib/custom-workout-builder.ts` - `buildCustomWorkout(exerciseIds, setsCount)`: builds + persists a pending custom full-body workout (McGill vs standard progression) for the dev-only Custom Workout Builder
 - `src/lib/workout-duration.ts` - `calculateEstimatedDuration`: estimated workout length in minutes
 - `src/lib/workout-history-helpers.ts` - History lookups (`getExerciseLastUsed`, `findLastPerformanceWithFeedback`)
 - `src/lib/progression-calculator.ts` - Handles strength calculations and progressive overload
@@ -52,7 +53,17 @@ Routes defined in `src/App.tsx`. Main pages in `src/pages/`:
 - `WorkoutComplete.tsx` - Per-exercise progression data, PB tracking, integrated milestones
 - `History.tsx` - Past workout records
 - `ExerciseLibrary.tsx` - Browse exercises
-- `Settings.tsx` - User settings, reset options
+- `Settings.tsx` - Thin container that composes the settings section components (below) in order
+
+### Settings Section Components
+`Settings.tsx` is split into single-responsibility sections in `src/components/settings/`:
+- `CalibrationResults.tsx` - Read-only display of the latest calibration results
+- `ExcludedExercisesSection.tsx` - Lists excluded exercises with re-include buttons
+- `InstallAppSection.tsx` - PWA install (owns the `beforeinstallprompt` listener + iOS instructions)
+- `BackupRestoreSection.tsx` - Export/import full-data JSON backup
+- `DangerZoneSection.tsx` - Reset fitness levels / clear all data
+- `DeveloperTools.tsx` - Development-only seed/clear history tools; hosts `CustomWorkoutBuilder`
+- `CustomWorkoutBuilder.tsx` - Dev-only exercise-picker UI; delegates construction to `buildCustomWorkout`
 
 ### Layout Conventions
 - Max width: 640px (`max-w-md`)
