@@ -108,7 +108,6 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         strengthLevels: userProfile.strengthLevels,
         recentExerciseIds,
         workoutHistory,
-        hasElasticBands: userProfile.equipment?.hasElasticBands || false,
         excludedExerciseIds: userProfile.excludedExercises || [],
         timeConstraintMinutes,
         exerciseAchievements: userProfile.exerciseAchievements || { unlockedExercises: [], retiredExercises: [] },
@@ -166,7 +165,6 @@ export const useWorkoutStore = create<WorkoutStore>((set, get) => ({
         strengthLevels: userProfile.strengthLevels,
         targetMuscleGroup,
         workoutHistory,
-        hasElasticBands: userProfile.equipment?.hasElasticBands || false,
         excludedExerciseIds: userProfile.excludedExercises || [],
         exerciseAchievements: userProfile.exerciseAchievements || { unlockedExercises: [], retiredExercises: [] },
       });

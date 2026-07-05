@@ -346,7 +346,6 @@ test.describe('Week-Based Streak System', () => {
     await expect(page.getByText(/Work out every\.\.\./i)).not.toBeVisible();
 
     // Other settings should still be visible
-    await expect(page.getByText('Equipment')).toBeVisible();
     await expect(page.getByText('Backup & Restore')).toBeVisible();
   });
 

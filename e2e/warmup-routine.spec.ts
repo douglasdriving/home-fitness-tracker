@@ -26,7 +26,6 @@ test.describe('Pre-Workout Warmup', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: {
           abs: 30,
           glutes: 30,

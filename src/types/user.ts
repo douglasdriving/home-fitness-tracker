@@ -20,9 +20,6 @@ export interface UserProfile {
   calibrationCompleted: boolean;
   calibrationData?: CalibrationData;
   strengthLevels: StrengthLevels;
-  equipment?: {
-    hasElasticBands?: boolean;
-  };
   excludedExercises?: string[]; // Array of exercise IDs to exclude from workouts
   hasBackfilledStrengthData?: boolean; // Flag to track if strength history backfill has been completed
   hasMigratedShoulderTaps?: boolean; // Flag to track if plank shoulder taps migration has been completed

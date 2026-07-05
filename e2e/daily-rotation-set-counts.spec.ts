@@ -24,7 +24,6 @@ test.describe('Daily Rotation Set Counts', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: {
           abs: 30,
           glutes: 30,
@@ -74,7 +73,6 @@ test.describe('Daily Rotation Set Counts', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: false,
         strengthLevels: {
           abs: 30,
           glutes: 30,
@@ -124,7 +122,6 @@ test.describe('Daily Rotation Set Counts', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: {
           abs: 30,
           glutes: 30,
@@ -175,7 +172,6 @@ test.describe('Daily Rotation Set Counts', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: {
           abs: 30,
           glutes: 30,

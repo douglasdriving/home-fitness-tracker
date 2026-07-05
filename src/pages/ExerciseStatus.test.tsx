@@ -3,14 +3,13 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import ExerciseStatus from './ExerciseStatus';
 
-// A calibrated profile with no equipment and no prior achievements, so the
-// default (band-free, no-unlock) exercises show as active.
+// A calibrated profile with no prior achievements, so the default (no-unlock)
+// exercises show as active.
 const mockProfile = {
   userId: 'test-user',
   createdDate: Date.now(),
   calibrationCompleted: true,
   strengthLevels: { abs: 30, glutes: 30, lowerBack: 30, upperBody: 30, lastUpdated: Date.now() },
-  equipment: { hasElasticBands: false },
   exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
 };
 

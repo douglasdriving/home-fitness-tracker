@@ -20,7 +20,6 @@ vi.mock('../store/user-store', () => ({
         unlockedExercises: [],
         retiredExercises: [],
       },
-      equipment: { hasElasticBands: false },
     },
   }),
 }));

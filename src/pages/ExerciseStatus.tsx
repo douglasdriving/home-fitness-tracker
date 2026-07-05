@@ -40,8 +40,7 @@ export default function ExerciseStatus() {
       retiredExercises: [],
     };
 
-    const hasElasticBands = profile.equipment?.hasElasticBands ?? false;
-    const statuses = getExerciseStatuses(workoutHistory, achievements, hasElasticBands);
+    const statuses = getExerciseStatuses(workoutHistory, achievements);
     setExercises(statuses);
   }, [profile, workoutHistory]);
 
@@ -134,17 +133,8 @@ export default function ExerciseStatus() {
                       {formatMuscleGroups(exercise.muscleGroups)}
                     </div>
 
-                    {/* Equipment requirement for locked exercises */}
-                    {exercise.status === 'locked' && exercise.needsEquipment && (
-                      <div className="mt-2">
-                        <div className="text-xs text-purple-400">
-                          Requires resistance band (enable in Settings)
-                        </div>
-                      </div>
-                    )}
-
                     {/* Unlock progress for locked exercises */}
-                    {exercise.status === 'locked' && exercise.unlockProgress && !exercise.needsEquipment && (
+                    {exercise.status === 'locked' && exercise.unlockProgress && (
                       <div className="mt-2">
                         <div className="text-xs text-text-muted">
                           {exercise.unlockProgress.currentValue}/{exercise.unlockProgress.requiredValue}{' '}

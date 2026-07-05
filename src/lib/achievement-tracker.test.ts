@@ -442,7 +442,7 @@ describe('Achievement Tracker', () => {
       };
 
       // With no crunches history, flutter kicks should be locked
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
 
       const flutterKicks = available.find(ex => ex.id === 'flutter-kicks-001');
       expect(flutterKicks).toBeUndefined();
@@ -454,7 +454,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: ['crunches-001'],
       };
 
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
 
       const crunches = available.find(ex => ex.id === 'crunches-001');
       expect(crunches).toBeUndefined();
@@ -466,7 +466,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
 
       // Crunches and Plank should be available (no unlock requirements)
       const crunches = available.find(ex => ex.id === 'crunches-001');
@@ -482,7 +482,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false, ['crunches-001']);
+      const available = getAvailableExercises([], achievements, ['crunches-001']);
 
       const crunches = available.find(ex => ex.id === 'crunches-001');
       expect(crunches).toBeUndefined();
@@ -496,31 +496,19 @@ describe('Achievement Tracker', () => {
 
       // Do 45 crunches - should unlock flutter kicks
       const history = [createHistoryEntry('crunches-001', 45)];
-      const available = getAvailableExercises(history, achievements, false);
+      const available = getAvailableExercises(history, achievements);
 
       const flutterKicks = available.find(ex => ex.id === 'flutter-kicks-001');
       expect(flutterKicks).toBeDefined();
     });
 
-    it('filters band exercises when user has no bands', () => {
+    it('always includes band exercises (equipment gate removed)', () => {
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false);
-
-      const bandClamshells = available.find(ex => ex.id === 'band-clamshells-001');
-      expect(bandClamshells).toBeUndefined();
-    });
-
-    it('includes band exercises when user has bands', () => {
-      const achievements: ExerciseAchievements = {
-        unlockedExercises: [],
-        retiredExercises: [],
-      };
-
-      const available = getAvailableExercises([], achievements, true);
+      const available = getAvailableExercises([], achievements);
 
       const bandClamshells = available.find(ex => ex.id === 'band-clamshells-001');
       expect(bandClamshells).toBeDefined();
@@ -536,7 +524,7 @@ describe('Achievement Tracker', () => {
 
       // Do 45 crunches - unlocks flutter kicks, but NOT leg raises (needs 45s flutter kicks)
       const history = [createHistoryEntry('crunches-001', 45)];
-      const available = getAvailableExercises(history, achievements, false);
+      const available = getAvailableExercises(history, achievements);
 
       const flutterKicks = available.find(ex => ex.id === 'flutter-kicks-001');
       const legRaises = available.find(ex => ex.id === 'leg-raises-001');
@@ -553,7 +541,7 @@ describe('Achievement Tracker', () => {
 
       // Do 50s flutter kicks - should unlock leg raises
       const history = [createHistoryEntry('flutter-kicks-001', undefined, 50)];
-      const available = getAvailableExercises(history, achievements, false);
+      const available = getAvailableExercises(history, achievements);
 
       const legRaises = available.find(ex => ex.id === 'leg-raises-001');
       expect(legRaises).toBeDefined();
@@ -664,65 +652,47 @@ describe('Achievement Tracker', () => {
   });
 
   describe('getExerciseStatuses', () => {
-    it('shows band exercises as locked with needsEquipment when user has no bands', () => {
+    it('shows band exercises as active when they have no unlock requirement', () => {
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
         retiredExercises: [],
       };
 
-      const statuses = getExerciseStatuses([], achievements, false);
+      const statuses = getExerciseStatuses([], achievements);
 
-      const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
-      expect(singleLegRdl).toBeDefined();
-      expect(singleLegRdl?.status).toBe('locked');
-      expect(singleLegRdl?.needsEquipment).toBe(true);
-    });
-
-    it('shows band exercises with normal status when user has bands', () => {
-      const achievements: ExerciseAchievements = {
-        unlockedExercises: [],
-        retiredExercises: [],
-      };
-
-      const statuses = getExerciseStatuses([], achievements, true);
-
-      // Band Clamshells has no unlock requirement, should be active
+      // Band Clamshells is an elastic-band exercise with no unlock requirement,
+      // so it is active now that the equipment gate is removed.
       const clamshells = statuses.find(ex => ex.id === 'band-clamshells-001');
       expect(clamshells).toBeDefined();
       expect(clamshells?.status).toBe('active');
-      expect(clamshells?.needsEquipment).toBeUndefined();
+    });
 
-      // Single-Leg RDL has unlock requirement, should be locked (not needsEquipment)
+    it('still locks band exercises that have an unmet unlock requirement', () => {
+      const achievements: ExerciseAchievements = {
+        unlockedExercises: [],
+        retiredExercises: [],
+      };
+
+      const statuses = getExerciseStatuses([], achievements);
+
+      // Single-Leg RDL is a band exercise but has an unlock requirement, so it
+      // remains locked for that reason (not equipment).
       const singleLegRdl = statuses.find(ex => ex.id === 'single-leg-rdl-001');
       expect(singleLegRdl).toBeDefined();
       expect(singleLegRdl?.status).toBe('locked');
-      expect(singleLegRdl?.needsEquipment).toBeUndefined();
     });
 
-    it('includes all exercises in statuses regardless of equipment', () => {
+    it('includes band exercises with no unlock requirement in available exercises', () => {
       const achievements: ExerciseAchievements = {
         unlockedExercises: [],
         retiredExercises: [],
       };
 
-      const statusesNoBands = getExerciseStatuses([], achievements, false);
-      const statusesWithBands = getExerciseStatuses([], achievements, true);
+      const available = getAvailableExercises([], achievements);
 
-      // Both should include all 31 exercises
-      expect(statusesNoBands.length).toBe(statusesWithBands.length);
-    });
-
-    it('excludes equipment-gated exercises from available exercises (workout generation)', () => {
-      const achievements: ExerciseAchievements = {
-        unlockedExercises: [],
-        retiredExercises: [],
-      };
-
-      const available = getAvailableExercises([], achievements, false);
-
-      // Band exercises should NOT be available for workout generation
-      const singleLegRdl = available.find(ex => ex.id === 'single-leg-rdl-001');
-      expect(singleLegRdl).toBeUndefined();
+      // Band exercises are always available for workout generation now.
+      const clamshells = available.find(ex => ex.id === 'band-clamshells-001');
+      expect(clamshells).toBeDefined();
     });
   });
 
@@ -758,7 +728,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
 
       // Should have some exercises (the ones without unlock requirements)
       expect(available.length).toBeGreaterThan(0);
@@ -791,7 +761,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
       const crunches = available.find(ex => ex.id === 'crunches-001');
 
       expect(crunches).toBeDefined();
@@ -807,7 +777,7 @@ describe('Achievement Tracker', () => {
         retiredExercises: [],
       };
 
-      const available = getAvailableExercises([], achievements, false);
+      const available = getAvailableExercises([], achievements);
       const tableRow = available.find(ex => ex.id === 'inverted-rows-001');
 
       expect(tableRow?.ladder).toBeDefined();
