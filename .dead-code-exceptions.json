@@ -28,7 +28,8 @@
   "files": [
     "src/vite-env.d.ts",
     "src/__test_dead_code__.ts",
-    "src/test/setup.ts"
+    "src/test/setup.ts",
+    "src/lib/achievement-fixtures.ts"
   ],
   "exports": [
     "src/App.tsx:default"
