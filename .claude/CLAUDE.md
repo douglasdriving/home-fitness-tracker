@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A Progressive Web App (PWA) for home fitness tracking focused on core exercises (abs, glutes, lower back). Users calibrate their fitness level, then the app generates personalized workouts with progressive overload. All data is stored client-side using IndexedDB and localStorage.
+A Progressive Web App (PWA) for home fitness tracking, focused on core strength (abs, glutes, lower back) with an added upper-body track. Users calibrate their fitness level, then the app generates personalized workouts with progressive overload — either full-body sessions or single-muscle-group daily-rotation days. Sessions are wrapped with a pre-workout warmup and post-workout stretching + meditation. All data is stored client-side using IndexedDB and localStorage.
 
 **Stack:** React 18 + TypeScript + Vite, Zustand (state), Dexie (IndexedDB), Tailwind CSS, vite-plugin-pwa
 
