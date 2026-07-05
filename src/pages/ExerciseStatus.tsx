@@ -5,12 +5,22 @@ import { getExerciseStatuses, ExerciseWithStatus } from '../lib/achievement-trac
 import { MuscleGroup } from '../types/exercise';
 
 type FilterTab = 'active' | 'locked' | 'retired';
+type MuscleFilter = 'all' | MuscleGroup;
+
+const MUSCLE_FILTERS: { value: MuscleFilter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'abs', label: 'Abs' },
+  { value: 'glutes', label: 'Glutes' },
+  { value: 'lowerBack', label: 'Lower Back' },
+  { value: 'upperBody', label: 'Upper Body' },
+];
 
 export default function ExerciseStatus() {
   const { profile, restoreRetiredExercise } = useUserStore();
   const { workoutHistory, loadWorkouts } = useWorkoutStore();
   const [exercises, setExercises] = useState<ExerciseWithStatus[]>([]);
   const [activeTab, setActiveTab] = useState<FilterTab>('active');
+  const [muscleFilter, setMuscleFilter] = useState<MuscleFilter>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,12 +45,16 @@ export default function ExerciseStatus() {
     setExercises(statuses);
   }, [profile, workoutHistory]);
 
-  const filteredExercises = exercises.filter(ex => ex.status === activeTab);
+  const matchesMuscle = (ex: ExerciseWithStatus) =>
+    muscleFilter === 'all' || ex.muscleGroups.includes(muscleFilter);
+
+  const muscleFilteredExercises = exercises.filter(matchesMuscle);
+  const filteredExercises = muscleFilteredExercises.filter(ex => ex.status === activeTab);
 
   const counts = {
-    active: exercises.filter(ex => ex.status === 'active').length,
-    locked: exercises.filter(ex => ex.status === 'locked').length,
-    retired: exercises.filter(ex => ex.status === 'retired').length,
+    active: muscleFilteredExercises.filter(ex => ex.status === 'active').length,
+    locked: muscleFilteredExercises.filter(ex => ex.status === 'locked').length,
+    retired: muscleFilteredExercises.filter(ex => ex.status === 'retired').length,
   };
 
   const formatMuscleGroups = (groups: MuscleGroup[]) => {
@@ -65,6 +79,23 @@ export default function ExerciseStatus() {
   return (
     <div className="bg-background min-h-screen pb-20">
       <div className="p-4">
+        {/* Muscle Group Filter */}
+        <div className="flex gap-2 overflow-x-auto pb-2 mb-3">
+          {MUSCLE_FILTERS.map((option) => (
+            <button
+              key={option.value}
+              onClick={() => setMuscleFilter(option.value)}
+              className={`px-3 py-1.5 rounded-lg text-sm font-medium whitespace-nowrap transition-colors ${
+                muscleFilter === option.value
+                  ? 'bg-primary text-background'
+                  : 'bg-background-light text-text border border-background-lighter hover:bg-background-lighter'
+              }`}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         {/* Tab Navigation */}
         <div className="flex border-b border-background-lighter mb-4">
           {(['active', 'locked', 'retired'] as FilterTab[]).map(tab => (
