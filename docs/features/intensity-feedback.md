@@ -10,7 +10,7 @@ After completing all sets of an exercise, users rate its difficulty on a 1-5 sca
 2. `IntensityFeedback` component appears, user selects a rating (1-5), which immediately proceeds to the next exercise or completes the workout (no separate submit step)
 3. Rating is stored in a React state map keyed by **exercise ID** (not index)
 4. When the last exercise is rated, `completeWorkout(feedbackMap)` is called
-5. `workout-store.ts` maps each exercise to its feedback by exercise ID and saves to IndexedDB history
+5. `workout-session-slice.ts` (`completeWorkout`, composed into `useWorkoutStore`) maps each exercise to its feedback by exercise ID and saves to IndexedDB history
 6. Next workout generation: `findLastPerformanceWithFeedback()` retrieves the most recent performance + feedback for each exercise from history
 7. `calculateProgressionWithFeedback()` applies the adjustment multiplier to compute the new target
 
@@ -31,7 +31,7 @@ For timed: rounds to nearest 5 seconds, minimum change of +/-5s, floor of 10s.
 
 - `src/pages/WorkoutExecution.tsx` — Collects feedback via `handleIntensityFeedback`, passes ID-keyed map to store
 - `src/components/workout/IntensityFeedback.tsx` — Rating UI component (1-5 scale)
-- `src/store/workout-store.ts` — `completeWorkout()` saves feedback to history entries by exercise ID
+- `src/store/workout-session-slice.ts` — `completeWorkout()` saves feedback to history entries by exercise ID (composed into `useWorkoutStore`)
 - `src/lib/workout-history-helpers.ts` — `findLastPerformanceWithFeedback()` retrieves feedback from history
 - `src/lib/exercise-set-builder.ts` — `buildExerciseSets()` applies the feedback-based progression (both re-exported/consumed via the `src/lib/workout-generator.ts` barrel and its generators)
 - `src/lib/progression-calculator.ts` — `calculateProgressionWithFeedback()` computes adjusted targets

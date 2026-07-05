@@ -14,7 +14,9 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 
 ### Zustand Stores
 - `src/store/user-store.ts` - User profile, calibration status, strength levels (syncs to localStorage)
-- `src/store/workout-store.ts` - Current workout, history (syncs to Dexie database)
+- `src/store/workout-store.ts` - Thin composition that spreads the two slices below into a single `useWorkoutStore` (unchanged public API/shape)
+- `src/store/workout-session-slice.ts` - `createWorkoutSessionSlice`: active-session lifecycle (`currentWorkout`/`isLoading` + `loadWorkouts`, `generateNewWorkout`, `generateDailyRotationWorkout`, `startWorkout`, `updateSet`, `updateWorkoutPosition`, `completeWorkout`, `discardWorkout`)
+- `src/store/workout-history-slice.ts` - `createWorkoutHistorySlice`: history CRUD (`workoutHistory` + `loadHistory`, `deleteHistoryEntry`, `updateHistoryEntry`, `addManualWorkout`; includes legacy intensity-score backfill + strength recompute)
 
 ### Core Algorithm Files
 - `src/lib/workout-generator.ts` - Thin public barrel re-exporting the generation API (`generateWorkout`, `generateDailyRotationWorkout`, `getNextDailyRotationGroup`, `calculateEstimatedDuration`, `getExerciseLastUsed`, `findLastPerformanceWithFeedback`)

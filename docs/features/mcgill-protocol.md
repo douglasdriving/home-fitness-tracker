@@ -50,7 +50,7 @@ Dynamic timed exercises (Flutter Kicks, Mountain Climbers) and stretching/mobili
 | `src/utils/mcgill-formatter.ts` | `formatMcgillSet()` helper for consistent "3x10s per side" formatting |
 | `src/components/history/WorkoutDetailModal.tsx` | History detail view with McGill format display |
 | `src/components/history/EditWorkoutModal.tsx` | History edit view showing McGill format (read-only for McGill sets) |
-| `src/store/workout-store.ts` | `completeWorkout()` filter preserves McGill sets in history |
+| `src/store/workout-session-slice.ts` | `completeWorkout()` filter preserves McGill sets in history (composed into `useWorkoutStore`) |
 
 ## Gotchas
 

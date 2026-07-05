@@ -23,7 +23,7 @@ A shorter, muscle-group-focused workout mode that coexists with the existing ful
 - `src/lib/rotation-day-slots.ts` — the role-slot selectors `selectUpperBodyExercises()` / `selectPosteriorChainExercises()`, and the Slot-3 category helper `getNextPosteriorChainSlot3Category()`
 - `src/lib/exercise-set-builder.ts` — `buildExerciseSets()`, the shared per-exercise set construction (McGill → ladder → standard) used by this generator
 - `src/types/exercise.ts` — `posteriorChainSlot` (hinge / glute-builder / spinal-extension / lateral-glute) and `upperBodySlot` role tags used by the slot selectors
-- `src/store/workout-store.ts` — `generateDailyRotationWorkout` store action with rotation tracking and mode clearing
+- `src/store/workout-session-slice.ts` — `generateDailyRotationWorkout` store action with rotation tracking and mode clearing (composed into `useWorkoutStore` by `workout-store.ts`)
 - `src/pages/Dashboard.tsx` — Two-mode selection UI with next rotation group indicator
 - `src/pages/StretchingRoutine.tsx` — Muscle-group filtering via `activeRoutine` useMemo
 - `src/pages/WarmupRoutine.tsx` — Pre-workout dynamic warmup, muscle-group filtering via `activeRoutine` useMemo

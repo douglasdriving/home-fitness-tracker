@@ -32,7 +32,7 @@ A development-only tool in the Settings page that allows developers to manually 
 | `src/lib/progression-calculator.ts` | `calculateProgressionWithFeedback`, `calculateMcgillProgression`, `convertLegacyToMcgill` for progressive overload |
 | `src/data/exerciseData.ts` | `allExercises` array and `getExerciseById` for exercise lookup |
 | `src/types/workout.ts` | `Workout`, `WorkoutExercise`, and `Set` type definitions |
-| `src/store/workout-store.ts` | `loadWorkouts()` to refresh current workout after creation |
+| `src/store/workout-session-slice.ts` | `loadWorkouts()` to refresh current workout after creation (composed into `useWorkoutStore`) |
 | `src/lib/custom-workout-builder.test.ts` | Unit tests for `buildCustomWorkout` (standard/McGill/multi-exercise branches) |
 
 ## Gotchas

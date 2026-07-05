@@ -18,7 +18,7 @@ Fallback: if `startedDate` is missing (shouldn't happen), `generatedDate` is use
 
 | File | Role |
 |---|---|
-| `src/store/workout-store.ts` | `startWorkout()` (line ~187) sets/preserves `startedDate`; `completeWorkout()` (line ~241) calculates duration |
+| `src/store/workout-session-slice.ts` | `startWorkout()` (line ~184) sets/preserves `startedDate`; `completeWorkout()` (line ~240) calculates duration (composed into `useWorkoutStore`) |
 | `src/types/workout.ts` | `Workout.startedDate`, `Workout.generatedDate`, `WorkoutHistoryEntry.totalDuration` type definitions |
 | `src/pages/Dashboard.tsx` | "Start"/"Continue" button calls `startWorkout()` for both cases |
 | `src/pages/History.tsx` | Displays `totalDuration` in workout history entries |
