@@ -33,6 +33,7 @@ User Action → Zustand Store → Dexie (IndexedDB) + localStorage
 - `src/lib/exercise-unlock-tracker.ts` - `isExerciseUnlocked`, `shouldRetireExercise`, `checkWorkoutAchievements`: unlock/retirement threshold evaluation for a completed workout
 - `src/lib/exercise-status.ts` - `getExerciseStatuses` / `getAvailableExercises`: derives active/locked/retired status and the available-exercise field whitelist for generation
 - `src/lib/ladder-advancement.ts` - `checkLadderAdvancements`: ladder-rung double-progression advancement for a completed workout
+- `src/lib/intensity-calculator.ts` - `calculateIntensityScore`: 0-100 workout intensity score (volume × heaviness × muscle-group breadth), used for legacy history backfill
 
 **Key formulas:**
 - Workout targets use **75% of estimated capacity** (sustainable for multiple sets, since calibration tests single-set max)
@@ -49,12 +50,16 @@ All exercises defined in `src/data/exerciseData.ts` with:
 ### Page Structure
 Routes defined in `src/App.tsx`. Main pages in `src/pages/`:
 - `Dashboard.tsx` - Home screen, workout start
+- `WarmupRoutine.tsx` - Pre-workout warmup
 - `Calibration.tsx` - Initial 3-exercise assessment
 - `WorkoutExecution.tsx` - Active workout interface
 - `StretchingRoutine.tsx` - Post-workout stretching (shown before completion)
+- `MeditationTimer.tsx` - Post-stretching meditation
 - `WorkoutComplete.tsx` - Per-exercise progression data, PB tracking, integrated milestones
 - `History.tsx` - Past workout records
+- `ExerciseStatus.tsx` - Exercise unlock/retirement status browser (`/exercises`)
 - `ExerciseLibrary.tsx` - Browse exercises
+- `Challenges.tsx` / `ChallengeAttempt.tsx` - Core Calisthenics Challenge Journey: browse challenge ladder / attempt a challenge (`src/data/challengeData.ts`)
 - `Settings.tsx` - Thin container that composes the settings section components (below) in order
 
 ### Settings Section Components
@@ -76,3 +81,6 @@ Routes defined in `src/App.tsx`. Main pages in `src/pages/`:
 - **Timer** (`src/components/workout/Timer.tsx`) supports count-up/down modes via `countUp` prop
 - **ScrollToTop** in `src/components/common/` ensures page scroll resets on navigation
 - **PWA install** button appears in Settings only on HTTPS
+
+### Startup Migrations
+`App.tsx` runs two one-time data migrations on load (guarded by `needsMigration`/`needsShoulderTapsMigration` checks): `strength-migration.ts` (backfills historical strength-level snapshots) and `shoulder-taps-migration.ts` (converts old timed plank-shoulder-taps entries to reps). Both are idempotent no-ops once history is migrated.
