@@ -10,6 +10,7 @@ import {
   recordBackupExported,
   getLastBackupDate,
   isBackupReminderDue,
+  parseBackupFile,
   BackupData,
 } from './backup-restore';
 
@@ -192,6 +193,37 @@ describe('backup-restore', () => {
 
       const fifteenDaysLater = exportedAt + 15 * 24 * 60 * 60 * 1000;
       expect(isBackupReminderDue(fifteenDaysLater)).toBe(true);
+    });
+  });
+
+  describe('parseBackupFile', () => {
+    it('reads, parses, and validates a well-formed backup file', async () => {
+      const data: BackupData = {
+        version: '1.1',
+        exportDate: 1,
+        userProfile: PROFILE,
+        workouts: [WORKOUT],
+        history: [HISTORY_ENTRY],
+      };
+      const file = new File([JSON.stringify(data)], 'backup.json', { type: 'application/json' });
+
+      const parsed = await parseBackupFile(file);
+
+      expect(parsed).toEqual(data);
+    });
+
+    it('rejects a file that is not valid JSON', async () => {
+      const file = new File(['not json'], 'backup.json', { type: 'application/json' });
+
+      await expect(parseBackupFile(file)).rejects.toThrow('not valid JSON');
+    });
+
+    it('rejects valid JSON that is not a valid backup shape', async () => {
+      const file = new File([JSON.stringify({ foo: 'bar' })], 'backup.json', {
+        type: 'application/json',
+      });
+
+      await expect(parseBackupFile(file)).rejects.toThrow('not a valid fitness tracker backup');
     });
   });
 });

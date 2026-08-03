@@ -2,7 +2,7 @@ import { useState } from 'react';
 import {
   buildBackupData,
   downloadBackupFile,
-  validateBackupData,
+  parseBackupFile,
   restoreBackupData,
   recordBackupExported,
 } from '../../lib/backup-restore';
@@ -40,12 +40,7 @@ export default function BackupRestoreSection() {
     try {
       setIsImporting(true);
 
-      const text = await file.text();
-      const importData = JSON.parse(text);
-
-      if (!validateBackupData(importData)) {
-        throw new Error('This file is not a valid fitness tracker backup');
-      }
+      const importData = await parseBackupFile(file);
 
       // Confirm before restoring
       if (
