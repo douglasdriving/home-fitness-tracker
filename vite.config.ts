@@ -15,6 +15,10 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      // Registered manually in main.tsx via virtual:pwa-register so we can force
+      // an immediate update check + reload — the auto-injected script only
+      // registers the SW once and never actively checks for a newer one.
+      injectRegister: false,
       includeAssets: ['favicon.ico', 'favicon-16x16.png', 'favicon-32x32.png'],
       manifest: {
         name: 'Home Fitness Tracker',

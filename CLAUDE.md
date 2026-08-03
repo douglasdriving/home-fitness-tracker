@@ -40,6 +40,8 @@ Dead code checks are **blocking**. Remove dead code rather than adding exception
 
 ## Workflow
 
-When developing new features or making changes in this repo, use test-driven development. Write tests first covering different cases, ensure they fail, then make edits until they are all green. Commit your changes when tests pass.
+When developing new features or making changes in this repo, use test-driven development. Write tests first covering different cases, ensure they fail, then make edits until they are all green.
+
+Commit and push your changes when tests pass to the dev branch. Dont push to merge to main before I give consent.
 
 The codebase should be optimized for claude context. This means keeping files slim and follow the single-responsibility principle. Whenever you edit a file that is large and should be refactored, suggest to the user to make that refactor since you have the context in memory anyways.
