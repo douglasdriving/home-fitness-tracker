@@ -47,10 +47,12 @@ export async function buildBackupData(): Promise<BackupData> {
 }
 
 /**
- * Reads a File as text via FileReader rather than the modern Blob.text()/arrayBuffer()
- * promise APIs. Android Chrome has a known bug where reading files picked from certain
- * content providers (e.g. the Downloads folder) via those newer APIs throws a NotFoundError
- * ("a requested file or directory could not be found") — FileReader doesn't hit it.
+ * Reads a File as text via FileReader. Some Android/Chrome + content-provider
+ * combinations can fail to hand back readable bytes for a picked file at all
+ * (a NotFoundError — "a requested file or directory could not be found" — from
+ * any read API, not specific to FileReader vs. Blob.text()). When that happens,
+ * `parsePastedBackupJSON` below is the fallback: paste the file's contents in
+ * directly instead of relying on the file picker to read them.
  */
 export function readFileAsText(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -61,22 +63,26 @@ export function readFileAsText(file: File): Promise<string> {
   });
 }
 
-/** Reads, parses, and validates a picked backup file, throwing a specific message at each stage. */
-export async function parseBackupFile(file: File): Promise<BackupData> {
-  const text = await readFileAsText(file);
-
+/** Parses and validates backup JSON text, throwing a specific message at each stage. */
+export function parseBackupJSON(text: string): BackupData {
   let data: unknown;
   try {
     data = JSON.parse(text);
   } catch {
-    throw new Error('This file is not valid JSON');
+    throw new Error('This is not valid JSON');
   }
 
   if (!validateBackupData(data)) {
-    throw new Error('This file is not a valid fitness tracker backup');
+    throw new Error('This is not a valid fitness tracker backup');
   }
 
   return data;
+}
+
+/** Reads, parses, and validates a picked backup file, throwing a specific message at each stage. */
+export async function parseBackupFile(file: File): Promise<BackupData> {
+  const text = await readFileAsText(file);
+  return parseBackupJSON(text);
 }
 
 export function validateBackupData(data: unknown): data is BackupData {
