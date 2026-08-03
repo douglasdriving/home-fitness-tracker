@@ -66,7 +66,7 @@ export default function StorageWarning() {
             </div>
           )}
 
-          {!healthCheck.isPersisted && healthCheck.indexedDBAvailable && (
+          {healthCheck.persistenceSupported && !healthCheck.isPersisted && healthCheck.indexedDBAvailable && (
             <div className="mt-3 flex gap-2">
               <Button
                 onClick={handleRequestPersistence}

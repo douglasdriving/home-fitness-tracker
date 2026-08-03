@@ -5,11 +5,13 @@ A Progressive Web App for tracking core strength workouts with intelligent progr
 ## Features
 
 ### Core Functionality
-- **Smart Workout Generation**: Automatically generates personalized workouts targeting abs, glutes, and lower back
-- **Progressive Overload**: Intelligently increases workout difficulty based on your performance (7.5% progression)
+- **Smart Workout Generation**: Automatically generates personalized workouts targeting abs, glutes, lower back, and upper body
+- **Two Workout Modes**: Full-body sessions (all muscle groups) or single-muscle-group daily-rotation days
+- **Progressive Overload**: Intelligently increases workout difficulty based on your performance (7.5% progression), including double-progression ladders for upper-body exercises
 - **Calibration System**: Initial 3-exercise assessment to establish baseline strength levels
-- **Workout Execution**: Interactive workout interface with timers, set tracking, and progress visualization
-- **Exercise Library**: Browse and search 15 bodyweight exercises with detailed descriptions and video tutorials
+- **Guided Session Flow**: Pre-workout dynamic warmup, interactive workout with timers and set tracking, then post-workout stretching and a meditation timer
+- **Achievements & Progression**: Exercise unlocks, retirements, and personal-best tracking surfaced on the workout-complete screen
+- **Exercise Library**: Browse and search 34 bodyweight exercises with detailed descriptions and video tutorials
 - **Workout History**: Complete history of all workouts with performance metrics
 - **Backup & Restore**: Export and import all your data as JSON
 
@@ -61,7 +63,7 @@ The app will be available at `http://localhost:5173`
 On first use, users complete a 3-exercise calibration to establish baseline strength levels.
 
 ### 2. Workout Generation
-The algorithm generates personalized workouts covering all muscle groups with intelligent exercise selection.
+The algorithm generates personalized workouts with intelligent exercise selection — either full-body sessions covering all muscle groups, or daily-rotation days focused on a single muscle group (abs, glutes/posterior-chain, or upper body).
 
 ### 3. Progressive Overload
 After each workout, the system updates strength levels and applies 7.5% progression for continuous improvement.

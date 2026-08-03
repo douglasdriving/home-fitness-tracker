@@ -14,7 +14,6 @@ export interface ExerciseWithStatus extends Exercise {
     requiredValue: number;
     requiredExerciseName: string;
   };
-  needsEquipment?: boolean; // true when exercise requires equipment the user doesn't have
 }
 
 /**
@@ -22,16 +21,10 @@ export interface ExerciseWithStatus extends Exercise {
  */
 export function getExerciseStatuses(
   workoutHistory: WorkoutHistoryEntry[],
-  achievements: ExerciseAchievements,
-  hasElasticBands: boolean
+  achievements: ExerciseAchievements
 ): ExerciseWithStatus[] {
   return allExercises
     .map(exercise => {
-      // Check if exercise requires equipment the user doesn't have
-      if (exercise.equipment === 'elastic-band' && !hasElasticBands) {
-        return { ...exercise, status: 'locked' as const, needsEquipment: true };
-      }
-
       // Check if retired
       if (achievements.retiredExercises.includes(exercise.id)) {
         return { ...exercise, status: 'retired' as const };
@@ -81,10 +74,9 @@ export function getExerciseStatuses(
 export function getAvailableExercises(
   workoutHistory: WorkoutHistoryEntry[],
   achievements: ExerciseAchievements,
-  hasElasticBands: boolean,
   excludedExerciseIds: string[] = []
 ): Exercise[] {
-  const statuses = getExerciseStatuses(workoutHistory, achievements, hasElasticBands);
+  const statuses = getExerciseStatuses(workoutHistory, achievements);
 
   return statuses
     .filter(ex => ex.status === 'active')

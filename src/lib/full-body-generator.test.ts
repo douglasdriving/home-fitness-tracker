@@ -20,7 +20,6 @@ describe('generateWorkout', () => {
         const workout = generateWorkout({
           workoutNumber: i + 1,
           strengthLevels: defaultStrengthLevels,
-          hasElasticBands: true, // Include band exercises
         });
 
         workout.exercises.forEach((workoutExercise) => {
@@ -40,7 +39,6 @@ describe('generateWorkout', () => {
         const workout = generateWorkout({
           workoutNumber: i + 1,
           strengthLevels: defaultStrengthLevels,
-          hasElasticBands: true,
         });
 
         workout.exercises.forEach((workoutExercise) => {
@@ -60,14 +58,12 @@ describe('generateWorkout', () => {
       const lowStrengthWorkout = generateWorkout({
         workoutNumber: 1,
         strengthLevels: { abs: 20, glutes: 20, lowerBack: 20, upperBody: 20, lastUpdated: Date.now() },
-        hasElasticBands: true,
       });
 
       // Test with high strength level
       const highStrengthWorkout = generateWorkout({
         workoutNumber: 2,
         strengthLevels: { abs: 80, glutes: 80, lowerBack: 80, upperBody: 80, lastUpdated: Date.now() },
-        hasElasticBands: true,
       });
 
       // Both should have same set count rules
@@ -102,7 +98,6 @@ describe('generateWorkout', () => {
         const workout = generateWorkout({
           workoutNumber: i + 1,
           strengthLevels: defaultStrengthLevels,
-          hasElasticBands: true,
         });
 
         workout.exercises.forEach((workoutExercise) => {

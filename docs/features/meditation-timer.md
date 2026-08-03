@@ -2,13 +2,13 @@
 
 ## Overview
 
-A progressive post-workout meditation timer that appears after the stretching routine (or immediately after workout if stretching is disabled). The timer encourages users to build a meditation habit with durations that increase every 5 completed sessions, from 1 minute to a maximum of 15 minutes.
+A progressive post-workout meditation timer that appears after the stretching routine. The timer encourages users to build a meditation habit with durations that increase every 5 completed sessions, from 1 minute to a maximum of 15 minutes.
 
 ## How It Works
 
 ### Navigation Flow
 
-The meditation timer appears in the post-workout flow:
+The meditation timer always appears in the post-workout flow:
 
 ```
 WorkoutExecution → StretchingRoutine → MeditationTimer → WorkoutComplete
@@ -16,17 +16,8 @@ WorkoutExecution → StretchingRoutine → MeditationTimer → WorkoutComplete
                    MeditationTimer    WorkoutComplete
 ```
 
-**If stretching is disabled:**
-```
-WorkoutExecution → MeditationTimer → WorkoutComplete
-                        ↓ (skip)
-                   WorkoutComplete
-```
-
-**If both stretching and meditation are disabled:**
-```
-WorkoutExecution → WorkoutComplete
-```
+Both the stretching routine and the meditation timer are always shown — skipping
+either advances to the next stage of the flow.
 
 ### Timer Behavior
 
@@ -64,13 +55,11 @@ The meditation duration increases every 5 completed sessions based on habit form
 
 **Implementation:** The `getMeditationDuration(completionCount)` function in `src/utils/meditation.ts` returns the appropriate duration based on completion count.
 
-## Settings Toggle
+## Always On
 
-Users can disable meditation in Settings → Preferences:
-
-- **Default**: Enabled (meditation appears by default)
-- **When disabled**: Flow skips meditation entirely, going directly from stretching (or workout) to WorkoutComplete
-- **Setting key**: `profile.preferences.autoShowMeditation`
+Meditation always runs as part of the post-workout flow. It is reached from the
+stretching routine (via completing or skipping stretching) whenever a completion
+state is present. There is no toggle to disable it.
 
 ## State Storage
 
@@ -101,8 +90,6 @@ interface MeditationState {
 3. Calls `getMeditationDuration(newCount)` to compute new duration
 4. Updates `profile.meditationState` and persists via `saveUserProfile()`
 
-**`updatePreferences({ autoShowMeditation })`** — Toggles meditation on/off in Settings.
-
 ## Key Files
 
 ### New Files
@@ -112,11 +99,10 @@ interface MeditationState {
 - **`src/utils/meditation.test.ts`** — Unit tests for meditation utilities
 
 ### Modified Files
-- **`src/types/user.ts`** — Added `MeditationState` interface and `UserProfile.meditationState` field, added `preferences.autoShowMeditation`
-- **`src/store/user-store.ts`** — Added `completeMeditation` action, extended `updatePreferences` type
-- **`src/pages/StretchingRoutine.tsx`** — Modified `handleRoutineComplete()` and `handleSkip()` to conditionally route to `/meditation`
-- **`src/pages/WorkoutExecution.tsx`** — Modified `handleCompleteWorkout()` to route to `/meditation` when stretching is disabled but meditation is enabled
-- **`src/pages/Settings.tsx`** — Added meditation preference toggle in Preferences section
+- **`src/types/user.ts`** — Added `MeditationState` interface and `UserProfile.meditationState` field
+- **`src/store/user-store.ts`** — Added `completeMeditation` action
+- **`src/pages/StretchingRoutine.tsx`** — Modified `handleRoutineComplete()` and `handleSkip()` to route to `/meditation` when a completion state is present
+- **`src/pages/WorkoutExecution.tsx`** — Modified `handleCompleteWorkout()` to route to `/stretching`
 - **`src/App.tsx`** — Added `/meditation` route
 
 ## Gotchas
@@ -131,32 +117,19 @@ When `completeMeditation()` is called, it increments the count and recalculates 
 
 `MeditationTimer` must pass `completionState` to `WorkoutComplete` **identically** to how `StretchingRoutine` does. The object must not be mutated or wrapped — it's a direct passthrough via `location.state`.
 
-### 3. Both Preferences Disabled
-
-When both `autoShowStretching` and `autoShowMeditation` are `false`, the flow must go directly from `WorkoutExecution` to `WorkoutComplete`. The logic in `WorkoutExecution.handleCompleteWorkout()` handles this with:
-```typescript
-if (autoShowStretching) {
-  // Navigate to stretching (which chains to meditation if enabled)
-} else if (autoShowMeditation) {
-  // Navigate to meditation directly
-} else {
-  // Navigate to workout complete
-}
-```
-
-### 4. Direct URL Access Guard
+### 3. Direct URL Access Guard
 
 If a user navigates directly to `/meditation` without `completionState` in location state, the page redirects to `/` (home). This matches the pattern used in `StretchingRoutine`.
 
-### 5. Skip vs Complete Logic
+### 4. Skip vs Complete Logic
 
 The Timer component uses countdown mode with Start/Pause and Skip buttons. The page also provides a separate `Skip` button in the header for skipping meditation entirely. Clicking the header Skip button navigates to WorkoutComplete **without** calling `completeMeditation()`.
 
-### 6. Wake Lock
+### 5. Wake Lock
 
 The page uses `useWakeLock()` to keep the screen awake during meditation, preventing the screen from dimming/sleeping mid-session.
 
-### 7. Delayed Navigation After Completion
+### 6. Delayed Navigation After Completion
 
 When the timer finishes, `Timer.tsx` plays the completion bell (`playCompletionSound()`, ~0.5s play + 600ms AudioContext cleanup) and synchronously calls `onComplete()`. `handleComplete()` calls `completeMeditation()` immediately (so progression is never lost) but defers `navigate('/workout-complete')` by ~1s (`COMPLETION_NAV_DELAY_MS`) via a `setTimeout` tracked in `navTimeoutRef`, otherwise the component unmounts and cuts the bell off. The header Skip path (`handleSkip()`) clears that pending timeout before navigating immediately, preventing a complete-then-skip double-navigation, and an unmount cleanup effect clears it to avoid navigate-after-unmount. The delay lives only in `MeditationTimer`, not in the shared `Timer` component (so stretching/exercise timers stay immediate).
 
@@ -166,5 +139,4 @@ When the timer finishes, `Timer.tsx` plays the completion bell (`playCompletionS
 2. **Progression boundaries**: Tests verify duration changes at 5, 10, 15, 20, 25, 30 completions
 3. **Cap enforcement**: Duration stays at 900s for counts >= 30
 4. **Skip does not increment**: Verified that skipping does NOT call `completeMeditation()`
-5. **Preference persistence**: Toggling `autoShowMeditation` in Settings persists across sessions
-6. **Navigation without state**: Redirects to home if `completionState` is missing
+5. **Navigation without state**: Redirects to home if `completionState` is missing

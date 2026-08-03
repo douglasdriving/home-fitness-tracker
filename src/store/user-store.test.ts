@@ -131,28 +131,4 @@ describe('useUserStore - meditation actions', () => {
       expect(userProfileUtils.saveUserProfile).toHaveBeenCalled();
     });
   });
-
-  describe('updatePreferences - meditation', () => {
-    it('should update autoShowMeditation preference', () => {
-      const store = useUserStore.getState();
-
-      store.updatePreferences({ autoShowMeditation: false });
-
-      const profile = useUserStore.getState().profile;
-      expect(profile?.preferences?.autoShowMeditation).toBe(false);
-    });
-
-    it('should preserve existing preferences when updating meditation preference', () => {
-      const store = useUserStore.getState();
-
-      // Set stretching preference first
-      store.updatePreferences({ autoShowStretching: false });
-      // Then set meditation preference
-      store.updatePreferences({ autoShowMeditation: false });
-
-      const profile = useUserStore.getState().profile;
-      expect(profile?.preferences?.autoShowStretching).toBe(false);
-      expect(profile?.preferences?.autoShowMeditation).toBe(false);
-    });
-  });
 });

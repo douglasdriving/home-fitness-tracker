@@ -1,10 +1,10 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file guides Claude Code.
 
 ## Project Overview
 
-A Progressive Web App (PWA) for home fitness tracking focused on core exercises (abs, glutes, lower back). Users calibrate their fitness level, then the app generates personalized workouts with progressive overload. All data is stored client-side using IndexedDB and localStorage.
+A Progressive Web App (PWA) for home fitness tracking, focused on core strength (abs, glutes, lower back) with an added upper-body track. Users calibrate their fitness level, then the app generates personalized workouts with progressive overload — either full-body sessions or single-muscle-group daily-rotation days. Sessions are wrapped with a pre-workout warmup and post-workout stretching + meditation. All data is stored client-side using IndexedDB and localStorage.
 
 **Stack:** React 18 + TypeScript + Vite, Zustand (state), Dexie (IndexedDB), Tailwind CSS, vite-plugin-pwa
 
@@ -26,6 +26,8 @@ npm run build            # TypeScript check + production build
 npm run lint             # ESLint with --max-warnings 0
 npm run test             # Run tests with Vitest
 npm run scan:dead-code   # Dead code scanner
+npm run scan:dead-components  # Detect unreferenced React components
+npm run verify           # Full pre-merge check (tsc + lint + tests + dead-code scans)
 ```
 
 ### Quality Control
@@ -35,10 +37,7 @@ Claude Code hooks run automatically (configured in `.claude/settings.json`):
 
 Dead code checks are **blocking**. Remove dead code rather than adding exceptions.
 
-### Automated Issue Workflow
-1. Run `node scripts/manage-issues.js` (or `start-claude.bat`)
-2. Script fetches issues via `gh` CLI, presents for manual review
-3. Approved issues go to `.claude/ACTIVE-ISSUES.md`
-4. Completed issues archived to `.claude/COMPLETED.md`
 
-**Commit format for issues:** `Fixes #X: description`
+## Workflow
+
+When developing new features or making changes in this repo, use test-driven development. Write tests first covering different cases, ensure they fail, then make edits until they are all green. Commit your changes when tests pass.

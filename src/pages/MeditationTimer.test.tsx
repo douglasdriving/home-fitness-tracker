@@ -43,7 +43,6 @@ describe('MeditationTimer', () => {
     createdDate: Date.now(),
     calibrationCompleted: true,
     strengthLevels: { abs: 5, glutes: 5, lowerBack: 5, lastUpdated: Date.now() },
-    preferences: { autoShowMeditation: true },
     meditationState: {
       completionCount: 0,
       currentDurationSeconds: 60,

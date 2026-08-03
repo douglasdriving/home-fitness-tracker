@@ -6,6 +6,7 @@ import { db } from '../db/db';
 import Button from '../components/common/Button';
 import StreakTracker from '../components/common/StreakTracker';
 import StorageWarning from '../components/common/StorageWarning';
+import BackupReminder from '../components/common/BackupReminder';
 import { getExerciseEmoji } from '../data/exerciseData';
 import { getNextDailyRotationGroup } from '../lib/workout-generator';
 import { MuscleGroup } from '../types/exercise';
@@ -141,7 +142,6 @@ export default function Dashboard() {
 
     try {
       const isResuming = currentWorkout.status === 'in-progress';
-      const autoShowWarmup = profile?.preferences?.autoShowWarmup ?? true;
 
       await startWorkout(currentWorkout.id);
 
@@ -151,7 +151,7 @@ export default function Dashboard() {
       // workout is still in progress, resume it; otherwise go to the exercises.
       const resumeWarmupState = isResuming ? getActiveWarmupState(currentWorkout.id) : null;
 
-      if (autoShowWarmup && !isResuming) {
+      if (!isResuming) {
         navigate('/warmup', {
           state: {
             workoutId: currentWorkout.id,
@@ -218,6 +218,9 @@ export default function Dashboard() {
       <div className="p-4 space-y-6">
         {/* Storage Warning */}
         <StorageWarning />
+
+        {/* Backup Reminder */}
+        <BackupReminder />
 
         {/* Streak Tracker */}
         <StreakTracker />

@@ -16,12 +16,10 @@ vi.mock('../store/workout-store', () => ({
 vi.mock('../store/user-store', () => ({
   useUserStore: () => ({
     profile: {
-      preferences: { autoShowStretching: true },
       exerciseAchievements: {
         unlockedExercises: [],
         retiredExercises: [],
       },
-      equipment: { hasElasticBands: false },
     },
   }),
 }));

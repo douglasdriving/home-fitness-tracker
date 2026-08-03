@@ -16,7 +16,6 @@ interface GenerateDailyRotationOptions {
   strengthLevels: StrengthLevels;
   targetMuscleGroup: MuscleGroup;
   workoutHistory?: WorkoutHistoryEntry[];
-  hasElasticBands?: boolean;
   excludedExerciseIds?: string[];
   exerciseAchievements?: ExerciseAchievements;
 }
@@ -36,7 +35,6 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
     strengthLevels,
     targetMuscleGroup,
     workoutHistory = [],
-    hasElasticBands = false,
     excludedExerciseIds = [],
     exerciseAchievements = { unlockedExercises: [], retiredExercises: [] }
   } = options;
@@ -47,7 +45,6 @@ export function generateDailyRotationWorkout(options: GenerateDailyRotationOptio
   const allAvailableExercises = getAvailableExercises(
     workoutHistory,
     exerciseAchievements,
-    hasElasticBands,
     excludedExerciseIds
   );
 

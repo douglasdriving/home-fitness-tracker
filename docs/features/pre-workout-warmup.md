@@ -10,8 +10,8 @@ block delivers movement rehearsal and joint priming instead.
 
 ## How it works
 
-1. **Start branch**: On the Dashboard, `handleStartWorkout` reads the
-   `autoShowWarmup` preference (default on). When starting a *fresh* workout it
+1. **Start branch**: On the Dashboard, `handleStartWorkout` always runs the
+   warmup. When starting a *fresh* workout it
    navigates to `/warmup` with `{ workoutId, targetMuscleGroup }` in location
    state; otherwise it goes straight to `/workout`. The warmup is the first
    *stage* of the workout, not a separate session — so resuming an in-progress
@@ -42,8 +42,6 @@ block delivers movement rehearsal and joint priming instead.
   `muscleGroupWarmups` map, `genericWarmup`, and `getWarmupForMuscleGroup()` helper
 - `src/pages/WarmupRoutine.tsx` — the `/warmup` page (timer, progress, skip, persistence)
 - `src/pages/Dashboard.tsx` — Start branching + resuming the warmup stage of an in-progress workout (`getActiveWarmupState`)
-- `src/pages/Settings.tsx` — "Pre-Workout Warmup" preference toggle
-- `src/types/user.ts` / `src/store/user-store.ts` — `autoShowWarmup` preference plumbing
 - `src/App.tsx` — `/warmup` route registration
 
 ## Gotchas

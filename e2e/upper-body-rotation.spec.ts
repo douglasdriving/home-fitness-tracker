@@ -73,7 +73,6 @@ test.describe('Upper Body Daily Rotation', () => {
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: { abs: 30, glutes: 30, lowerBack: 30, upperBody: 30, lastUpdated: Date.now() },
         exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
       }));

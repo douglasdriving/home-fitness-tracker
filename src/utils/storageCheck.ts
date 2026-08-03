@@ -102,6 +102,15 @@ export const requestPersistentStorage = async (): Promise<boolean> => {
 };
 
 /**
+ * Whether the browser implements the Persistent Storage API at all.
+ * Safari has historically lacked support, so we shouldn't treat "unsupported"
+ * the same as "supported but denied" when deciding what to warn about.
+ */
+export const isPersistenceSupported = (): boolean => {
+  return !!(navigator.storage && navigator.storage.persisted);
+};
+
+/**
  * Check if storage is already persistent
  */
 export const checkStoragePersisted = async (): Promise<boolean> => {
@@ -123,6 +132,7 @@ export const checkStoragePersisted = async (): Promise<boolean> => {
 export interface StorageHealthCheck {
   indexedDBAvailable: boolean;
   privateBrowsing: boolean;
+  persistenceSupported: boolean;
   isPersisted: boolean;
   quota?: number;
   usage?: number;
@@ -134,6 +144,7 @@ export interface StorageHealthCheck {
 export const performStorageHealthCheck = async (): Promise<StorageHealthCheck> => {
   const indexedDBAvailable = await checkIndexedDBAvailable();
   const privateBrowsing = await checkPrivateBrowsing();
+  const persistenceSupported = isPersistenceSupported();
   const isPersisted = await checkStoragePersisted();
   const { quota, usage, percent: usagePercent } = await checkStorageQuota();
 
@@ -147,19 +158,26 @@ export const performStorageHealthCheck = async (): Promise<StorageHealthCheck> =
     warnings.push('You appear to be in private browsing mode. Data may not persist after closing the browser.');
   }
 
-  if (!isPersisted) {
-    warnings.push('Storage is not persistent. Your data might be cleared when storage is low.');
+  // Only warn about persistence on browsers that actually support the API —
+  // otherwise this fires permanently for every Safari user with nothing they can do about it.
+  if (persistenceSupported && !isPersisted) {
+    warnings.push('Storage is not persistent. Your data might be cleared when storage is low or after a long period of inactivity.');
   }
 
   if (usagePercent && usagePercent > 80) {
     warnings.push('Storage is nearly full. Consider freeing up space to prevent data loss.');
   }
 
-  const isHealthy = indexedDBAvailable && !privateBrowsing;
+  // Note: on browsers without the Persistence API (e.g. most iOS Safari versions),
+  // storage can still be evicted after a period of inactivity — there's no signal
+  // or lever we can offer there, so it isn't counted against isHealthy.
+  const isHealthy =
+    indexedDBAvailable && !privateBrowsing && (!persistenceSupported || isPersisted);
 
   return {
     indexedDBAvailable,
     privateBrowsing,
+    persistenceSupported,
     isPersisted,
     quota,
     usage,

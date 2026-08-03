@@ -19,8 +19,6 @@ test.describe('Meditation Timer', () => {
   });
 
   async function setupCalibratedUser(page: import('@playwright/test').Page, options?: {
-    autoShowStretching?: boolean;
-    autoShowMeditation?: boolean;
     meditationState?: { completionCount: number; currentDurationSeconds: number };
   }) {
     await page.evaluate((opts) => {
@@ -34,10 +32,6 @@ test.describe('Meditation Timer', () => {
           glutes: 30,
           lowerBack: 30,
           lastUpdated: Date.now(),
-        },
-        preferences: {
-          autoShowStretching: opts?.autoShowStretching ?? true,
-          autoShowMeditation: opts?.autoShowMeditation ?? true,
         },
       };
 
@@ -147,37 +141,6 @@ test.describe('Meditation Timer', () => {
     expect(profile.meditationState?.completionCount || 0).toBe(0);
   });
 
-  test('meditation disabled skips directly to workout complete from stretching', async ({ page }) => {
-    await setupCalibratedUser(page, { autoShowMeditation: false });
-    await completeWorkout(page);
-
-    // Skip stretching
-    page.on('dialog', dialog => dialog.accept());
-    await page.getByText(/skip all/i).click();
-
-    // Should go directly to workout complete (no meditation)
-    await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
-  });
-
-  test('both stretching and meditation disabled skips to workout complete', async ({ page }) => {
-    await setupCalibratedUser(page, {
-      autoShowStretching: false,
-      autoShowMeditation: false,
-    });
-    await completeWorkout(page);
-
-    // Should go directly to workout complete
-    await expect(page.getByText(/workout complete/i)).toBeVisible({ timeout: 10000 });
-  });
-
-  test('stretching disabled but meditation enabled shows meditation', async ({ page }) => {
-    await setupCalibratedUser(page, { autoShowStretching: false });
-    await completeWorkout(page);
-
-    // Should go directly to meditation (skipping stretching)
-    await expect(page.locator('h1').filter({ hasText: /meditation/i })).toBeVisible({ timeout: 10000 });
-  });
-
   test('meditation has skip button in header', async ({ page }) => {
     await setupCalibratedUser(page);
     await completeWorkout(page);
@@ -188,27 +151,6 @@ test.describe('Meditation Timer', () => {
 
     // Should have Skip button in header
     await expect(page.locator('button:has-text("Skip")').first()).toBeVisible();
-  });
-
-  test('Settings page has meditation toggle', async ({ page }) => {
-    await setupCalibratedUser(page);
-
-    // Navigate to settings
-    await page.goto('/settings');
-
-    // Should see meditation checkbox
-    await expect(page.getByText(/post-workout meditation/i)).toBeVisible();
-
-    // Check that checkbox is checked by default
-    const meditationCheckbox = page.locator('input[type="checkbox"]').nth(1); // Second checkbox (first is stretching)
-    await expect(meditationCheckbox).toBeChecked();
-
-    // Uncheck it
-    await meditationCheckbox.uncheck();
-
-    // Reload and verify it persisted
-    await page.reload();
-    await expect(page.locator('input[type="checkbox"]').nth(1)).not.toBeChecked();
   });
 
   test('completing meditation lands on workout complete after the bell delay and increments count', async ({ page }) => {

@@ -14,7 +14,7 @@ import { getExerciseById } from '../data/exerciseData';
  * Each slot picks its least-recently-used available exercise. Slots with no
  * available exercise are dropped, yielding a shorter workout rather than erroring.
  *
- * @param availableExercises - Already unlock/retirement/equipment/exclusion filtered
+ * @param availableExercises - Already unlock/retirement/exclusion filtered
  * @param exerciseLastUsed - Map of exercise id → last used workout number
  */
 export function selectUpperBodyExercises(
@@ -46,9 +46,8 @@ export type PosteriorChainSlot3Category = 'spinal-extension' | 'lateral-glute';
  * Like the upper-body vertical alternation and the ladder-rung inference, this is
  * *history-derived*: it reads the actual `posteriorChainSlot` of the exercises in
  * the most recent posterior-chain session and returns the opposite category, so
- * equipment-driven fallbacks can't desync the alternation. When there's no prior
- * posterior-chain session it defaults to spinal-extension — its options are all
- * no-equipment starters, so that slot is always fillable.
+ * fallbacks can't desync the alternation. When there's no prior posterior-chain
+ * session it defaults to spinal-extension.
  *
  * @param workoutHistory - Workout history ordered newest-first
  */
@@ -83,17 +82,12 @@ export function getNextPosteriorChainSlot3Category(
  * - Slot 2: glute-builder (every session)
  * - Slot 3: the rotating accessory — `slot3Category` (spinal-extension or
  *   lateral-glute), falling back to the opposite category when the intended pool
- *   is empty (e.g. all lateral-glute options are band-only for a band-less user).
+ *   is empty.
  *
  * Each slot picks its least-recently-used available exercise. Slots with no
  * available exercise are dropped, yielding a shorter workout rather than erroring.
  *
- * KNOWN LIMITATION: both hinge exercises (Single-Leg RDL, banded Good Morning)
- * require an elastic band, so a band-less user has an empty Slot 1 and the session
- * shrinks to 2 exercises. Douglas has bands, so this holds in practice; a
- * no-band backpack hinge would close the gap (out of scope for this issue).
- *
- * @param availableExercises - Already unlock/retirement/equipment/exclusion filtered
+ * @param availableExercises - Already unlock/retirement/exclusion filtered
  * @param exerciseLastUsed - Map of exercise id → last used workout number
  * @param slot3Category - Which accessory category to prefer for Slot 3
  */

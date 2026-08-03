@@ -11,7 +11,6 @@ interface GenerateWorkoutOptions {
   strengthLevels: StrengthLevels;
   recentExerciseIds?: string[]; // IDs of exercises used in last 2-3 workouts
   workoutHistory?: WorkoutHistoryEntry[]; // For progressive overload
-  hasElasticBands?: boolean; // Whether user has elastic bands
   excludedExerciseIds?: string[]; // IDs of exercises user wants to exclude
   timeConstraintMinutes?: number; // Optional time limit for workout in minutes
   exerciseAchievements?: ExerciseAchievements; // For filtering locked/retired exercises
@@ -34,7 +33,6 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
     workoutNumber,
     strengthLevels,
     workoutHistory = [],
-    hasElasticBands = false,
     excludedExerciseIds = [],
     timeConstraintMinutes,
     exerciseAchievements = { unlockedExercises: [], retiredExercises: [] }
@@ -47,7 +45,6 @@ export function generateWorkout(options: GenerateWorkoutOptions): Workout {
   const allAvailableExercises = getAvailableExercises(
     workoutHistory,
     exerciseAchievements,
-    hasElasticBands,
     excludedExerciseIds
   );
 

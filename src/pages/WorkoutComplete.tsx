@@ -51,10 +51,8 @@ export default function WorkoutComplete() {
     unlockedExercises: [],
     retiredExercises: [],
   };
-  const hasElasticBands = profile?.equipment?.hasElasticBands ?? false;
-
   // Get exercise statuses for unlock progress display
-  const exerciseStatuses = getExerciseStatuses(workoutHistory, achievements, hasElasticBands);
+  const exerciseStatuses = getExerciseStatuses(workoutHistory, achievements);
 
   // Find locked exercises that are close to being unlocked (>=80% progress)
   // and related to exercises in this workout

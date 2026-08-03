@@ -2,9 +2,8 @@ import { test, expect, Page } from '@playwright/test';
 
 // Issue #29: A pre-workout dynamic warmup screen runs before each session,
 // parameterized by muscle group. Starting a fresh daily-rotation abs session
-// (with autoShowWarmup on) lands on /warmup showing abs-specific moves
-// (Cat-Cow Flow first). Skip All goes straight to the workout. With the
-// preference off, Start goes directly to the workout.
+// always lands on /warmup showing abs-specific moves (Cat-Cow Flow first).
+// Skip All goes straight to the workout.
 
 test.describe('Pre-Workout Warmup', () => {
   test.beforeEach(async ({ page }) => {
@@ -21,13 +20,12 @@ test.describe('Pre-Workout Warmup', () => {
     await page.reload();
   });
 
-  async function setupCalibratedUser(page: Page, autoShowWarmup: boolean) {
-    await page.evaluate((warmup) => {
+  async function setupCalibratedUser(page: Page) {
+    await page.evaluate(() => {
       localStorage.setItem('fitness-tracker-user-profile', JSON.stringify({
         userId: 'test-user',
         createdDate: Date.now(),
         calibrationCompleted: true,
-        hasElasticBands: true,
         strengthLevels: {
           abs: 30,
           glutes: 30,
@@ -36,9 +34,8 @@ test.describe('Pre-Workout Warmup', () => {
           lastUpdated: Date.now(),
         },
         exerciseAchievements: { unlockedExercises: [], retiredExercises: [] },
-        preferences: { autoShowWarmup: warmup, autoShowStretching: true, autoShowMeditation: false },
       }));
-    }, autoShowWarmup);
+    });
     await page.reload();
   }
 
@@ -49,7 +46,7 @@ test.describe('Pre-Workout Warmup', () => {
   }
 
   test('fresh abs session lands on the warmup with abs-specific moves', async ({ page }) => {
-    await setupCalibratedUser(page, true);
+    await setupCalibratedUser(page);
     await startDailyRotation(page);
 
     // Warmup screen, first abs move is the Cat-Cow Flow (dynamic, not a hold)
@@ -64,7 +61,7 @@ test.describe('Pre-Workout Warmup', () => {
   });
 
   test('Skip All exits the warmup and enters the workout', async ({ page }) => {
-    await setupCalibratedUser(page, true);
+    await setupCalibratedUser(page);
     await startDailyRotation(page);
 
     await expect(page.getByRole('heading', { name: '🔥 Warmup' })).toBeVisible();
@@ -73,15 +70,6 @@ test.describe('Pre-Workout Warmup', () => {
     await page.getByRole('button', { name: /skip all/i }).click();
 
     // Should now be in the workout (warmup header gone)
-    await expect(page.getByRole('heading', { name: '🔥 Warmup' })).not.toBeVisible();
-    await expect(page).toHaveURL(/\/workout$/);
-  });
-
-  test('warmup is skipped entirely when the preference is off', async ({ page }) => {
-    await setupCalibratedUser(page, false);
-    await startDailyRotation(page);
-
-    // No warmup screen — go straight to the workout
     await expect(page.getByRole('heading', { name: '🔥 Warmup' })).not.toBeVisible();
     await expect(page).toHaveURL(/\/workout$/);
   });

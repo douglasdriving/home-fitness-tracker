@@ -15,7 +15,7 @@ vi.mock('react-router-dom', async () => {
 
 // Stores
 const mockStartWorkout = vi.fn(() => Promise.resolve());
-let mockProfile: Record<string, unknown> = { calibrationCompleted: true, preferences: {} };
+let mockProfile: Record<string, unknown> = { calibrationCompleted: true };
 let mockCurrentWorkout: Record<string, unknown> | null = null;
 
 vi.mock('../store/user-store', () => ({
@@ -55,7 +55,7 @@ describe('Dashboard - warmup branching on Start', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     localStorage.clear();
-    mockProfile = { calibrationCompleted: true, preferences: {} };
+    mockProfile = { calibrationCompleted: true };
     mockCurrentWorkout = {
       id: 'workout-abc',
       status: 'pending',
@@ -77,17 +77,6 @@ describe('Dashboard - warmup branching on Start', () => {
         state: { workoutId: 'workout-abc', targetMuscleGroup: 'glutes' },
       });
     });
-  });
-
-  it('skips warmup and goes to /workout when autoShowWarmup is off', async () => {
-    mockProfile = { calibrationCompleted: true, preferences: { autoShowWarmup: false } };
-    renderDashboard();
-    fireEvent.click(screen.getByText('Start'));
-
-    await waitFor(() => {
-      expect(mockNavigate).toHaveBeenCalledWith('/workout');
-    });
-    expect(mockNavigate).not.toHaveBeenCalledWith('/warmup', expect.anything());
   });
 
   it('goes straight to /workout when resuming an in-progress workout with no warmup left', async () => {

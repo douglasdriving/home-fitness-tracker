@@ -73,7 +73,6 @@ describe('upper body role-based selection (tested pool, coaching 2026-07-01)', (
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'upperBody',
       workoutHistory: history,
-      hasElasticBands: true,
     });
 
     const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
@@ -99,7 +98,6 @@ describe('upper body role-based selection (tested pool, coaching 2026-07-01)', (
         workoutNumber: i + 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'upperBody',
-        hasElasticBands: true,
       });
 
       workout.exercises.forEach(ex => {
@@ -140,7 +138,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       workoutNumber: 1,
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
-      hasElasticBands: true,
     });
 
     const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
@@ -158,7 +155,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
         workoutNumber: i + 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'glutes',
-        hasElasticBands: true,
       });
       workout.exercises.forEach(ex => {
         expect(getExerciseById(ex.exerciseId)?.primaryMuscleGroup).toBe('glutes');
@@ -176,7 +172,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
       workoutHistory: history,
-      hasElasticBands: true,
     });
     expect(workout.exercises.map(ex => slotOf(ex.exerciseId))).toContain('hinge');
   });
@@ -190,7 +185,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
       workoutHistory: history,
-      hasElasticBands: true,
     });
     const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
     expect(slots).toContain('lateral-glute');
@@ -206,7 +200,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
       workoutHistory: history,
-      hasElasticBands: true,
     });
     const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
     expect(slots).toContain('spinal-extension');
@@ -240,7 +233,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
       workoutHistory: history,
-      hasElasticBands: true,
     });
     // Last glutes accessory was lateral-glute → next must be spinal-extension.
     const slots = workout.exercises.map(ex => slotOf(ex.exerciseId));
@@ -253,7 +245,6 @@ describe('posterior chain role-based selection (glutes day, 2026-06-17 consolida
       workoutNumber: 1,
       strengthLevels: defaultStrengthLevels,
       targetMuscleGroup: 'glutes',
-      hasElasticBands: true,
     });
     workout.exercises.forEach(ex => {
       const exercise = getExerciseById(ex.exerciseId);

@@ -26,7 +26,6 @@ describe('generateDailyRotationWorkout', () => {
           workoutNumber: 1,
           strengthLevels: defaultStrengthLevels,
           targetMuscleGroup,
-          hasElasticBands: true,
         });
 
         expect(workout.exercises.length).toBe(3);
@@ -96,7 +95,6 @@ describe('generateDailyRotationWorkout', () => {
             workoutNumber: i + 1,
             strengthLevels: defaultStrengthLevels,
             targetMuscleGroup,
-            hasElasticBands: true,
           });
 
           workout.exercises.forEach(ex => {
@@ -124,12 +122,11 @@ describe('generateDailyRotationWorkout', () => {
       });
     });
 
-    it('should have at least 3 glutes exercises available for new users without bands', () => {
-      // Simulate a new user with no workout history and no elastic bands
+    it('should have at least 3 glutes exercises available for new users', () => {
+      // Simulate a new user with no workout history; band exercises are always available
       const available = getAvailableExercises(
         [], // no workout history
         { unlockedExercises: [], retiredExercises: [] },
-        false, // no elastic bands
       );
 
       const glutesExercises = available.filter(ex => ex.primaryMuscleGroup === 'glutes');
@@ -144,7 +141,6 @@ describe('generateDailyRotationWorkout', () => {
         workoutNumber: 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'glutes',
-        hasElasticBands: true,
       });
 
       workout.exercises.forEach((workoutExercise) => {
@@ -162,7 +158,6 @@ describe('generateDailyRotationWorkout', () => {
         workoutNumber: 1,
         strengthLevels: defaultStrengthLevels,
         targetMuscleGroup: 'abs',
-        hasElasticBands: true,
       });
 
       workout.exercises.forEach((workoutExercise) => {
