@@ -4,7 +4,7 @@ import WorkoutDetailModal from './WorkoutDetailModal';
 import { WorkoutHistoryEntry } from '../../types/workout';
 
 // Mock date-fns
-const formatMock = vi.fn(() => 'Jan 1, 2025 • 14:00');
+const formatMock = vi.fn<(...args: unknown[]) => string>(() => 'Jan 1, 2025 • 14:00');
 vi.mock('date-fns', () => ({
   format: (...args: unknown[]) => formatMock(...args),
 }));

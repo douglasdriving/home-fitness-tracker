@@ -35,9 +35,8 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Montserrat', 'system-ui', 'sans-serif'],
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
         display: ['Bebas Neue', 'Impact', 'sans-serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
       },
       keyframes: {
         confetti: {
