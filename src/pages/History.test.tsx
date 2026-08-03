@@ -38,6 +38,8 @@ const mockWorkoutHistory = [
     completedDate: Date.now(),
     totalDuration: 15,
     intensityScore: 85,
+    workoutMode: 'daily-rotation',
+    targetMuscleGroup: 'upperBody',
     exercises: [
       {
         exerciseId: 'plank-001',
@@ -45,6 +47,25 @@ const mockWorkoutHistory = [
         muscleGroups: ['abs'],
         completedSets: [
           { setNumber: 1, actualDuration: 30 },
+        ],
+      },
+    ],
+  },
+  {
+    id: 'history-3',
+    workoutId: 'workout-3',
+    workoutNumber: 3,
+    completedDate: Date.now(),
+    totalDuration: 18,
+    workoutMode: 'daily-rotation',
+    targetMuscleGroup: 'glutes',
+    exercises: [
+      {
+        exerciseId: 'hip-thrust-001',
+        exerciseName: 'Hip Thrust',
+        muscleGroups: ['glutes'],
+        completedSets: [
+          { setNumber: 1, actualReps: 12 },
         ],
       },
     ],
@@ -102,6 +123,54 @@ describe('History', () => {
       expect(screen.getByText(/Crunches/)).toBeInTheDocument();
       expect(screen.getByText(/Glute Bridge/)).toBeInTheDocument();
       expect(screen.getByText(/Plank/)).toBeInTheDocument();
+    });
+  });
+
+  describe('Muscle group badge', () => {
+    it('shows "Full Body" for workouts with no workoutMode', () => {
+      renderHistory();
+
+      expect(screen.getByText('Full Body')).toBeInTheDocument();
+    });
+
+    it('shows the target muscle group label for daily rotation workouts', () => {
+      renderHistory();
+
+      expect(screen.getByText('Upper Body')).toBeInTheDocument();
+    });
+
+    it('shows "Posterior Chain" for the glutes rotation day', () => {
+      renderHistory();
+
+      expect(screen.getByText('Posterior Chain')).toBeInTheDocument();
+    });
+  });
+
+  describe('Exercise pills', () => {
+    it('renders each exercise as its own pill instead of a comma-separated string', () => {
+      renderHistory();
+
+      const cruncesPill = screen.getByText(/Crunches/);
+      const glutePill = screen.getByText(/Glute Bridge/);
+
+      // Each exercise name is its own element, not joined by commas
+      expect(cruncesPill).not.toHaveTextContent(',');
+      expect(glutePill).not.toHaveTextContent(',');
+      expect(cruncesPill).not.toBe(glutePill);
+    });
+  });
+
+  describe('Duration icon', () => {
+    it('does not spell out "minutes" on workout cards', () => {
+      renderHistory();
+
+      expect(screen.queryByText('minutes')).not.toBeInTheDocument();
+    });
+
+    it('shows a duration icon with an accessible label', () => {
+      renderHistory();
+
+      expect(screen.getAllByLabelText('duration').length).toBeGreaterThan(0);
     });
   });
 });

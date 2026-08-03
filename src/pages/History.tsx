@@ -2,10 +2,28 @@ import { useEffect, useState } from 'react';
 import { useWorkoutStore } from '../store/workout-store';
 import { format } from 'date-fns';
 import { WorkoutHistoryEntry } from '../types/workout';
+import { MuscleGroup } from '../types/exercise';
 import EditWorkoutModal from '../components/history/EditWorkoutModal';
 import AddManualWorkoutModal from '../components/history/AddManualWorkoutModal';
 import WorkoutDetailModal from '../components/history/WorkoutDetailModal';
 import { getExerciseEmoji } from '../data/exerciseData';
+
+// Display labels for the daily rotation muscle groups. Glutes days are
+// coached as "Posterior Chain" days (2026-06-17 consolidation), so that's
+// the label shown rather than the raw muscle group name.
+const ROTATION_GROUP_LABELS: Record<MuscleGroup, string> = {
+  abs: 'Abs',
+  glutes: 'Posterior Chain',
+  lowerBack: 'Lower Back',
+  upperBody: 'Upper Body',
+};
+
+function getMuscleGroupLabel(entry: WorkoutHistoryEntry): string {
+  if (entry.workoutMode === 'daily-rotation' && entry.targetMuscleGroup) {
+    return ROTATION_GROUP_LABELS[entry.targetMuscleGroup];
+  }
+  return 'Full Body';
+}
 
 export default function History() {
   const { workoutHistory, loadHistory, deleteHistoryEntry, updateHistoryEntry, addManualWorkout } = useWorkoutStore();
@@ -159,21 +177,34 @@ export default function History() {
                       <p className="text-sm text-text-muted">
                         {format(new Date(entry.completedDate), 'MMM d, yyyy')}
                       </p>
+                      <span className="inline-block mt-1 text-xs bg-primary/20 text-primary px-2 py-0.5 rounded-full">
+                        {getMuscleGroupLabel(entry)}
+                      </span>
                     </div>
                     <div className="flex gap-3 items-center">
                       <div className="text-right">
                         <div className="text-2xl font-bold text-primary">
                           {entry.totalDuration}
                         </div>
-                        <div className="text-xs text-text-muted">minutes</div>
+                        <svg
+                          className="w-4 h-4 text-text-muted mx-auto mt-0.5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                          aria-label="duration"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
                       </div>
                     </div>
                   </div>
-                  <div className="text-sm text-text-muted">
+                  <div className="flex flex-wrap gap-1.5">
                     {entry.exercises.map((ex, idx) => (
-                      <span key={idx}>
+                      <span
+                        key={idx}
+                        className="text-xs bg-background-lighter text-text-muted px-2 py-1 rounded-full"
+                      >
                         {getExerciseEmoji(ex.exerciseId)} {ex.exerciseName}
-                        {idx < entry.exercises.length - 1 ? ', ' : ''}
                       </span>
                     ))}
                   </div>
