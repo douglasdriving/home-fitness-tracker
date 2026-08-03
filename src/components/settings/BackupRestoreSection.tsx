@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
   buildBackupData,
   downloadBackupFile,
@@ -19,6 +19,10 @@ export default function BackupRestoreSection() {
   const [isImporting, setIsImporting] = useState(false);
   const [showPasteImport, setShowPasteImport] = useState(false);
   const [pastedJSON, setPastedJSON] = useState('');
+  // Some Android devices fire the file input's change event twice for one selection,
+  // which can otherwise start two overlapping restores. React state updates are async
+  // and don't reliably block the second event in time, so a plain ref does the guarding.
+  const isRestoringRef = useRef(false);
 
   const handleExportData = async () => {
     try {
@@ -58,6 +62,8 @@ export default function BackupRestoreSection() {
   const handleImportData = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    if (isRestoringRef.current) return; // duplicate change event on the same selection
+    isRestoringRef.current = true;
 
     try {
       setIsImporting(true);
@@ -68,6 +74,7 @@ export default function BackupRestoreSection() {
       const message = error instanceof Error ? error.message : 'Unknown error';
       alert(`Failed to import data: ${message}`);
     } finally {
+      isRestoringRef.current = false;
       setIsImporting(false);
       // Reset file input
       event.target.value = '';
@@ -75,6 +82,9 @@ export default function BackupRestoreSection() {
   };
 
   const handlePasteImport = async () => {
+    if (isRestoringRef.current) return;
+    isRestoringRef.current = true;
+
     try {
       setIsImporting(true);
       const importData = parseBackupJSON(pastedJSON);
@@ -84,6 +94,7 @@ export default function BackupRestoreSection() {
       const message = error instanceof Error ? error.message : 'Unknown error';
       alert(`Failed to import data: ${message}`);
     } finally {
+      isRestoringRef.current = false;
       setIsImporting(false);
     }
   };
