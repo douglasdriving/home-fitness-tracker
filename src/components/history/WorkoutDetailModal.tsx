@@ -73,7 +73,7 @@ export default function WorkoutDetailModal({
               <div>
                 <p className="text-sm text-text-muted mb-1">Date</p>
                 <p className="text-text font-medium">
-                  {format(new Date(workout.completedDate), 'MMM d, yyyy • h:mm a')}
+                  {format(new Date(workout.completedDate), 'MMM d, yyyy • HH:mm')}
                 </p>
               </div>
               <div className="text-right">

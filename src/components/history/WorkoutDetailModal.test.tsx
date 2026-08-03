@@ -4,8 +4,9 @@ import WorkoutDetailModal from './WorkoutDetailModal';
 import { WorkoutHistoryEntry } from '../../types/workout';
 
 // Mock date-fns
+const formatMock = vi.fn(() => 'Jan 1, 2025 • 14:00');
 vi.mock('date-fns', () => ({
-  format: () => 'Jan 1, 2025 • 10:00 AM',
+  format: (...args: unknown[]) => formatMock(...args),
 }));
 
 // Mock Dexie database
@@ -59,6 +60,23 @@ describe('WorkoutDetailModal', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+  });
+
+  it('formats the completed date/time using a 24-hour clock (no AM/PM)', () => {
+    const workout: WorkoutHistoryEntry = {
+      id: 'history-1',
+      workoutId: 'workout-1',
+      workoutNumber: 1,
+      completedDate: Date.now(),
+      totalDuration: 20,
+      exercises: [],
+    };
+
+    render(<WorkoutDetailModal {...baseProps} workout={workout} />);
+
+    const formatString = formatMock.mock.calls[0][1] as string;
+    expect(formatString).toMatch(/HH:mm/);
+    expect(formatString).not.toMatch(/h:mm a/i);
   });
 
   it('displays McGill format for sets with mcgillRounds and mcgillHoldDuration', () => {
