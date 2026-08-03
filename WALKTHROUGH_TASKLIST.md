@@ -35,9 +35,9 @@ Source: [home-fitness-tracker-walthrough.txt](home-fitness-tracker-walthrough.tx
 
 ## History Page
 
-- [ ] Show the **muscle group** (abs / posterior chain / upper body / etc.) on each workout history card. (P2)
-- [ ] Display exercises as individual **pills** instead of a comma-separated text string. (P2)
-- [ ] Replace the "X minutes" text with a time icon (e.g. clock/stopwatch glyph) instead of spelling out "minutes". (P3)
+- [x] Show the **muscle group** (abs / posterior chain / upper body / etc.) on each workout history card. (P2)
+- [x] Display exercises as individual **pills** instead of a comma-separated text string. (P2)
+- [x] Replace the "X minutes" text with a time icon (e.g. clock/stopwatch glyph) instead of spelling out "minutes". (P3)
 
 ---
 
@@ -55,8 +55,8 @@ Source: [home-fitness-tracker-walthrough.txt](home-fitness-tracker-walthrough.tx
 
 ## Daily Focus — Start/Preview Screen
 
-- [ ] Remove the estimated-time pill (e.g. "16 minutes") — the estimate feels inaccurate and isn't needed for a short workout. (P2)
-- [ ] Remove the "Daily rotation mode" label/subtext under the workout title. (P3)
+- [x] Remove the estimated-time pill (e.g. "16 minutes") — the estimate feels inaccurate and isn't needed for a short workout. (P2)
+- [x] Remove the "Daily rotation mode" label/subtext under the workout title. (P3)
 
 ---
 

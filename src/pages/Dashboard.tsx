@@ -256,20 +256,12 @@ export default function Dashboard() {
         {/* Next Workout / Generate Workout */}
         {currentWorkout ? (
           <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
-            <div className="flex justify-between items-center mb-4">
-              <div>
-                <h2 className="text-2xl font-display font-bold text-text-bright">
-                  {currentWorkout.workoutMode === 'daily-rotation'
-                    ? `DAILY FOCUS: ${currentWorkout.targetMuscleGroup?.toUpperCase()} #${currentWorkout.workoutNumber}`
-                    : `FULL CORE WORKOUT #${currentWorkout.workoutNumber}`}
-                </h2>
-                <span className="text-xs text-text-muted">
-                  {currentWorkout.workoutMode === 'daily-rotation' ? 'Daily Rotation Mode' : 'Full Body Mode'}
-                </span>
-              </div>
-              <span className="text-sm font-semibold text-primary bg-primary/10 px-3 py-1 rounded-full">
-                {currentWorkout.estimatedDuration} min
-              </span>
+            <div className="mb-4">
+              <h2 className="text-2xl font-display font-bold text-text-bright">
+                {currentWorkout.workoutMode === 'daily-rotation'
+                  ? `DAILY FOCUS: ${currentWorkout.targetMuscleGroup?.toUpperCase()} #${currentWorkout.workoutNumber}`
+                  : `FULL CORE WORKOUT #${currentWorkout.workoutNumber}`}
+              </h2>
             </div>
 
             <div className="space-y-3">
