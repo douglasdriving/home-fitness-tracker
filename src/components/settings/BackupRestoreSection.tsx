@@ -103,7 +103,9 @@ export default function BackupRestoreSection() {
         <div>
           <input
             type="file"
-            accept=".json"
+            // Deliberately unfiltered: some Android file pickers route MIME/extension-filtered
+            // requests through a flakier document provider than an unfiltered pick. The file
+            // content itself is still validated after reading, so this is safe either way.
             onChange={handleImportData}
             disabled={isImporting}
             className="hidden"
