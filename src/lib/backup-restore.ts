@@ -46,6 +46,39 @@ export async function buildBackupData(): Promise<BackupData> {
   };
 }
 
+/**
+ * Reads a File as text via FileReader rather than the modern Blob.text()/arrayBuffer()
+ * promise APIs. Android Chrome has a known bug where reading files picked from certain
+ * content providers (e.g. the Downloads folder) via those newer APIs throws a NotFoundError
+ * ("a requested file or directory could not be found") — FileReader doesn't hit it.
+ */
+export function readFileAsText(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result));
+    reader.onerror = () => reject(reader.error ?? new Error('Could not read the selected file'));
+    reader.readAsText(file);
+  });
+}
+
+/** Reads, parses, and validates a picked backup file, throwing a specific message at each stage. */
+export async function parseBackupFile(file: File): Promise<BackupData> {
+  const text = await readFileAsText(file);
+
+  let data: unknown;
+  try {
+    data = JSON.parse(text);
+  } catch {
+    throw new Error('This file is not valid JSON');
+  }
+
+  if (!validateBackupData(data)) {
+    throw new Error('This file is not a valid fitness tracker backup');
+  }
+
+  return data;
+}
+
 export function validateBackupData(data: unknown): data is BackupData {
   if (!data || typeof data !== 'object') return false;
   const candidate = data as Record<string, unknown>;
