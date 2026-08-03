@@ -1,17 +1,18 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useUserStore } from '../../store/user-store';
-import { db } from '../../db/db';
-import { loadUserProfile, saveUserProfile } from '../../utils/userProfile';
+import {
+  buildBackupData,
+  downloadBackupFile,
+  validateBackupData,
+  restoreBackupData,
+  recordBackupExported,
+} from '../../lib/backup-restore';
 import Button from '../common/Button';
 
 /**
- * Export the user's full dataset (profile + workouts + history) to a JSON file,
- * or restore it from a previously exported backup.
+ * Export the user's full dataset (profile + workouts + history + notes +
+ * strength history) to a JSON file, or restore it from a previously exported backup.
  */
 export default function BackupRestoreSection() {
-  const navigate = useNavigate();
-  const { initializeUser } = useUserStore();
   const [isExporting, setIsExporting] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
 
@@ -19,36 +20,14 @@ export default function BackupRestoreSection() {
     try {
       setIsExporting(true);
 
-      // Get all data
-      const userProfile = loadUserProfile();
-      const workouts = await db.workouts.toArray();
-      const history = await db.history.toArray();
-
-      const exportData = {
-        version: '1.0',
-        exportDate: Date.now(),
-        userProfile,
-        workouts,
-        history,
-      };
-
-      // Create blob and download
-      const blob = new Blob([JSON.stringify(exportData, null, 2)], {
-        type: 'application/json',
-      });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `fitness-tracker-backup-${Date.now()}.json`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-
+      const exportData = await buildBackupData();
+      downloadBackupFile(exportData);
+      recordBackupExported(exportData.exportDate);
       alert('Data exported successfully!');
     } catch (error) {
       console.error('Export failed:', error);
-      alert('Failed to export data. Please try again.');
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to export data: ${message}`);
     } finally {
       setIsExporting(false);
     }
@@ -64,9 +43,8 @@ export default function BackupRestoreSection() {
       const text = await file.text();
       const importData = JSON.parse(text);
 
-      // Validate import data
-      if (!importData.version || !importData.userProfile) {
-        throw new Error('Invalid backup file');
+      if (!validateBackupData(importData)) {
+        throw new Error('This file is not a valid fitness tracker backup');
       }
 
       // Confirm before restoring
@@ -79,31 +57,16 @@ export default function BackupRestoreSection() {
         return;
       }
 
-      // Clear existing data
-      await db.workouts.clear();
-      await db.history.clear();
+      await restoreBackupData(importData);
 
-      // Restore user profile
-      saveUserProfile(importData.userProfile);
-
-      // Restore workouts
-      if (importData.workouts && importData.workouts.length > 0) {
-        await db.workouts.bulkAdd(importData.workouts);
-      }
-
-      // Restore history
-      if (importData.history && importData.history.length > 0) {
-        await db.history.bulkAdd(importData.history);
-      }
-
-      // Reinitialize user
-      initializeUser();
-
-      alert('Data restored successfully!');
-      navigate('/');
+      alert('Data restored successfully! Reloading the app...');
+      // Full reload (rather than just navigating) so every Zustand store re-initializes
+      // from the freshly-restored data instead of keeping whatever it had cached in memory.
+      window.location.href = '/';
     } catch (error) {
       console.error('Import failed:', error);
-      alert('Failed to import data. Please make sure you selected a valid backup file.');
+      const message = error instanceof Error ? error.message : 'Unknown error';
+      alert(`Failed to import data: ${message}`);
     } finally {
       setIsImporting(false);
       // Reset file input

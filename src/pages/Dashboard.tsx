@@ -6,6 +6,7 @@ import { db } from '../db/db';
 import Button from '../components/common/Button';
 import StreakTracker from '../components/common/StreakTracker';
 import StorageWarning from '../components/common/StorageWarning';
+import BackupReminder from '../components/common/BackupReminder';
 import { getExerciseEmoji } from '../data/exerciseData';
 import { getNextDailyRotationGroup } from '../lib/workout-generator';
 import { MuscleGroup } from '../types/exercise';
@@ -217,6 +218,9 @@ export default function Dashboard() {
       <div className="p-4 space-y-6">
         {/* Storage Warning */}
         <StorageWarning />
+
+        {/* Backup Reminder */}
+        <BackupReminder />
 
         {/* Streak Tracker */}
         <StreakTracker />
