@@ -57,7 +57,6 @@ export default function Dashboard() {
   const { currentWorkout, loadWorkouts, generateNewWorkout, generateDailyRotationWorkout, startWorkout, discardWorkout, loadHistory, workoutHistory } =
     useWorkoutStore();
   const [newExerciseIds, setNewExerciseIds] = useState<Set<string>>(new Set());
-  const [timeConstraint, setTimeConstraint] = useState<string>('');
   const [activeStretchSession, setActiveStretchSession] = useState<StretchState | null>(null);
   const [nextDailyRotationGroup, setNextDailyRotationGroup] = useState<MuscleGroup>('abs');
 
@@ -119,9 +118,7 @@ export default function Dashboard() {
 
   const handleGenerateWorkout = async () => {
     try {
-      const timeLimit = timeConstraint ? parseInt(timeConstraint) : undefined;
-      await generateNewWorkout(timeLimit);
-      setTimeConstraint(''); // Reset after generation
+      await generateNewWorkout();
     } catch (error) {
       console.error('Error generating workout:', error);
       alert('Failed to generate workout. Please try again.');
@@ -338,12 +335,7 @@ export default function Dashboard() {
             {/* Daily Focus Session Card */}
             <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-purple-600">
               <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-bold text-text">🎯 Daily Focus Session</h3>
-                  <span className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full font-semibold">
-                    SHORTER
-                  </span>
-                </div>
+                <h3 className="text-lg font-bold text-text mb-2">🎯 Daily Focus Session</h3>
                 <p className="text-sm text-text-muted mb-3">
                   3 exercises focusing on one muscle group. Faster, focused workout with muscle-group rotation.
                 </p>
@@ -357,19 +349,14 @@ export default function Dashboard() {
                 </div>
               </div>
               <Button onClick={handleGenerateDailyRotation} fullWidth variant="primary">
-                Generate Daily Focus
+                Start
               </Button>
             </div>
 
             {/* Full Core Workout Card */}
             <div className="bg-background-light rounded-lg shadow-lg p-6 border-l-4 border-primary">
               <div className="mb-4">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-bold text-text">💪 Full Core Workout</h3>
-                  <span className="text-xs bg-primary text-white px-2 py-1 rounded-full font-semibold">
-                    COMPLETE
-                  </span>
-                </div>
+                <h3 className="text-lg font-bold text-text mb-2">💪 Full Core Workout</h3>
                 <p className="text-sm text-text-muted mb-3">
                   4 exercises covering all muscle groups (abs, glutes, lower back). Comprehensive full-body core training.
                 </p>
@@ -381,25 +368,9 @@ export default function Dashboard() {
                     All muscle groups
                   </span>
                 </div>
-
-                {/* Time Constraint Input */}
-                <div className="mt-3">
-                  <label className="block text-xs font-medium text-text-muted mb-1">
-                    Time limit (optional)
-                  </label>
-                  <input
-                    type="number"
-                    value={timeConstraint}
-                    onChange={(e) => setTimeConstraint(e.target.value)}
-                    placeholder="e.g., 30 minutes"
-                    min="5"
-                    max="60"
-                    className="w-full px-3 py-2 bg-background border border-background-lighter text-text rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none placeholder:text-text-muted text-sm"
-                  />
-                </div>
               </div>
               <Button onClick={handleGenerateWorkout} fullWidth variant="primary">
-                Generate Full Workout
+                Start
               </Button>
             </div>
           </div>

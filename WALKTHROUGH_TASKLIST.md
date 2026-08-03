@@ -19,16 +19,16 @@ Source: [home-fitness-tracker-walthrough.txt](home-fitness-tracker-walthrough.tx
 ## 🌐 Global / Cross-Cutting
 
 - [x] **Switch entire app from 12-hour (AM/PM) to 24-hour clock**, everywhere a time is displayed (workout history detail, etc.). (P2)
-- [ ] **Replace the default/generic app font** with something bolder, blockier, and more energetic to fit a fitness-app vibe — currently reads as a generic React/Google default with no personality. Single highest-impact style change per the user. (P2)
+- [x] **Replace the default/generic app font** with something bolder, blockier, and more energetic to fit a fitness-app vibe — currently reads as a generic React/Google default with no personality. Single highest-impact style change per the user. (P2)
 - [ ] **Recurring design theme — cut duplicate progress/status indicators and redundant text.** Multiple screens show the same information twice (see Exercise Session Screen and Main Workout Screen below for specifics). When touching any of these screens, apply this principle: prefer one clear visual indicator over repeated text/numbers. (P2)
 
 ---
 
 ## Dashboard (Home)
 
-- [ ] Remove the "shorter" / "complete" info pills from workout cards — extra clutter. (P2)
-- [ ] Change button labels "Generate Daily Focus" / "Generate Full Workout" to just **"Start"**. (P2)
-- [ ] Remove the optional time-limit setting on the Full Core Workout — no longer used. Keep the Full Core Workout feature itself for now (deprioritized, but don't delete). (P3)
+- [x] Remove the "shorter" / "complete" info pills from workout cards — extra clutter. (P2)
+- [x] Change button labels "Generate Daily Focus" / "Generate Full Workout" to just **"Start"**. (P2)
+- [x] Remove the optional time-limit setting on the Full Core Workout — no longer used. Keep the Full Core Workout feature itself for now (deprioritized, but don't delete). (P3)
 - [ ] Note: user has shifted almost entirely to Daily Focus sessions over Full Workouts — prioritize future iteration there. (context, not a standalone task)
 
 ---
