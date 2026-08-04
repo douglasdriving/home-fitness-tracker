@@ -37,7 +37,7 @@ describe('McgillTimer', () => {
       screen.getByText('Start').click();
     });
 
-    expect(screen.getByText(/Left Side — Hold 1 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 1 of 3/)).toBeInTheDocument();
   });
 
   it('progresses through all left-side rounds before transitioning', () => {
@@ -58,7 +58,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on left-hold round 1
-    expect(screen.getByText(/Left Side — Hold 1 of 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 1 of 2/)).toBeInTheDocument();
 
     // Advance through the first 5s hold
     act(() => {
@@ -66,7 +66,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on left-rest (between rounds on same side)
-    expect(screen.getByText('Left Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 1 — Rest')).toBeInTheDocument();
 
     // Advance through 3s rest
     act(() => {
@@ -74,7 +74,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on left-hold round 2
-    expect(screen.getByText(/Left Side — Hold 2 of 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 2 of 2/)).toBeInTheDocument();
 
     // Advance through second hold
     act(() => {
@@ -82,7 +82,7 @@ describe('McgillTimer', () => {
     });
 
     // All left rounds done, should now be transitioning
-    expect(screen.getByText('Switch to Right Side')).toBeInTheDocument();
+    expect(screen.getByText('Switch to Side 2')).toBeInTheDocument();
 
     // Advance through transition
     act(() => {
@@ -90,7 +90,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on right-hold round 1
-    expect(screen.getByText(/Right Side — Hold 1 of 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 1 of 2/)).toBeInTheDocument();
 
     // Advance through right hold 1
     act(() => {
@@ -98,7 +98,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on right-rest
-    expect(screen.getByText('Right Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 2 — Rest')).toBeInTheDocument();
 
     // Advance through rest
     act(() => {
@@ -106,7 +106,7 @@ describe('McgillTimer', () => {
     });
 
     // Should be on right-hold round 2
-    expect(screen.getByText(/Right Side — Hold 2 of 2/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 2 of 2/)).toBeInTheDocument();
 
     // Advance through last hold
     act(() => {
@@ -134,7 +134,7 @@ describe('McgillTimer', () => {
       screen.getByText('Start').click();
     });
 
-    expect(screen.getByText(/Left Side — Hold 1 of 1/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 1 of 1/)).toBeInTheDocument();
 
     // Complete left hold
     act(() => {
@@ -142,14 +142,14 @@ describe('McgillTimer', () => {
     });
 
     // Should go directly to transition (no rest since only 1 round)
-    expect(screen.getByText('Switch to Right Side')).toBeInTheDocument();
+    expect(screen.getByText('Switch to Side 2')).toBeInTheDocument();
 
     // Complete transition
     act(() => {
       vi.advanceTimersByTime(5000);
     });
 
-    expect(screen.getByText(/Right Side — Hold 1 of 1/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 1 of 1/)).toBeInTheDocument();
 
     // Complete right hold
     act(() => {
@@ -168,9 +168,9 @@ describe('McgillTimer', () => {
       screen.getByText('Start').click();
     });
 
-    // Should show L and R labels for round dots
-    expect(screen.getByText('L')).toBeInTheDocument();
-    expect(screen.getByText('R')).toBeInTheDocument();
+    // Should show "1" and "2" labels for the two side rows of round dots
+    expect(screen.getByText('1')).toBeInTheDocument();
+    expect(screen.getByText('2')).toBeInTheDocument();
   });
 
   it('does not show round dots for single round', () => {
@@ -182,8 +182,8 @@ describe('McgillTimer', () => {
     });
 
     // Should not show round dot labels (rounds <= 1)
-    expect(screen.queryByText('L')).not.toBeInTheDocument();
-    expect(screen.queryByText('R')).not.toBeInTheDocument();
+    expect(screen.queryByText('1')).not.toBeInTheDocument();
+    expect(screen.queryByText('2')).not.toBeInTheDocument();
   });
 
   it('skip button completes the timer immediately', () => {
@@ -349,19 +349,19 @@ describe('McgillTimer', () => {
       });
 
       expect(screen.getByText(/^Hold 1 of 3$/)).toBeInTheDocument();
-      expect(screen.queryByText(/Left Side/)).not.toBeInTheDocument();
-      expect(screen.queryByText(/Right Side/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Side 1/)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Side 2/)).not.toBeInTheDocument();
     });
 
-    it('does not render L/R round-dot labels', () => {
+    it('does not render side-number round-dot labels', () => {
       render(<McgillTimer rounds={3} holdDuration={15} perSide={false} />);
 
       act(() => {
         screen.getByText('Start').click();
       });
 
-      expect(screen.queryByText('L')).not.toBeInTheDocument();
-      expect(screen.queryByText('R')).not.toBeInTheDocument();
+      expect(screen.queryByText('1')).not.toBeInTheDocument();
+      expect(screen.queryByText('2')).not.toBeInTheDocument();
     });
 
     it('completes after a single run with no transition or right side', () => {
@@ -384,7 +384,7 @@ describe('McgillTimer', () => {
       expect(screen.getByText(/^Hold 1 of 2$/)).toBeInTheDocument();
       act(() => { vi.advanceTimersByTime(5000); });
 
-      // Rest (no "Left Side" prefix)
+      // Rest (no "Side 1" prefix)
       expect(screen.getByText('Rest')).toBeInTheDocument();
       act(() => { vi.advanceTimersByTime(3000); });
 
@@ -393,7 +393,7 @@ describe('McgillTimer', () => {
       act(() => { vi.advanceTimersByTime(5000); });
 
       // Should be complete immediately — no transition, no right side
-      expect(screen.queryByText('Switch to Right Side')).not.toBeInTheDocument();
+      expect(screen.queryByText('Switch to Side 2')).not.toBeInTheDocument();
       expect(screen.getByText('Complete!')).toBeInTheDocument();
       expect(onComplete).toHaveBeenCalledTimes(1);
     });
@@ -449,47 +449,47 @@ describe('McgillTimer', () => {
     });
 
     // Left Hold 1
-    expect(screen.getByText(/Left Side — Hold 1 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 1 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Left Rest 1
-    expect(screen.getByText('Left Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 1 — Rest')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(5000); });
 
     // Left Hold 2
-    expect(screen.getByText(/Left Side — Hold 2 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 2 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Left Rest 2
-    expect(screen.getByText('Left Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 1 — Rest')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(5000); });
 
     // Left Hold 3
-    expect(screen.getByText(/Left Side — Hold 3 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 1 — Hold 3 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Transition
-    expect(screen.getByText('Switch to Right Side')).toBeInTheDocument();
+    expect(screen.getByText('Switch to Side 2')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Right Hold 1
-    expect(screen.getByText(/Right Side — Hold 1 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 1 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Right Rest 1
-    expect(screen.getByText('Right Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 2 — Rest')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(5000); });
 
     // Right Hold 2
-    expect(screen.getByText(/Right Side — Hold 2 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 2 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Right Rest 2
-    expect(screen.getByText('Right Side — Rest')).toBeInTheDocument();
+    expect(screen.getByText('Side 2 — Rest')).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(5000); });
 
     // Right Hold 3
-    expect(screen.getByText(/Right Side — Hold 3 of 3/)).toBeInTheDocument();
+    expect(screen.getByText(/Side 2 — Hold 3 of 3/)).toBeInTheDocument();
     act(() => { vi.advanceTimersByTime(10000); });
 
     // Complete

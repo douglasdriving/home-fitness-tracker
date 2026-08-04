@@ -219,11 +219,11 @@ export default function McgillTimer({
   const getStatusText = (): string => {
     if (phase === 'idle') return 'Ready to start';
     if (phase === 'complete') return 'Complete!';
-    if (phase === 'left-hold') return perSide ? `Left Side — Hold ${currentRound} of ${rounds}` : `Hold ${currentRound} of ${rounds}`;
-    if (phase === 'left-rest') return perSide ? 'Left Side — Rest' : 'Rest';
-    if (phase === 'transition') return 'Switch to Right Side';
-    if (phase === 'right-hold') return `Right Side — Hold ${currentRound} of ${rounds}`;
-    if (phase === 'right-rest') return 'Right Side — Rest';
+    if (phase === 'left-hold') return perSide ? `Side 1 — Hold ${currentRound} of ${rounds}` : `Hold ${currentRound} of ${rounds}`;
+    if (phase === 'left-rest') return perSide ? 'Side 1 — Rest' : 'Rest';
+    if (phase === 'transition') return 'Switch to Side 2';
+    if (phase === 'right-hold') return `Side 2 — Hold ${currentRound} of ${rounds}`;
+    if (phase === 'right-rest') return 'Side 2 — Rest';
     return '';
   };
 
@@ -235,8 +235,8 @@ export default function McgillTimer({
   };
 
   const getSideIndicator = (): string => {
-    if (phase === 'left-hold' || phase === 'left-rest') return '← L';
-    if (phase === 'right-hold' || phase === 'right-rest') return 'R →';
+    if (phase === 'left-hold' || phase === 'left-rest') return '← 1';
+    if (phase === 'right-hold' || phase === 'right-rest') return '2 →';
     if (phase === 'transition') return '← → ';
     return '';
   };
@@ -312,8 +312,8 @@ export default function McgillTimer({
         <div className="flex justify-center gap-4 mb-3">
           {perSide ? (
             <>
-              {renderRoundDots('left', 'L')}
-              {renderRoundDots('right', 'R')}
+              {renderRoundDots('left', '1')}
+              {renderRoundDots('right', '2')}
             </>
           ) : (
             renderRoundDots('left')

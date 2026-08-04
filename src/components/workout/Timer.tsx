@@ -202,11 +202,11 @@ export default function Timer({
   const getStatusText = () => {
     if (bilateral) {
       if (currentSide === 'left') {
-        return 'Left Side';
+        return 'Side 1';
       } else if (currentSide === 'transition') {
         return 'Switching Sides...';
       } else if (currentSide === 'right') {
-        return 'Right Side';
+        return 'Side 2';
       } else {
         return 'Complete';
       }

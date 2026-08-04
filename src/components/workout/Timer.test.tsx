@@ -19,3 +19,11 @@ describe('Timer box nesting', () => {
     expect(screen.getByText('Start')).toBeInTheDocument();
   });
 });
+
+describe('Timer bilateral side labels', () => {
+  it('labels the first side "Side 1", not "Left Side"', () => {
+    render(<Timer duration={10} bilateral />);
+    expect(screen.getByText('Side 1')).toBeInTheDocument();
+    expect(screen.queryByText('Left Side')).not.toBeInTheDocument();
+  });
+});
