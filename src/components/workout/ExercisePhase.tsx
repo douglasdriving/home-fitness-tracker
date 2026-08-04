@@ -9,7 +9,8 @@ import Timer from './Timer';
 import McgillTimer from './McgillTimer';
 import Button from '../common/Button';
 import Input from '../common/Input';
-import ExerciseModal from './ExerciseModal';
+import InlineVideoPlayer from './InlineVideoPlayer';
+import LadderProgress from './LadderProgress';
 import { WorkoutExercise, Set as WorkoutSet } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
 import { formatMcgillSet } from '../../utils/mcgill-formatter';
@@ -42,7 +43,6 @@ export default function ExercisePhase({
 
   const [equipmentInput, setEquipmentInput] = useState(previousSetEquipment);
   const [exerciseNote, setExerciseNote] = useState(previousNote);
-  const [showExerciseModal, setShowExerciseModal] = useState(false);
 
   // Update equipment when set changes
   useEffect(() => {
@@ -120,6 +120,10 @@ export default function ExercisePhase({
                 </span>
               ))}
             </div>
+
+            {exercise.description && (
+              <p className="text-sm text-text-muted mt-3 leading-relaxed">{exercise.description}</p>
+            )}
 
             {/* Current Ladder Rung */}
             {exercise.ladder && (
@@ -243,24 +247,17 @@ export default function ExercisePhase({
         </Button>
       </div>
 
-      {/* Exercise Help Button */}
-      <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-        <button
-          onClick={() => setShowExerciseModal(true)}
-          className="w-full flex items-center justify-center gap-2 text-primary hover:text-primary-light transition-colors"
-        >
-          <span className="text-xl">❓</span>
-          <span className="text-sm font-medium">How to do this exercise</span>
-        </button>
-      </div>
+      {/* Video (click-to-play, scroll down to find it) */}
+      {exercise.videoUrl && (
+        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
+          <h3 className="text-sm font-medium text-text-muted mb-3">Watch how it&apos;s done</h3>
+          <InlineVideoPlayer videoUrl={exercise.videoUrl} title={exercise.name} />
+        </div>
+      )}
 
-      {/* Exercise Modal */}
-      {showExerciseModal && (
-        <ExerciseModal
-          exercise={exercise}
-          currentLadderRung={currentExercise.ladderRung}
-          onClose={() => setShowExerciseModal(false)}
-        />
+      {/* Full Difficulty Ladder */}
+      {exercise.ladder && (
+        <LadderProgress ladder={exercise.ladder} currentRung={currentExercise.ladderRung ?? 0} />
       )}
     </div>
   );

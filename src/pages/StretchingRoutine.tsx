@@ -8,7 +8,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { stretchingRoutine, getStretchesForMuscleGroup } from '../data/stretchingData';
 import Timer from '../components/workout/Timer';
-import StretchModal from '../components/workout/StretchModal';
+import InlineVideoPlayer from '../components/workout/InlineVideoPlayer';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { MuscleGroup } from '../types/exercise';
@@ -41,7 +41,6 @@ export default function StretchingRoutine() {
   }, [targetMuscleGroup]);
 
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
-  const [showStretchModal, setShowStretchModal] = useState(false);
   const [completedStretches, setCompletedStretches] = useState<Set<number>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -195,6 +194,13 @@ export default function StretchingRoutine() {
             </div>
           </div>
 
+          {currentStretch.instructions.length > 0 && (
+            <ol className="list-decimal list-inside space-y-1 text-sm text-text-muted leading-relaxed">
+              {currentStretch.instructions.map((instruction, idx) => (
+                <li key={idx}>{instruction}</li>
+              ))}
+            </ol>
+          )}
         </div>
 
         {/* Timer */}
@@ -208,22 +214,14 @@ export default function StretchingRoutine() {
           />
         </div>
 
-        {/* Stretch Help Button */}
-        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-          <button
-            onClick={() => setShowStretchModal(true)}
-            className="w-full flex items-center justify-center gap-2 text-purple-600 hover:text-purple-700 transition-colors"
-          >
-            <span className="text-xl">❓</span>
-            <span className="text-sm font-medium">How to do this stretch</span>
-          </button>
-        </div>
+        {/* Video (click-to-play, scroll down to find it) */}
+        {currentStretch.videoUrl && (
+          <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
+            <h3 className="text-sm font-medium text-text-muted mb-3">Watch how it&apos;s done</h3>
+            <InlineVideoPlayer videoUrl={currentStretch.videoUrl} title={currentStretch.name} />
+          </div>
+        )}
       </div>
-
-      {/* Stretch Modal */}
-      {showStretchModal && (
-        <StretchModal stretch={currentStretch} onClose={() => setShowStretchModal(false)} />
-      )}
     </div>
   );
 }

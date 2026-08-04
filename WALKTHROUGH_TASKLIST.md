@@ -69,8 +69,8 @@ These three screens share the same underlying UI, so fixes here apply across all
 - [x] Reduce box nesting around the timer — the timer is boxed inside another box; it should sit directly on the page background. (P3)
 - [x] Remove the redundant "Duration: 60 seconds" header text when the timer itself already displays the countdown. (P2)
 - [x] Remove the "Total warmup is about 3 minutes" summary text at the bottom of the warmup screen — not useful. (P3)
-- [ ] 💡 Move exercise how-to content inline instead of behind a "How to do this move" modal: embed the video (user-initiated play, not autoplay) and instructions directly on the page, reachable by scrolling down. (P2)
-- [ ] Move short-form instructions higher up the page — e.g. directly under the exercise name/heading — since they're brief enough to not need a separate section. (P2)
+- [x] 💡 Move exercise how-to content inline instead of behind a "How to do this move" modal: embed the video (user-initiated play, not autoplay) and instructions directly on the page, reachable by scrolling down. (P2)
+- [x] Move short-form instructions higher up the page — e.g. directly under the exercise name/heading — since they're brief enough to not need a separate section. (P2)
 - [ ] Rename left/right-side labeling to **"Side 1" / "Side 2"** for two-sided exercises (trunk rotations, bird dogs, etc.) — more natural since users don't think in strict left/right order. (P3)
 - [ ] Remove the forced "switch sides" timer/buffer on exercises where switching is effectively instant (e.g. trunk rotations don't need a 10s switch countdown). (P2)
 

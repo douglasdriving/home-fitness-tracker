@@ -106,4 +106,34 @@ describe('StretchingRoutine - No Rest Timer Between Stretches', () => {
     renderStretchingRoutine();
     expect(screen.queryByText(/Total routine/)).not.toBeInTheDocument();
   });
+
+  it('shows instructions inline under the heading instead of behind a modal', () => {
+    renderStretchingRoutine();
+    // Child's Pose's first instruction line
+    expect(screen.getByText(/Kneel on the floor and sit back on your heels/)).toBeInTheDocument();
+    expect(screen.queryByText('How to do this stretch')).not.toBeInTheDocument();
+  });
+
+  it('shows an inline, click-to-play video for stretches that have one', () => {
+    renderStretchingRoutine();
+    // Child's Pose has a videoUrl — should render a play button, not an autoplaying iframe
+    expect(screen.getByRole('button', { name: /play video/i })).toBeInTheDocument();
+  });
+
+  it('does not show a video section for stretches without a video', () => {
+    localStorage.setItem(
+      'stretchRoutineState',
+      JSON.stringify({
+        workoutId: 'test-workout-123',
+        currentStretchIndex: 6,
+        completedStretches: [0, 1, 2, 3, 4, 5],
+      })
+    );
+
+    renderStretchingRoutine();
+
+    // Side-Bend Stretch has no videoUrl
+    expect(screen.getByText('Side-Bend Stretch')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /play video/i })).not.toBeInTheDocument();
+  });
 });

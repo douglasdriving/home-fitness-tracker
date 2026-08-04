@@ -71,6 +71,37 @@ describe('WarmupRoutine', () => {
     expect(screen.queryByText(/Total warmup/)).not.toBeInTheDocument();
   });
 
+  it('shows instructions inline under the heading instead of behind a modal', () => {
+    renderWarmupRoutine();
+    // Cat-Cow Flow's first instruction line
+    expect(screen.getByText(/Start on hands and knees in a tabletop position/)).toBeInTheDocument();
+    expect(screen.queryByText('How to do this move')).not.toBeInTheDocument();
+  });
+
+  it('shows an inline, click-to-play video for moves that have one', () => {
+    renderWarmupRoutine();
+    // Cat-Cow Flow has a videoUrl — should render a play button, not an autoplaying iframe
+    expect(screen.getByRole('button', { name: /play video/i })).toBeInTheDocument();
+  });
+
+  it('does not show a video section for moves without a video', () => {
+    localStorage.setItem(
+      'warmupRoutineState',
+      JSON.stringify({
+        workoutId: 'test-workout-123',
+        currentWarmupIndex: 1,
+        completedWarmups: [0],
+        targetMuscleGroup: 'abs',
+      })
+    );
+
+    renderWarmupRoutine();
+
+    // Trunk Rotations has no videoUrl
+    expect(screen.getByText('Trunk Rotations')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /play video/i })).not.toBeInTheDocument();
+  });
+
   it('still shows the "Target" rep count for rep-based moves (not shown by the timer)', () => {
     localStorage.setItem(
       'warmupRoutineState',

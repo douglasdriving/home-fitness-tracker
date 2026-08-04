@@ -12,7 +12,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getWarmupForMuscleGroup } from '../data/warmupData';
 import Timer from '../components/workout/Timer';
-import StretchModal from '../components/workout/StretchModal';
+import InlineVideoPlayer from '../components/workout/InlineVideoPlayer';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { MuscleGroup } from '../types/exercise';
 
@@ -40,7 +40,6 @@ export default function WarmupRoutine() {
   }, [targetMuscleGroup]);
 
   const [currentWarmupIndex, setCurrentWarmupIndex] = useState(0);
-  const [showWarmupModal, setShowWarmupModal] = useState(false);
   const [completedWarmups, setCompletedWarmups] = useState<Set<number>>(new Set());
   const [isInitialized, setIsInitialized] = useState(false);
 
@@ -173,6 +172,14 @@ export default function WarmupRoutine() {
               </div>
             )}
           </div>
+
+          {currentWarmup.instructions.length > 0 && (
+            <ol className="list-decimal list-inside space-y-1 text-sm text-text-muted leading-relaxed">
+              {currentWarmup.instructions.map((instruction, idx) => (
+                <li key={idx}>{instruction}</li>
+              ))}
+            </ol>
+          )}
         </div>
 
         {/* Timer */}
@@ -186,22 +193,14 @@ export default function WarmupRoutine() {
           />
         </div>
 
-        {/* Warmup Help Button */}
-        <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
-          <button
-            onClick={() => setShowWarmupModal(true)}
-            className="w-full flex items-center justify-center gap-2 text-orange-500 hover:text-orange-600 transition-colors"
-          >
-            <span className="text-xl">❓</span>
-            <span className="text-sm font-medium">How to do this move</span>
-          </button>
-        </div>
+        {/* Video (click-to-play, scroll down to find it) */}
+        {currentWarmup.videoUrl && (
+          <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
+            <h3 className="text-sm font-medium text-text-muted mb-3">Watch how it&apos;s done</h3>
+            <InlineVideoPlayer videoUrl={currentWarmup.videoUrl} title={currentWarmup.name} />
+          </div>
+        )}
       </div>
-
-      {/* Warmup Modal */}
-      {showWarmupModal && (
-        <StretchModal stretch={currentWarmup} onClose={() => setShowWarmupModal(false)} />
-      )}
     </div>
   );
 }

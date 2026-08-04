@@ -14,10 +14,6 @@ vi.mock('./McgillTimer', () => ({
   default: () => <div data-testid="mcgill-timer">Mock McgillTimer</div>,
 }));
 
-// Mock the ExerciseModal component
-vi.mock('./ExerciseModal', () => ({
-  default: () => <div data-testid="exercise-modal">Mock Exercise Modal</div>,
-}));
 
 describe('ExercisePhase - Coaching Tips', () => {
   const baseExercise: Exercise = {
@@ -123,6 +119,53 @@ describe('ExercisePhase - Coaching Tips', () => {
   it('does not render a redundant "Set Progress" section (the workout-level progress bar is enough)', () => {
     render(<ExercisePhase {...baseProps} />);
     expect(screen.queryByText('Set Progress')).not.toBeInTheDocument();
+  });
+
+  it('shows the exercise description inline under the heading instead of behind a modal', () => {
+    render(<ExercisePhase {...baseProps} />);
+    expect(screen.getByText('Test description')).toBeInTheDocument();
+    expect(screen.queryByText('How to do this exercise')).not.toBeInTheDocument();
+  });
+
+  it('shows an inline, click-to-play video for exercises that have one', () => {
+    const exerciseWithVideo: Exercise = {
+      ...baseExercise,
+      videoUrl: 'https://www.youtube.com/watch?v=kqnua4rHVVA',
+    };
+
+    render(<ExercisePhase {...baseProps} exercise={exerciseWithVideo} />);
+
+    expect(screen.getByRole('button', { name: /play video/i })).toBeInTheDocument();
+  });
+
+  it('does not show a video section for exercises without a video', () => {
+    render(<ExercisePhase {...baseProps} />);
+    expect(screen.queryByRole('button', { name: /play video/i })).not.toBeInTheDocument();
+  });
+
+  it('shows the full difficulty ladder for exercises that have one', () => {
+    const exerciseWithLadder: Exercise = {
+      ...baseExercise,
+      ladder: {
+        startReps: 8,
+        advanceReps: 15,
+        rungs: [
+          { name: 'Kitchen counter (waist height)', description: 'Hands on the counter edge.' },
+          { name: 'Low bookcase (mid-thigh height)', description: 'Hands on a low, sturdy surface.' },
+        ],
+      },
+    };
+
+    render(
+      <ExercisePhase
+        {...baseProps}
+        exercise={exerciseWithLadder}
+        currentExercise={{ ...baseWorkoutExercise, ladderRung: 0 }}
+      />
+    );
+
+    expect(screen.getByText('Difficulty ladder')).toBeInTheDocument();
+    expect(screen.getByText(/Low bookcase \(mid-thigh height\)/)).toBeInTheDocument();
   });
 
   it('shows coaching tip for all 4 target exercises', () => {

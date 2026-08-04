@@ -6,7 +6,7 @@
  * movement rehearsal and joint priming are what the pre-session block delivers.
  *
  * WarmupExercise is structurally compatible with StretchExercise so the existing
- * Timer and StretchModal components can be reused unchanged. Every move is
+ * Timer and InlineVideoPlayer components can be reused unchanged. Every move is
  * timer-driven by `duration`; rep-based moves (bird dogs, leg swings, hinges)
  * carry an optional `reps` count that approximates the duration and is surfaced
  * for display only.
