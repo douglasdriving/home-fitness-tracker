@@ -24,6 +24,12 @@ describe('McgillTimer', () => {
     expect(screen.getByText('Start')).toBeInTheDocument();
   });
 
+  it('does not wrap itself in its own boxed card (avoids double-boxing inside the parent card)', () => {
+    const { container } = render(<McgillTimer rounds={3} holdDuration={10} />);
+    expect(container.querySelector('.bg-gray-50')).not.toBeInTheDocument();
+    expect(container.querySelector('.border-gray-200')).not.toBeInTheDocument();
+  });
+
   it('starts on left side hold when Start is clicked', () => {
     render(<McgillTimer rounds={3} holdDuration={10} />);
 

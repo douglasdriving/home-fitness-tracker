@@ -66,7 +66,7 @@ These three screens share the same underlying UI, so fixes here apply across all
 
 - [x] Remove the duplicate skip control: currently there's a skip-on-timer *and* a separate skip-exercise button, which do almost the same thing. Pressing skip on the timer should just advance to the next exercise; remove the redundant bottom "skip" button. (P1)
 - [x] Remove the duplicate progress bar under the timer — the progress bar at the top of the screen is enough. (P2)
-- [ ] Reduce box nesting around the timer — the timer is boxed inside another box; it should sit directly on the page background. (P3)
+- [x] Reduce box nesting around the timer — the timer is boxed inside another box; it should sit directly on the page background. (P3)
 - [ ] Remove the redundant "Duration: 60 seconds" header text when the timer itself already displays the countdown. (P2)
 - [ ] Remove the "Total warmup is about 3 minutes" summary text at the bottom of the warmup screen — not useful. (P3)
 - [ ] 💡 Move exercise how-to content inline instead of behind a "How to do this move" modal: embed the video (user-initiated play, not autoplay) and instructions directly on the page, reachable by scrolling down. (P2)

@@ -226,9 +226,9 @@ export default function Timer({
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <div>
       <div className="flex justify-between items-center mb-2">
-        <span className="text-sm font-medium text-gray-700">
+        <span className="text-sm font-medium text-text-muted">
           {getStatusText()}
         </span>
         <span className="text-2xl font-bold text-primary">
@@ -238,7 +238,7 @@ export default function Timer({
 
       {/* Progress bar - hide for count-up timers (unless bilateral) */}
       {(bilateral || !countUp) && (
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+        <div className="w-full bg-background-lighter rounded-full h-2 mb-3">
           <div
             className="bg-primary h-2 rounded-full transition-all"
             style={{ width: `${progress}%` }}
@@ -258,7 +258,7 @@ export default function Timer({
             timeLeft > 0 && (
               <button
                 onClick={resetTimer}
-                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-background-lighter text-text px-4 py-2 rounded-lg font-medium hover:bg-background-lighter/80 transition-colors"
               >
                 Reset
               </button>
@@ -267,7 +267,7 @@ export default function Timer({
             timeLeft > 0 && (
               <button
                 onClick={skipTimer}
-                className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+                className="flex-1 bg-background-lighter text-text px-4 py-2 rounded-lg font-medium hover:bg-background-lighter/80 transition-colors"
               >
                 Skip
               </button>

@@ -281,7 +281,7 @@ export default function McgillTimer({
   };
 
   return (
-    <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <div>
       {/* Status and side indicator */}
       <div className="flex justify-between items-center mb-2">
         <div className="flex items-center gap-2">
@@ -290,7 +290,7 @@ export default function McgillTimer({
               {getSideIndicator()}
             </span>
           )}
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-text-muted">
             {getStatusText()}
           </span>
         </div>
@@ -300,7 +300,7 @@ export default function McgillTimer({
       </div>
 
       {/* Progress bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+      <div className="w-full bg-background-lighter rounded-full h-2 mb-3">
         <div
           className="bg-primary h-2 rounded-full transition-all"
           style={{ width: `${Math.min(100, progress)}%` }}
@@ -340,7 +340,7 @@ export default function McgillTimer({
             </button>
             <button
               onClick={handleSkip}
-              className="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-300 transition-colors"
+              className="flex-1 bg-background-lighter text-text px-4 py-2 rounded-lg font-medium hover:bg-background-lighter/80 transition-colors"
             >
               Skip
             </button>
