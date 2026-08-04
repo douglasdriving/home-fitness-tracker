@@ -75,6 +75,11 @@ describe('StretchingRoutine - No Rest Timer Between Stretches', () => {
     expect(screen.queryByText(/of .* completed/)).not.toBeInTheDocument();
   });
 
+  it('does not render a redundant "Duration" label (the timer already shows it)', () => {
+    renderStretchingRoutine();
+    expect(screen.queryByText('Duration')).not.toBeInTheDocument();
+  });
+
   it('calculates progress without rest periods', () => {
     renderStretchingRoutine();
 

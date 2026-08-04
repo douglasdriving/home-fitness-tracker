@@ -60,6 +60,31 @@ describe('WarmupRoutine', () => {
     expect(screen.queryByText(/of .* completed/)).not.toBeInTheDocument();
   });
 
+  it('does not render a redundant "Duration" label for a timed move (the timer already shows it)', () => {
+    renderWarmupRoutine();
+    // Cat-Cow Flow is duration-only (no reps) — the Timer card already shows 60s
+    expect(screen.queryByText('Duration')).not.toBeInTheDocument();
+  });
+
+  it('still shows the "Target" rep count for rep-based moves (not shown by the timer)', () => {
+    localStorage.setItem(
+      'warmupRoutineState',
+      JSON.stringify({
+        workoutId: 'test-workout-123',
+        currentWarmupIndex: 3,
+        completedWarmups: [0, 1, 2],
+        targetMuscleGroup: 'abs',
+      })
+    );
+
+    renderWarmupRoutine();
+
+    // Fourth abs move is Slow Bird Dogs (reps: 8)
+    expect(screen.getByText('Slow Bird Dogs')).toBeInTheDocument();
+    expect(screen.getByText('Target')).toBeInTheDocument();
+    expect(screen.getByText('~8 reps')).toBeInTheDocument();
+  });
+
   it('shows different moves for a different muscle group', () => {
     mockLocationState = { workoutId: 'w-2', targetMuscleGroup: 'upperBody' };
     renderWarmupRoutine();

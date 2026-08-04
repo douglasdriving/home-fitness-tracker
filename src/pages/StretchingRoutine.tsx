@@ -185,25 +185,17 @@ export default function StretchingRoutine() {
       <div className="p-4 space-y-6">
         {/* Stretch Info */}
         <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <div className="flex justify-between items-start mb-4">
-            <div>
-              <h2 className="text-2xl font-bold text-text mb-2">{currentStretch.name}</h2>
-              <div className="flex flex-wrap gap-2">
-                {currentStretch.targetMuscles.map((muscle, idx) => (
-                  <span
-                    key={idx}
-                    className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full font-semibold"
-                  >
-                    {muscle}
-                  </span>
-                ))}
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="text-sm text-text-muted">Duration</div>
-              <div className="text-lg font-bold text-purple-600">
-                {currentStretch.duration}s
-              </div>
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-text mb-2">{currentStretch.name}</h2>
+            <div className="flex flex-wrap gap-2">
+              {currentStretch.targetMuscles.map((muscle, idx) => (
+                <span
+                  key={idx}
+                  className="text-xs bg-purple-600 text-white px-2 py-1 rounded-full font-semibold"
+                >
+                  {muscle}
+                </span>
+              ))}
             </div>
           </div>
 

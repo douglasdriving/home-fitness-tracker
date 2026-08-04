@@ -167,14 +167,15 @@ export default function WarmupRoutine() {
                 ))}
               </div>
             </div>
-            <div className="text-right">
-              <div className="text-sm text-text-muted">
-                {currentWarmup.reps ? 'Target' : 'Duration'}
+            {/* Only rep counts are shown here — duration is already covered by the timer below */}
+            {currentWarmup.reps && (
+              <div className="text-right">
+                <div className="text-sm text-text-muted">Target</div>
+                <div className="text-lg font-bold text-orange-500">
+                  ~{currentWarmup.reps} reps
+                </div>
               </div>
-              <div className="text-lg font-bold text-orange-500">
-                {currentWarmup.reps ? `~${currentWarmup.reps} reps` : `${currentWarmup.duration}s`}
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
