@@ -54,6 +54,11 @@ describe('WarmupRoutine', () => {
     expect(screen.getByText(new RegExp(`Move 1 of ${total}`))).toBeInTheDocument();
   });
 
+  it('does not render the timer\'s own progress bar (header bar is enough)', () => {
+    const { container } = renderWarmupRoutine();
+    expect(container.querySelector('.bg-primary.h-2.rounded-full')).not.toBeInTheDocument();
+  });
+
   it('shows different moves for a different muscle group', () => {
     mockLocationState = { workoutId: 'w-2', targetMuscleGroup: 'upperBody' };
     renderWarmupRoutine();
@@ -82,24 +87,29 @@ describe('WarmupRoutine', () => {
     confirmSpy.mockRestore();
   });
 
-  it('Skip This Exercise advances to the next move without leaving the page', () => {
+  it('does not render a redundant "Skip This Exercise" button', () => {
+    renderWarmupRoutine();
+    expect(screen.queryByText('Skip This Exercise')).not.toBeInTheDocument();
+  });
+
+  it('skipping the timer advances to the next move without leaving the page', () => {
     renderWarmupRoutine();
     expect(screen.getByText('Cat-Cow Flow')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByText('Skip This Exercise'));
+    fireEvent.click(screen.getByText('Skip'));
 
     // Second abs move is Trunk Rotations
     expect(screen.getByText('Trunk Rotations')).toBeInTheDocument();
     expect(mockNavigate).not.toHaveBeenCalled();
   });
 
-  it('skipping past the last move navigates to /workout', () => {
+  it('skipping the timer past the last move navigates to /workout', () => {
     renderWarmupRoutine();
     const total = getWarmupForMuscleGroup('abs').length;
 
-    // Skip through every move
+    // Skip through every move via the timer's skip control
     for (let i = 0; i < total; i++) {
-      fireEvent.click(screen.getByText('Skip This Exercise'));
+      fireEvent.click(screen.getByText('Skip'));
     }
 
     expect(mockNavigate).toHaveBeenCalledWith('/workout');
@@ -107,7 +117,7 @@ describe('WarmupRoutine', () => {
 
   it('persists in-progress state to localStorage', () => {
     renderWarmupRoutine();
-    fireEvent.click(screen.getByText('Skip This Exercise'));
+    fireEvent.click(screen.getByText('Skip'));
 
     const saved = localStorage.getItem('warmupRoutineState');
     expect(saved).not.toBeNull();

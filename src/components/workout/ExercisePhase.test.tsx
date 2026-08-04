@@ -4,14 +4,22 @@ import ExercisePhase from './ExercisePhase';
 import { WorkoutExercise, Set as WorkoutSet } from '../../types/workout';
 import { Exercise } from '../../types/exercise';
 
-// Mock the Timer component
+// Mock the Timer component (captures props so we can assert on how it's invoked)
 vi.mock('./Timer', () => ({
-  default: () => <div data-testid="timer">Mock Timer</div>,
+  default: (props: { hideProgressBar?: boolean }) => (
+    <div data-testid="timer" data-hide-progress-bar={String(!!props.hideProgressBar)}>
+      Mock Timer
+    </div>
+  ),
 }));
 
-// Mock the McgillTimer component
+// Mock the McgillTimer component (captures props so we can assert on how it's invoked)
 vi.mock('./McgillTimer', () => ({
-  default: () => <div data-testid="mcgill-timer">Mock McgillTimer</div>,
+  default: (props: { hideProgressBar?: boolean }) => (
+    <div data-testid="mcgill-timer" data-hide-progress-bar={String(!!props.hideProgressBar)}>
+      Mock McgillTimer
+    </div>
+  ),
 }));
 
 // Mock the ExerciseModal component
@@ -153,5 +161,65 @@ describe('ExercisePhase - Coaching Tips', () => {
 
       unmount();
     });
+  });
+});
+
+describe('ExercisePhase - Timer progress bar', () => {
+  const timedExercise: Exercise = {
+    id: 'test-timed-exercise-001',
+    name: 'Test Timed Exercise',
+    emoji: '⏱️',
+    primaryMuscleGroup: 'abs',
+    muscleGroups: ['abs'],
+    description: 'Test description',
+    source: 'Test Source',
+    heavinessScore: { abs: 5, glutes: 0, lowerBack: 0, upperBody: 0 },
+    type: 'timed',
+  };
+
+  const timedWorkoutExercise: WorkoutExercise = {
+    exerciseId: 'test-timed-exercise-001',
+    exerciseName: 'Test Timed Exercise',
+    muscleGroups: ['abs'],
+    sets: [{ setNumber: 1, targetDuration: 30, completed: false }],
+    restTime: 60,
+  };
+
+  const baseProps = {
+    currentExercise: timedWorkoutExercise,
+    currentExerciseIndex: 0,
+    currentSetIndex: 0,
+    totalExercises: 3,
+    exercise: timedExercise,
+    isFirstTime: false,
+    previousNote: '',
+    onCompleteSet: vi.fn(),
+  };
+
+  it('tells the plain Timer to hide its own progress bar', () => {
+    render(
+      <ExercisePhase
+        {...baseProps}
+        currentSet={{ setNumber: 1, targetDuration: 30, completed: false }}
+      />
+    );
+
+    expect(screen.getByTestId('timer').dataset.hideProgressBar).toBe('true');
+  });
+
+  it('tells the McgillTimer to hide its own progress bar', () => {
+    render(
+      <ExercisePhase
+        {...baseProps}
+        currentSet={{
+          setNumber: 1,
+          mcgillRounds: 3,
+          mcgillHoldDuration: 10,
+          completed: false,
+        }}
+      />
+    );
+
+    expect(screen.getByTestId('mcgill-timer').dataset.hideProgressBar).toBe('true');
   });
 });
