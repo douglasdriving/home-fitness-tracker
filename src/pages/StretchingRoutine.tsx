@@ -220,28 +220,6 @@ export default function StretchingRoutine() {
           />
         </div>
 
-        {/* Progress Indicators */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <h3 className="text-sm font-medium text-text-muted mb-3">Stretch Progress</h3>
-          <div className="flex gap-2 flex-wrap">
-            {activeRoutine.map((_, index) => (
-              <div
-                key={index}
-                className={`flex-1 min-w-[40px] h-2 rounded-full transition-colors ${
-                  completedStretches.has(index)
-                    ? 'bg-purple-600'
-                    : index === currentStretchIndex
-                    ? 'bg-purple-400'
-                    : 'bg-background-lighter'
-                }`}
-              />
-            ))}
-          </div>
-          <div className="mt-2 text-xs text-text-muted text-center">
-            {completedStretches.size} of {activeRoutine.length} completed
-          </div>
-        </div>
-
         {/* Stretch Help Button */}
         <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
           <button

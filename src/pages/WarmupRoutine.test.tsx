@@ -54,6 +54,12 @@ describe('WarmupRoutine', () => {
     expect(screen.getByText(new RegExp(`Move 1 of ${total}`))).toBeInTheDocument();
   });
 
+  it('does not render a redundant per-move progress section (header progress bar is enough)', () => {
+    renderWarmupRoutine();
+    expect(screen.queryByText('Warmup Progress')).not.toBeInTheDocument();
+    expect(screen.queryByText(/of .* completed/)).not.toBeInTheDocument();
+  });
+
   it('shows different moves for a different muscle group', () => {
     mockLocationState = { workoutId: 'w-2', targetMuscleGroup: 'upperBody' };
     renderWarmupRoutine();

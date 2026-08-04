@@ -69,6 +69,12 @@ describe('StretchingRoutine - No Rest Timer Between Stretches', () => {
     }
   });
 
+  it('does not render a redundant per-stretch progress section (header progress bar is enough)', () => {
+    renderStretchingRoutine();
+    expect(screen.queryByText('Stretch Progress')).not.toBeInTheDocument();
+    expect(screen.queryByText(/of .* completed/)).not.toBeInTheDocument();
+  });
+
   it('calculates progress without rest periods', () => {
     renderStretchingRoutine();
 

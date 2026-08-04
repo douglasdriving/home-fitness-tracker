@@ -243,25 +243,6 @@ export default function ExercisePhase({
         </Button>
       </div>
 
-      {/* All Sets Progress */}
-      <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-        <h3 className="text-sm font-medium text-text-muted mb-3">Set Progress</h3>
-        <div className="flex gap-2">
-          {currentExercise.sets.map((set, index) => (
-            <div
-              key={index}
-              className={`flex-1 h-2 rounded-full transition-colors ${
-                set.completed
-                  ? 'bg-primary'
-                  : index === currentSetIndex
-                  ? 'bg-primary/50'
-                  : 'bg-background-lighter'
-              }`}
-            />
-          ))}
-        </div>
-      </div>
-
       {/* Exercise Help Button */}
       <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
         <button

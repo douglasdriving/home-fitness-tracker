@@ -189,28 +189,6 @@ export default function WarmupRoutine() {
           />
         </div>
 
-        {/* Progress Indicators */}
-        <div className="bg-background-light rounded-lg shadow-lg p-6 border border-background-lighter">
-          <h3 className="text-sm font-medium text-text-muted mb-3">Warmup Progress</h3>
-          <div className="flex gap-2 flex-wrap">
-            {activeRoutine.map((_, index) => (
-              <div
-                key={index}
-                className={`flex-1 min-w-[40px] h-2 rounded-full transition-colors ${
-                  completedWarmups.has(index)
-                    ? 'bg-orange-500'
-                    : index === currentWarmupIndex
-                    ? 'bg-orange-300'
-                    : 'bg-background-lighter'
-                }`}
-              />
-            ))}
-          </div>
-          <div className="mt-2 text-xs text-text-muted text-center">
-            {completedWarmups.size} of {activeRoutine.length} completed
-          </div>
-        </div>
-
         {/* Warmup Help Button */}
         <div className="bg-background-light rounded-lg shadow-lg p-4 border border-background-lighter">
           <button

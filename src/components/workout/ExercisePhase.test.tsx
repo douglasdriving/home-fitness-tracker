@@ -120,6 +120,11 @@ describe('ExercisePhase - Coaching Tips', () => {
     expect(tipContainer?.className).toMatch(/border-secondary/);
   });
 
+  it('does not render a redundant "Set Progress" section (the workout-level progress bar is enough)', () => {
+    render(<ExercisePhase {...baseProps} />);
+    expect(screen.queryByText('Set Progress')).not.toBeInTheDocument();
+  });
+
   it('shows coaching tip for all 4 target exercises', () => {
     const exercises: Array<{ id: string; tip: string }> = [
       {
