@@ -34,18 +34,6 @@ describe('McgillTimer', () => {
     expect(screen.getByText(/Left Side — Hold 1 of 3/)).toBeInTheDocument();
   });
 
-  it('renders its own progress bar by default', () => {
-    const { container } = render(<McgillTimer rounds={3} holdDuration={10} />);
-    expect(container.querySelector('.bg-primary.h-2.rounded-full')).toBeInTheDocument();
-  });
-
-  it('hides its own progress bar when hideProgressBar is set', () => {
-    const { container } = render(
-      <McgillTimer rounds={3} holdDuration={10} hideProgressBar />
-    );
-    expect(container.querySelector('.bg-primary.h-2.rounded-full')).not.toBeInTheDocument();
-  });
-
   it('progresses through all left-side rounds before transitioning', () => {
     const onComplete = vi.fn();
     render(

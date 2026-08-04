@@ -194,14 +194,12 @@ export default function ExercisePhase({
                 holdDuration={currentSet.mcgillHoldDuration}
                 restBetweenRounds={exercise.mcgillDefaults?.restBetweenRounds || 5}
                 perSide={exercise.countingMethod === 'per-side'}
-                hideProgressBar
               />
             ) : (
               <Timer
                 key={`timer-${currentExerciseIndex}-${currentSetIndex}`}
                 duration={currentSet.targetDuration || 30}
                 bilateral={exercise.countingMethod === 'per-side'}
-                hideProgressBar
               />
             )}
           </div>

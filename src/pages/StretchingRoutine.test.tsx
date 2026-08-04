@@ -69,11 +69,6 @@ describe('StretchingRoutine - No Rest Timer Between Stretches', () => {
     }
   });
 
-  it('does not render the timer\'s own progress bar (header bar is enough)', () => {
-    const { container } = renderStretchingRoutine();
-    expect(container.querySelector('.bg-primary.h-2.rounded-full')).not.toBeInTheDocument();
-  });
-
   it('calculates progress without rest periods', () => {
     renderStretchingRoutine();
 

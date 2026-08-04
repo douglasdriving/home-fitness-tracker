@@ -8,6 +8,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { stretchingRoutine, getStretchesForMuscleGroup } from '../data/stretchingData';
 import Timer from '../components/workout/Timer';
+import Button from '../components/common/Button';
 import StretchModal from '../components/workout/StretchModal';
 import { db } from '../db/db';
 import { useWakeLock } from '../hooks/useWakeLock';
@@ -161,6 +162,14 @@ export default function StretchingRoutine() {
     }
   };
 
+  const handleSkipStretch = () => {
+    if (isLastStretch) {
+      handleRoutineComplete();
+    } else {
+      setCurrentStretchIndex(currentStretchIndex + 1);
+    }
+  };
+
   return (
     <div className="bg-background min-h-screen">
       {/* Header */}
@@ -217,7 +226,6 @@ export default function StretchingRoutine() {
             onComplete={handleStretchComplete}
             autoStart={false}
             bilateral={currentStretch.bilateral}
-            hideProgressBar
           />
         </div>
 
@@ -252,6 +260,13 @@ export default function StretchingRoutine() {
             <span className="text-xl">❓</span>
             <span className="text-sm font-medium">How to do this stretch</span>
           </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          <Button onClick={handleSkipStretch} fullWidth variant="secondary">
+            Skip This Stretch
+          </Button>
         </div>
 
         {/* Total Time Remaining */}

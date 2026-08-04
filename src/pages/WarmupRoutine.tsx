@@ -12,6 +12,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getWarmupForMuscleGroup } from '../data/warmupData';
 import Timer from '../components/workout/Timer';
+import Button from '../components/common/Button';
 import StretchModal from '../components/workout/StretchModal';
 import { useWakeLock } from '../hooks/useWakeLock';
 import { MuscleGroup } from '../types/exercise';
@@ -122,6 +123,14 @@ export default function WarmupRoutine() {
     }
   };
 
+  const handleSkipWarmup = () => {
+    if (isLastWarmup) {
+      goToWorkout();
+    } else {
+      setCurrentWarmupIndex(currentWarmupIndex + 1);
+    }
+  };
+
   // Defensive guard: if there are no moves for this group, don't crash —
   // proceed straight to the workout. (Every group/generic has ≥1 move today.)
   if (!currentWarmup) {
@@ -186,7 +195,6 @@ export default function WarmupRoutine() {
             onComplete={handleWarmupComplete}
             autoStart={false}
             bilateral={currentWarmup.bilateral}
-            hideProgressBar
           />
         </div>
 
@@ -221,6 +229,13 @@ export default function WarmupRoutine() {
             <span className="text-xl">❓</span>
             <span className="text-sm font-medium">How to do this move</span>
           </button>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-3">
+          <Button onClick={handleSkipWarmup} fullWidth variant="secondary">
+            Skip This Exercise
+          </Button>
         </div>
 
         {/* Total Time */}

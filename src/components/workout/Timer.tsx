@@ -6,7 +6,6 @@ interface TimerProps {
   onComplete?: () => void;
   autoStart?: boolean;
   hideControls?: boolean; // Hide start/pause/skip buttons
-  hideProgressBar?: boolean; // Hide the timer's own progress bar (e.g. when a screen-level bar already covers it)
   countUp?: boolean; // Count up from 0 instead of down from duration
   showSecondsOnly?: boolean; // Show only seconds, no minutes formatting
   bilateral?: boolean; // Run timer twice (for exercises done on both sides)
@@ -18,7 +17,6 @@ export default function Timer({
   onComplete,
   autoStart = false,
   hideControls = false,
-  hideProgressBar = false,
   countUp = false,
   showSecondsOnly = false,
   bilateral = false,
@@ -238,8 +236,8 @@ export default function Timer({
         </span>
       </div>
 
-      {/* Progress bar - hide for count-up timers (unless bilateral), or when explicitly suppressed */}
-      {!hideProgressBar && (bilateral || !countUp) && (
+      {/* Progress bar - hide for count-up timers (unless bilateral) */}
+      {(bilateral || !countUp) && (
         <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
           <div
             className="bg-primary h-2 rounded-full transition-all"

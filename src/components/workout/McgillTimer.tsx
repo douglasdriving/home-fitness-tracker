@@ -34,7 +34,6 @@ interface McgillTimerProps {
   restBetweenRounds?: number;  // Rest between rounds within a side (default 5)
   transitionDuration?: number; // Rest when switching sides (default 10)
   perSide?: boolean;           // Whether the exercise is bilateral (default true for backward compat)
-  hideProgressBar?: boolean;   // Hide the timer's own progress bar (e.g. when a screen-level bar already covers it)
   onComplete?: () => void;
 }
 
@@ -44,7 +43,6 @@ export default function McgillTimer({
   restBetweenRounds = 5,
   transitionDuration = 10,
   perSide = true,
-  hideProgressBar = false,
   onComplete,
 }: McgillTimerProps) {
   const [phase, setPhase] = useState<McgillPhase>('idle');
@@ -302,14 +300,12 @@ export default function McgillTimer({
       </div>
 
       {/* Progress bar */}
-      {!hideProgressBar && (
-        <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
-          <div
-            className="bg-primary h-2 rounded-full transition-all"
-            style={{ width: `${Math.min(100, progress)}%` }}
-          />
-        </div>
-      )}
+      <div className="w-full bg-gray-200 rounded-full h-2 mb-3">
+        <div
+          className="bg-primary h-2 rounded-full transition-all"
+          style={{ width: `${Math.min(100, progress)}%` }}
+        />
+      </div>
 
       {/* Round dots - visual indicator of rounds */}
       {phase !== 'idle' && phase !== 'complete' && rounds > 1 && (
