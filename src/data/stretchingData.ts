@@ -178,12 +178,6 @@ export const stretchingRoutine: StretchExercise[] = [
   }
 ];
 
-// Calculate total duration
-export const totalStretchingDuration = stretchingRoutine.reduce(
-  (sum, stretch) => sum + stretch.duration,
-  0
-);
-
 // Muscle-group-specific stretching for daily rotation mode
 export const muscleGroupStretches: Record<MuscleGroup, string[]> = {
   abs: ['stretch-cobra', 'stretch-lying-twist', 'stretch-side-bend'],

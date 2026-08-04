@@ -39,10 +39,6 @@ export default function WarmupRoutine() {
     return getWarmupForMuscleGroup(targetMuscleGroup);
   }, [targetMuscleGroup]);
 
-  const activeRoutineDuration = useMemo(() => {
-    return activeRoutine.reduce((sum, warmup) => sum + warmup.duration, 0);
-  }, [activeRoutine]);
-
   const [currentWarmupIndex, setCurrentWarmupIndex] = useState(0);
   const [showWarmupModal, setShowWarmupModal] = useState(false);
   const [completedWarmups, setCompletedWarmups] = useState<Set<number>>(new Set());
@@ -199,11 +195,6 @@ export default function WarmupRoutine() {
             <span className="text-xl">❓</span>
             <span className="text-sm font-medium">How to do this move</span>
           </button>
-        </div>
-
-        {/* Total Time */}
-        <div className="text-center text-sm text-text-muted">
-          Total warmup: ~{Math.ceil(activeRoutineDuration / 60)} minutes
         </div>
       </div>
 

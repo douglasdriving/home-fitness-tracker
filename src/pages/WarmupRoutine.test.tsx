@@ -66,6 +66,11 @@ describe('WarmupRoutine', () => {
     expect(screen.queryByText('Duration')).not.toBeInTheDocument();
   });
 
+  it('does not render the "Total warmup: ~X minutes" summary footer', () => {
+    renderWarmupRoutine();
+    expect(screen.queryByText(/Total warmup/)).not.toBeInTheDocument();
+  });
+
   it('still shows the "Target" rep count for rep-based moves (not shown by the timer)', () => {
     localStorage.setItem(
       'warmupRoutineState',

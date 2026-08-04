@@ -102,17 +102,8 @@ describe('StretchingRoutine - No Rest Timer Between Stretches', () => {
     expect(screen.queryByText('Relax for a moment before the next stretch')).not.toBeInTheDocument();
   });
 
-  it('does not include rest duration in total stretching time calculation', async () => {
-    // Import the stretchingRoutine to verify our expected calculation
-    const { stretchingRoutine } = await import('../data/stretchingData');
-
-    // The total duration should be sum of stretch durations only, no rest periods
-    const expectedDuration = stretchingRoutine.reduce((sum, s) => sum + s.duration, 0);
-    const expectedMinutes = Math.ceil(expectedDuration / 60);
-
+  it('does not render the "Total routine: ~X minutes" summary footer', () => {
     renderStretchingRoutine();
-
-    // The displayed total should match stretch-only time
-    expect(screen.getByText(new RegExp(`~${expectedMinutes} minutes`))).toBeInTheDocument();
+    expect(screen.queryByText(/Total routine/)).not.toBeInTheDocument();
   });
 });

@@ -40,10 +40,6 @@ export default function StretchingRoutine() {
     return stretchingRoutine;
   }, [targetMuscleGroup]);
 
-  const activeRoutineDuration = useMemo(() => {
-    return activeRoutine.reduce((sum, stretch) => sum + stretch.duration, 0);
-  }, [activeRoutine]);
-
   const [currentStretchIndex, setCurrentStretchIndex] = useState(0);
   const [showStretchModal, setShowStretchModal] = useState(false);
   const [completedStretches, setCompletedStretches] = useState<Set<number>>(new Set());
@@ -221,11 +217,6 @@ export default function StretchingRoutine() {
             <span className="text-xl">❓</span>
             <span className="text-sm font-medium">How to do this stretch</span>
           </button>
-        </div>
-
-        {/* Total Time Remaining */}
-        <div className="text-center text-sm text-text-muted">
-          Total routine: ~{Math.ceil(activeRoutineDuration / 60)} minutes
         </div>
       </div>
 
